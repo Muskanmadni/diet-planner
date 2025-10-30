@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Diet Planner - Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #f1f8e9;
+            margin-right: auto;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .input-container button {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .input-container button:hover {
+            background-color: #45a049;
+        }
+
+        .expert-contact {
+            background: #fff3e0;
+            border: 1px solid #ffe0b2;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .expert-contact h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .expert-contact input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .expert-contact button {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+            }
+            
+            .input-container button {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Smart Diet Planner</div>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/chatbot">Chatbot</a></li>
+                    <li><a href="/profile">Profile</a></li>
+                    <li><a href="/settings">Settings</a></li>
+                    <li><a href="/login" style="background: #ff6b6b; color: white;">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="text-align: center; margin: 20px 0;">Diet & Nutrition Chatbot</h1>
+        
+        <div class="chat-container">
+            <div class="chat-history" id="chatHistory">
+                <div class="message bot-message">
+                    Welcome to the Smart Diet Planner chatbot! I can help you with Pakistani diet and health matters. Ask me anything about nutrition, calories, or diet plans.
+                </div>
+            </div>
+            
+            <div class="expert-contact" id="expertContact">
+                <h3>Expert Consultation Required</h3>
+                <p>Please provide your contact details so we can connect you with an expert:</p>
+                <input type="text" id="contactInput" placeholder="Enter your phone number or email...">
+                <button onclick="submitContactDetails()">Submit</button>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Ask about Pakistani diet, health, calories..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to add a message to the chat history
+        function addMessage(text, isUser) {
+            const chatHistory = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = text;
+            chatHistory.appendChild(messageDiv);
+            
+            // Scroll to the bottom of chat history
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Function to show expert contact form
+        function showExpertContact() {
+            document.getElementById('expertContact').style.display = 'block';
+        }
+
+        // Function to hide expert contact form
+        function hideExpertContact() {
+            document.getElementById('expertContact').style.display = 'none';
+            document.getElementById('contactInput').value = '';
+        }
+
+        // Function to submit contact details
+        function submitContactDetails() {
+            const contactDetails = document.getElementById('contactInput').value.trim();
+            if (contactDetails) {
+                addMessage(`Contact details submitted: ${contactDetails}`, true);
+                addMessage("Thank you! Our expert will contact you soon.", false);
+                hideExpertContact();
+            } else {
+                alert("Please enter your contact details.");
+            }
+        }
+
+        // Main function to send message to the backend
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, true);
+            input.value = '';
+            
+            try {
+                // Show loading indicator or bot typing...
+                addMessage("Thinking...", false);
+                const loadingMessage = document.querySelector('.bot-message:last-child');
+                
+                // Send message to backend
+                const response = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_message: message })
+                });
+                
+                const data = await response.json();
+                
+                // Remove the loading message
+                if (loadingMessage) {
+                    loadingMessage.remove();
+                }
+                
+                // Add bot response to chat
+                addMessage(data.response, false);
+                
+                // Check if expert hand-off is needed
+                if (data.needs_expert) {
+                    showExpertContact();
+                }
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                // Remove the loading message
+                const loadingMessage = document.querySelector('.bot-message:last-child');
+                if (loadingMessage) {
+                    loadingMessage.remove();
+                }
+                addMessage("Sorry, there was an error processing your request. Please try again.", false);
+            }
+        }
+
+        // Handle Enter key press in the input field
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
