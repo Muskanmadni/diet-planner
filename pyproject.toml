@@ -21,5 +21,5 @@ diet-planner = "diet_planner:main"
 app ="diet_planner.app:start"
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=69.0", "wheel"]
 build-backend = "setuptools.build_meta"
