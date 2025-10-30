@@ -1,0 +1,6 @@
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+Werkzeug
+python-dotenv
+google-generativeai
