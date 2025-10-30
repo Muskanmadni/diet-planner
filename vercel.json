@@ -1,14 +1,16 @@
 {
+  "version": 2,
   "builds": [
     {
-      "src": "src/diet_planner/app.py",
-      "use": "@vercel/python"
+      "src": "wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.13" }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/diet_planner/app.py"
+      "dest": "wsgi.py"
     }
   ]
 }
