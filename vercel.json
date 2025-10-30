@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "src/diet_planner/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/diet_planner/app.py"
+    }
+  ]
+}
