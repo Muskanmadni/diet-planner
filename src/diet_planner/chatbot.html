@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Diet Planner - Chatbot</title>
+    <title>NutriGuide - Nutritionist Chatbot</title>
     <style>
         * {
             margin: 0;
@@ -190,14 +190,15 @@
 <body>
     <header>
         <div class="header-content">
-            <div class="logo">Smart Diet Planner</div>
+            <div class="logo">NutriGuide</div>
             <nav>
                 <ul>
                     <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/diet-plan">Diet Plan</a></li>
                     <li><a href="/chatbot">Chatbot</a></li>
                     <li><a href="/profile">Profile</a></li>
                     <li><a href="/settings">Settings</a></li>
-                    <li><a href="/login" style="background: #ff6b6b; color: white;">Logout</a></li>
+                    <li><button onclick="logout()" style="background: #ff6b6b; color: white; border: none; padding: 10px 15px; cursor: pointer;">Logout</button></li>
                 </ul>
             </nav>
         </div>
@@ -319,6 +320,30 @@
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
+            }
+        }
+        
+        // Logout function
+        async function logout() {
+            if(confirm('Are you sure you want to logout?')) {
+                try {
+                    const response = await fetch('/api/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        console.error('Logout failed:', await response.text());
+                        // Even if API call fails, redirect to login
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Error during logout:', error);
+                    // Redirect to login even if there's an error
+                    window.location.href = '/login';
+                }
             }
         }
     </script>
