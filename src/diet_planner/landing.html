@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriGuide - Transform Your Health Journey</title>
+    <title>NutriGuide - Personalized Meal Planning Simplified</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -26,7 +26,10 @@
         }
 
         body {
-            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/static/images/nutri.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
             min-height: 100vh;
             padding: 20px;
@@ -57,9 +60,14 @@
             align-items: center;
         }
 
-        .logo i {
+        .logo img {
+            height: 40px;
             margin-right: 10px;
-            font-size: 2rem;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: center;
         }
 
         .auth-buttons {
@@ -122,7 +130,73 @@
             margin: 30px 0;
         }
 
-        .features {
+        /* Meal Planner Generator Section */
+        .meal-planner-generator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .generator-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .generator-form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .diet-selector, .calorie-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            color: var(--dark);
+            min-width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .macro-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .macro-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 100px;
+        }
+
+        .macro-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .macro-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Benefits Section */
+        .benefits {
             display: flex;
             justify-content: center;
             gap: 30px;
@@ -133,7 +207,7 @@
             margin-right: auto;
         }
 
-        .feature-card {
+        .benefit-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
@@ -143,28 +217,126 @@
             transition: transform 0.3s;
         }
 
-        .feature-card:hover {
+        .benefit-card:hover {
             transform: translateY(-10px);
         }
 
-        .feature-icon {
+        .benefit-icon {
             font-size: 2.8rem;
             margin-bottom: 20px;
             color: #FFD54F;
         }
 
-        .feature-title {
+        .benefit-title {
             font-size: 1.4rem;
             margin-bottom: 15px;
             font-weight: 600;
         }
 
-        .feature-desc {
+        .benefit-desc {
             font-size: 1rem;
             opacity: 0.8;
         }
 
-        .how-it-works {
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            margin: 60px auto;
+            max-width: 1200px;
+        }
+        
+        .section-heading {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .section-subtitle {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            opacity: 0.9;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, background 0.3s;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .feature-desc {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .feature-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .highlight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .highlight-item i {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-top: 5px;
+        }
+        
+        .highlight-item h4 {
+            margin: 0 0 8px 0;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .highlight-item p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
@@ -174,47 +346,62 @@
             text-align: center;
         }
 
-        .how-it-works h2 {
+        .testimonials h2 {
             font-size: 2.5rem;
             margin-bottom: 40px;
         }
 
-        .steps {
+        .testimonial-cards {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 30px;
             flex-wrap: wrap;
         }
 
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 220px;
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            width: 300px;
+            text-align: left;
         }
 
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-bottom: 15px;
+        .rating {
+            color: #FFD700;
             font-size: 1.2rem;
+            margin-bottom: 15px;
         }
 
-        .step-title {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            font-weight: 600;
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 15px;
+            opacity: 0.9;
         }
 
-        .step-desc {
-            font-size: 0.95rem;
-            opacity: 0.8;
+        .testimonial-author {
+            font-weight: bold;
+        }
+
+        /* Professional Section */
+        .professional-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .professional-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .professional-section p {
+            max-width: 700px;
+            margin: 0 auto 25px;
+            font-size: 1.1rem;
         }
 
         footer {
@@ -224,6 +411,7 @@
             font-size: 0.9rem;
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -238,29 +426,156 @@
                 font-size: 1.2rem;
             }
 
-            .features {
+            .benefits {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .feature-card {
+            .benefit-card {
                 width: 100%;
                 max-width: 350px;
             }
 
-            .how-it-works {
-                padding: 40px 20px;
+            .meal-planner-generator {
+                padding: 30px 20px;
             }
 
-            .steps {
+            .generator-form {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .step {
-                width: 100%;
-                max-width: 300px;
+            .testimonials {
+                padding: 40px 20px;
             }
+
+            .testimonial-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .macro-display {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Footer Styles */
+        footer {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .footer-column {
+            text-align: left;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent, #FF9800);
+            position: relative;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--accent, #FF9800);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: block;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .footer-links a::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-links a:hover::before {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 1.5rem 0;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--primary, #4CAF50);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .copyright {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .copyright a {
+            color: var(--accent, #FF9800);
+            text-decoration: none;
+        }
+
+        .copyright a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -269,9 +584,9 @@
         <header>
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-heartbeat"></i>
-                    NutriGuide
+                    <img src="static/images/logo(2).png" alt="NutriGuide Logo" style="height: 150px; width: 200px; margin-right: 10px;">
                 </div>
+                
                 <div class="auth-buttons">
                     <a href="/login" class="btn btn-login">
                         <i class="fas fa-sign-in-alt"></i> Login
@@ -284,69 +599,176 @@
         </header>
 
         <section class="hero">
-            <h1>Transform Your Health Journey with Personalized Nutrition</h1>
-            <p class="subtitle">Get customized meal plans based on your health goals, using traditional Pakistani foods and nutrition science.</p>
+            <h1>PUT YOUR DIET ON AUTOPILOT</h1>
+            <p class="subtitle">Get custom meal plans tailored to your health goals, food preferences, and budget. No more meal planning stress!</p>
 
             <a href="/register" class="btn btn-signup cta-button">
-                <i class="fas fa-heart"></i> Start Your Transformation
+                <i class="fas fa-heart"></i> Start Your Journey
             </a>
+        </section>
 
-            <div class="features">
+
+
+        <!-- Features and Benefits Section -->
+        <section class="features">
+            <h2 class="section-heading">About NutriGuide</h2>
+            <p class="section-subtitle">Transform your health journey with our AI-powered nutrition platform</p>
+            
+            <div class="feature-cards">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-leaf"></i>
+                        <i class="fas fa-seedling"></i>
                     </div>
-                    <h3 class="feature-title">Pakistani Foods</h3>
-                    <p class="feature-desc">Traditional recipes with local ingredients that fit your cultural preferences</p>
+                    <h3 class="feature-title">AI-Powered Meal Planning</h3>
+                    <p class="feature-desc">Our intelligent system creates personalized weekly meal plans based on your health goals, dietary preferences, and nutritional needs. Perfectly balanced meals designed just for you.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-balance-scale"></i>
+                        <i class="fas fa-calculator"></i>
                     </div>
-                    <h3 class="feature-title">Weight Goals</h3>
-                    <p class="feature-desc">Plan for weight loss, gain, or maintenance based on your personal goals</p>
+                    <h3 class="feature-title">Calories Calculator</h3>
+                    <p class="feature-desc">Track every calorie with our advanced calculator. Add foods, specify quantities, and get instant calorie counts to stay on top of your nutritional goals.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-rupee-sign"></i>
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    <h3 class="feature-title">Budget-Friendly</h3>
-                    <p class="feature-desc">Healthy eating plans that work with Pakistani household budgets</p>
+                    <h3 class="feature-title">Real-Time Nutrition Tracking</h3>
+                    <p class="feature-desc">Monitor your daily calorie, protein, carbohydrate, and fat intake in real-time. See exactly how your eating habits align with your health goals.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized Health Goals</h3>
+                    <p class="feature-desc">Set custom health goals like weight loss, weight gain, or maintenance. Get tailored recommendations that evolve with your progress.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Easy-to-Use Interface</h3>
+                    <p class="feature-desc">Intuitive design that makes nutrition tracking simple. Search foods, add meals, and visualize your progress effortlessly.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Progress Visualization</h3>
+                    <p class="feature-desc">Beautiful charts and graphs to track your journey. Monitor weight changes, calorie trends, and nutritional achievements over time.</p>
+                </div>
+            </div>
+            
+            <div class="feature-highlights">
+                <div class="highlight-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Health-Focused Approach</h4>
+                        <p>Designed for users who prioritize their wellbeing with scientifically-backed nutrition plans</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Flexible Dietary Options</h4>
+                        <p>Accommodates various diets including vegetarian, vegan, keto, low-carb, and more</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Local Pakistani Cuisine</h4>
+                        <p>Features traditional Pakistani dishes with accurate nutritional information</p>
+                    </div>
+                </div>
+                
+                <div class="highlight-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h4>Beginner Friendly</h4>
+                        <p>No nutrition expertise needed - our system guides you every step of the way</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="how-it-works">
-            <h2>How It Works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3 class="step-title">Sign Up</h3>
-                    <p class="step-desc">Create your account and share your health information</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3 class="step-title">Set Goals</h3>
-                    <p class="step-desc">Define your weight goals and dietary preferences</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3 class="step-title">Get Plan</h3>
-                    <p class="step-desc">Receive your personalized weekly diet plan</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3 class="step-title">Track Progress</h3>
-                    <p class="step-desc">Monitor your journey with our tools and tips</p>
-                </div>
-            </div>
+
+
+        <!-- Professional Section -->
+        <section class="professional-section">
+            <h2>Health & Fitness Professionals</h2>
+            <p>Looking to provide better tools for your clients? NutriGuide offers specialized features for health and fitness professionals.</p>
+            <a href="/register" class="btn btn-signup">
+                <i class="fas fa-plus"></i> Learn More
+            </a>
         </section>
 
         <footer>
             <p>© 2025 NutriGuide. All rights reserved. Made for Pakistani households.</p>
         </footer>
     </div>
+
+    <script>
+        // Simple interactivity for the generator
+        document.addEventListener('DOMContentLoaded', function() {
+            const dietSelector = document.querySelector('.diet-selector');
+            const calorieInput = document.querySelector('.calorie-input');
+            const generateBtn = document.querySelector('.meal-planner-generator .btn');
+            
+            // Update macros based on selections
+            function updateMacros() {
+                const diet = dietSelector.value;
+                let carbs = 40, protein = 30, fat = 30;
+                
+                if (diet === 'keto') {
+                    carbs = 5;
+                    protein = 20;
+                    fat = 75;
+                } else if (diet === 'low-carb') {
+                    carbs = 20;
+                    protein = 30;
+                    fat = 50;
+                } else if (diet === 'high-protein') {
+                    carbs = 30;
+                    protein = 40;
+                    fat = 30;
+                }
+                
+                document.querySelectorAll('.macro-item .macro-value')[0].textContent = carbs + '%';
+                document.querySelectorAll('.macro-item .macro-value')[1].textContent = protein + '%';
+                document.querySelectorAll('.macro-item .macro-value')[2].textContent = fat + '%';
+            }
+            
+            dietSelector.addEventListener('change', updateMacros);
+            
+            // Generate plan button functionality
+            generateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const diet = dietSelector.value;
+                const calories = calorieInput.value;
+                
+                if (!diet) {
+                    alert('Please select a diet type');
+                    return;
+                }
+                
+                if (!calories || calories < 1000 || calories > 5000) {
+                    alert('Please enter valid daily calories (1000-5000)');
+                    return;
+                }
+                
+                // In a real app, this would generate the meal plan
+                alert('Meal plan generated successfully! Sign up to view your personalized plan.');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -59,9 +59,9 @@
             font-weight: bold;
         }
 
-        .logo i {
+        .logo img {
+            height: 30px;
             margin-right: 10px;
-            color: #FFD54F;
         }
 
         nav ul {
@@ -109,6 +109,187 @@
 
         .user-actions button:hover {
             background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Calories Calculator Styles */
+        .calories-calculator-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .calculator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .calculator-header h2 {
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .calculator-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calculator-form {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light);
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .food-suggestions-dropdown {
+            position: absolute;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 0.25rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .food-suggestions-dropdown.show {
+            display: block;
+        }
+
+        .food-suggestion-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .food-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .food-suggestion-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .added-foods-list {
+            margin-top: 1.5rem;
+        }
+
+        .added-foods-list h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        #foods-list-container {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .food-item-added {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .food-item-added:last-child {
+            border-bottom: none;
+        }
+
+        .food-info {
+            flex-grow: 1;
+        }
+
+        .food-name {
+            font-weight: 600;
+        }
+
+        .food-details {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .food-calories {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .remove-food-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .no-foods-message {
+            color: var(--gray);
+            text-align: center;
+            font-style: italic;
+            margin: 1rem 0;
+        }
+
+        .total-calories-display {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 1.2rem;
+        }
+
+        .total-calories-display h3 {
+            margin: 0;
+        }
+
+        .total-calories-display span {
+            font-weight: bold;
+            color: #ffeb3b; /* Yellow to highlight the total */
         }
 
         /* Hero Section */
@@ -639,8 +820,7 @@
     <header>
         <div class="header-container">
             <div class="logo">
-                <i class="fas fa-heartbeat"></i>
-                NutriGuide
+                <img src="/static/images/logo(2).png" alt="NutriGuide Logo" style="height: 150px; width: 200px; margin-right: 10px;">
             </div>
             <nav>
                 <ul>
@@ -711,96 +891,54 @@
             </div>
             
             <div class="main-content">
-                <div class="meal-planner-container">
-                    <div class="meal-plan-header">
-                        <h2>Weekly Meal Plan</h2>
-                        <div class="meal-plan-actions">
-                            <button class="btn"><i class="fas fa-plus"></i> New Plan</button>
-                            <div class="week-navigation">
-                                <button><i class="fas fa-chevron-left"></i></button>
-                                <span id="current-week">Nov 3 - Nov 9, 2025</span>
-                                <button><i class="fas fa-chevron-right"></i></button>
-                            </div>
+                <div class="calories-calculator-container">
+                    <div class="calculator-header">
+                        <h2>Calories Calculator</h2>
+                        <div class="calculator-actions">
+                            <button id="add-food-btn" class="btn"><i class="fas fa-plus"></i> Add Food</button>
+                            <button id="clear-calculator-btn" class="btn" style="background-color: #f44336;"><i class="fas fa-trash"></i> Clear All</button>
                         </div>
                     </div>
-                    
-                    <div class="days-tabs">
-                        <div class="day-tab active">Monday</div>
-                        <div class="day-tab">Tuesday</div>
-                        <div class="day-tab">Wednesday</div>
-                        <div class="day-tab">Thursday</div>
-                        <div class="day-tab">Friday</div>
-                        <div class="day-tab">Saturday</div>
-                        <div class="day-tab">Sunday</div>
+
+                    <div class="calculator-form">
+                        <div class="form-group">
+                            <label for="food-search">Search Food:</label>
+                            <input type="text" id="food-search" placeholder="Enter food name (e.g. apple, rice, chicken)" autocomplete="off">
+                            <div id="food-suggestions" class="food-suggestions-dropdown"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" id="quantity" placeholder="Amount" min="1" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="unit">Unit:</label>
+                                <select id="unit">
+                                    <option value="piece">Piece</option>
+                                    <option value="gram">Gram (g)</option>
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="oz">Ounce (oz)</option>
+                                    <option value="lb">Pound (lb)</option>
+                                    <option value="cup">Cup</option>
+                                    <option value="tbsp">Tablespoon</option>
+                                    <option value="tsp">Teaspoon</option>
+                                    <option value="ml">Milliliter (ml)</option>
+                                    <option value="l">Liter (l)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="calculate-btn" class="btn" style="width: 100%; background-color: #2196F3;">
+                            <i class="fas fa-calculator"></i> Calculate Calories
+                        </button>
                     </div>
-                    
-                    <div class="meals-container">
-                        <div class="meal-card">
-                            <div class="meal-header">
-                                <i class="fas fa-sun"></i> Breakfast
-                            </div>
-                            <div class="meal-body">
-                                <div class="meal-item">
-                                    <div class="meal-title">Oatmeal with Berries</div>
-                                    <div class="meal-calories">350 kcal</div>
-                                </div>
-                                <div class="meal-item">
-                                    <div class="meal-title">Green Tea</div>
-                                    <div class="meal-calories">5 kcal</div>
-                                </div>
-                                <a href="#" class="add-meal-btn"><i class="fas fa-plus"></i> Add Item</a>
-                            </div>
+
+                    <div class="added-foods-list">
+                        <h3>Added Foods</h3>
+                        <div id="foods-list-container">
+                            <p class="no-foods-message">No foods added yet. Search and add foods to calculate total calories.</p>
                         </div>
-                        
-                        <div class="meal-card">
-                            <div class="meal-header">
-                                <i class="fas fa-utensils"></i> Lunch
-                            </div>
-                            <div class="meal-body">
-                                <div class="meal-item">
-                                    <div class="meal-title">Grilled Chicken Salad</div>
-                                    <div class="meal-calories">420 kcal</div>
-                                </div>
-                                <div class="meal-item">
-                                    <div class="meal-title">Whole Wheat Bread</div>
-                                    <div class="meal-calories">120 kcal</div>
-                                </div>
-                                <a href="#" class="add-meal-btn"><i class="fas fa-plus"></i> Add Item</a>
-                            </div>
-                        </div>
-                        
-                        <div class="meal-card">
-                            <div class="meal-header">
-                                <i class="fas fa-ice-cream"></i> Snack
-                            </div>
-                            <div class="meal-body">
-                                <div class="meal-item">
-                                    <div class="meal-title">Greek Yogurt</div>
-                                    <div class="meal-calories">150 kcal</div>
-                                </div>
-                                <div class="meal-item">
-                                    <div class="meal-title">Mixed Nuts</div>
-                                    <div class="meal-calories">180 kcal</div>
-                                </div>
-                                <a href="#" class="add-meal-btn"><i class="fas fa-plus"></i> Add Item</a>
-                            </div>
-                        </div>
-                        
-                        <div class="meal-card">
-                            <div class="meal-header">
-                                <i class="fas fa-moon"></i> Dinner
-                            </div>
-                            <div class="meal-body">
-                                <div class="meal-item">
-                                    <div class="meal-title">Salmon with Vegetables</div>
-                                    <div class="meal-calories">450 kcal</div>
-                                </div>
-                                <div class="meal-item">
-                                    <div class="meal-title">Brown Rice</div>
-                                    <div class="meal-calories">200 kcal</div>
-                                </div>
-                                <a href="#" class="add-meal-btn"><i class="fas fa-plus"></i> Add Item</a>
-                            </div>
+                        <div class="total-calories-display">
+                            <h3>Total Calories: <span id="total-calories">0</span> kcal</h3>
                         </div>
                     </div>
                 </div>
@@ -1072,6 +1210,291 @@
         
         // Load subscription status when page loads
         loadSubscriptionStatus();
+        
+        // Calories Calculator functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Food database with calorie information
+            const foodDatabase = {
+                'apple': { name: 'Apple', caloriesPerUnit: 52, unit: 'piece' },
+                'banana': { name: 'Banana', caloriesPerUnit: 89, unit: 'piece' },
+                'orange': { name: 'Orange', caloriesPerUnit: 47, unit: 'piece' },
+                'mango': { name: 'Mango', caloriesPerUnit: 60, unit: 'piece' },
+                'grapes': { name: 'Grapes', caloriesPerUnit: 69, unit: 'gram' }, // Per 100g
+                'watermelon': { name: 'Watermelon', caloriesPerUnit: 30, unit: 'gram' }, // Per 100g
+                'strawberry': { name: 'Strawberry', caloriesPerUnit: 32, unit: 'gram' }, // Per 100g
+                'blueberry': { name: 'Blueberry', caloriesPerUnit: 57, unit: 'gram' }, // Per 100g
+                'cherry': { name: 'Cherry', caloriesPerUnit: 63, unit: 'gram' }, // Per 100g
+                'peach': { name: 'Peach', caloriesPerUnit: 39, unit: 'gram' }, // Per 100g
+                'plum': { name: 'Plum', caloriesPerUnit: 46, unit: 'piece' },
+                'pineapple': { name: 'Pineapple', caloriesPerUnit: 50, unit: 'gram' }, // Per 100g
+                
+                // Grains
+                'rice': { name: 'Rice (cooked)', caloriesPerUnit: 130, unit: 'cup' }, // Per cup
+                'brown rice': { name: 'Brown Rice (cooked)', caloriesPerUnit: 216, unit: 'cup' }, // Per cup
+                'oats': { name: 'Oats (dry)', caloriesPerUnit: 389, unit: 'cup' }, // Per cup
+                'quinoa': { name: 'Quinoa (cooked)', caloriesPerUnit: 222, unit: 'cup' }, // Per cup
+                'bread': { name: 'Bread (white)', caloriesPerUnit: 79, unit: 'slice' }, // Per slice
+                'whole wheat bread': { name: 'Whole Wheat Bread', caloriesPerUnit: 70, unit: 'slice' }, // Per slice
+                'pasta': { name: 'Pasta (cooked)', caloriesPerUnit: 131, unit: 'cup' }, // Per cup
+                'noodles': { name: 'Noodles (cooked)', caloriesPerUnit: 138, unit: 'cup' }, // Per cup
+                
+                // Proteins
+                'chicken': { name: 'Chicken Breast (cooked)', caloriesPerUnit: 165, unit: 'piece' }, // Per 100g
+                'beef': { name: 'Beef (cooked)', caloriesPerUnit: 250, unit: 'piece' }, // Per 100g
+                'fish': { name: 'Fish (salmon)', caloriesPerUnit: 206, unit: 'piece' }, // Per 100g
+                'egg': { name: 'Egg', caloriesPerUnit: 70, unit: 'piece' },
+                'tofu': { name: 'Tofu', caloriesPerUnit: 144, unit: 'piece' }, // Per 100g
+                'paneer': { name: 'Paneer', caloriesPerUnit: 291, unit: 'piece' }, // Per 100g
+                'dal': { name: 'Lentils (cooked)', caloriesPerUnit: 116, unit: 'cup' }, // Per cup
+                
+                // Dairy
+                'milk': { name: 'Milk (whole)', caloriesPerUnit: 103, unit: 'cup' }, // Per cup
+                'yogurt': { name: 'Yogurt (plain)', caloriesPerUnit: 59, unit: 'cup' }, // Per cup
+                'cheese': { name: 'Cheese (cheddar)', caloriesPerUnit: 113, unit: 'slice' }, // Per slice
+                'butter': { name: 'Butter', caloriesPerUnit: 102, unit: 'tbsp' }, // Per tbsp
+                'ghee': { name: 'Ghee', caloriesPerUnit: 135, unit: 'tbsp' }, // Per tbsp
+                
+                // Vegetables
+                'spinach': { name: 'Spinach', caloriesPerUnit: 23, unit: 'cup' }, // Per cup
+                'broccoli': { name: 'Broccoli', caloriesPerUnit: 25, unit: 'cup' }, // Per cup
+                'carrot': { name: 'Carrot', caloriesPerUnit: 25, unit: 'cup' }, // Per cup
+                'potato': { name: 'Potato', caloriesPerUnit: 77, unit: 'piece' }, // Per medium potato
+                'tomato': { name: 'Tomato', caloriesPerUnit: 22, unit: 'piece' }, // Per medium tomato
+                'onion': { name: 'Onion', caloriesPerUnit: 40, unit: 'piece' }, // Per medium onion
+                'garlic': { name: 'Garlic', caloriesPerUnit: 4, unit: 'cloves' }, // Per clove
+                'ginger': { name: 'Ginger', caloriesPerUnit: 80, unit: 'tbsp' }, // Per tbsp
+                
+                // Snacks
+                'biscuit': { name: 'Biscuit', caloriesPerUnit: 40, unit: 'piece' },
+                'chips': { name: 'Chips', caloriesPerUnit: 152, unit: 'oz' }, // Per oz
+                'nuts': { name: 'Mixed Nuts', caloriesPerUnit: 163, unit: 'oz' }, // Per oz
+                'almonds': { name: 'Almonds', caloriesPerUnit: 164, unit: 'oz' }, // Per oz
+                'cashews': { name: 'Cashews', caloriesPerUnit: 157, unit: 'oz' }, // Per oz
+                'walnuts': { name: 'Walnuts', caloriesPerUnit: 185, unit: 'oz' }, // Per oz
+                'dates': { name: 'Dates', caloriesPerUnit: 282, unit: 'piece' }, // Per 100g
+                'raisins': { name: 'Raisins', caloriesPerUnit: 299, unit: 'cup' }, // Per cup
+            };
+
+            // Get DOM elements
+            const foodSearchInput = document.getElementById('food-search');
+            const quantityInput = document.getElementById('quantity');
+            const unitSelect = document.getElementById('unit');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const foodsListContainer = document.getElementById('foods-list-container');
+            const totalCaloriesSpan = document.getElementById('total-calories');
+            const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
+            const foodSuggestionsDiv = document.getElementById('food-suggestions');
+            const addFoodBtn = document.getElementById('add-food-btn');
+
+            // Added foods array
+            let addedFoods = [];
+
+            // Food search with suggestions
+            foodSearchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                // Hide suggestions if no search term
+                if (!searchTerm) {
+                    foodSuggestionsDiv.classList.remove('show');
+                    return;
+                }
+                
+                // Find matching foods
+                const matches = Object.keys(foodDatabase).filter(food => 
+                    food.includes(searchTerm)
+                );
+                
+                // Show suggestions if matches found
+                if (matches.length > 0) {
+                    foodSuggestionsDiv.innerHTML = '';
+                    matches.forEach(match => {
+                        const foodItem = foodDatabase[match];
+                        const suggestionItem = document.createElement('div');
+                        suggestionItem.className = 'food-suggestion-item';
+                        suggestionItem.textContent = `${foodItem.name} (${foodItem.unit})`;
+                        suggestionItem.addEventListener('click', function() {
+                            foodSearchInput.value = match;
+                            foodSuggestionsDiv.classList.remove('show');
+                            // Auto-select the unit based on the food
+                            if (foodItem.unit) {
+                                unitSelect.value = foodItem.unit;
+                            }
+                        });
+                        foodSuggestionsDiv.appendChild(suggestionItem);
+                    });
+                    foodSuggestionsDiv.classList.add('show');
+                } else {
+                    foodSuggestionsDiv.classList.remove('show');
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!foodSearchInput.contains(e.target) && !foodSuggestionsDiv.contains(e.target)) {
+                    foodSuggestionsDiv.classList.remove('show');
+                }
+            });
+
+            // Calculate and add food to list
+            function addFoodToList() {
+                const foodName = foodSearchInput.value.trim().toLowerCase();
+                const quantity = parseFloat(quantityInput.value);
+                
+                if (!foodName) {
+                    alert('Please enter a food name');
+                    return;
+                }
+                
+                if (!quantity || quantity <= 0) {
+                    alert('Please enter a valid quantity');
+                    return;
+                }
+                
+                // Find the food in the database
+                const foodItem = Object.keys(foodDatabase).find(key => key.includes(foodName) || foodName.includes(key));
+                if (!foodItem) {
+                    alert('Food not found. Please select a food from the suggestions.');
+                    return;
+                }
+                
+                const foodDetails = foodDatabase[foodItem];
+                const selectedUnit = unitSelect.value;
+                
+                // Calculate calories based on unit
+                let calories = 0;
+                switch(selectedUnit) {
+                    case 'piece':
+                        calories = foodDetails.caloriesPerUnit * quantity;
+                        break;
+                    case 'gram':
+                        // For grams, the calories per unit is already per gram
+                        calories = foodDetails.caloriesPerUnit * quantity;
+                        break;
+                    case 'kg':
+                        // Convert kg to grams
+                        calories = foodDetails.caloriesPerUnit * (quantity * 1000);
+                        break;
+                    case 'oz':
+                        // Convert oz to grams (1 oz ≈ 28.35g)
+                        calories = foodDetails.caloriesPerUnit * (quantity * 28.35);
+                        break;
+                    case 'lb':
+                        // Convert lb to grams (1 lb ≈ 453.592g)
+                        calories = foodDetails.caloriesPerUnit * (quantity * 453.592);
+                        break;
+                    case 'cup':
+                        calories = foodDetails.caloriesPerUnit * quantity;
+                        break;
+                    case 'tbsp':
+                        // Tablespoon to grams conversion varies by ingredient, using generic 15g per tbsp
+                        calories = foodDetails.caloriesPerUnit * (quantity * 15);
+                        break;
+                    case 'tsp':
+                        // Teaspoon to grams conversion, using generic 5g per tsp
+                        calories = foodDetails.caloriesPerUnit * (quantity * 5);
+                        break;
+                    case 'ml':
+                        // Milliliter to gram conversion (1:1 for water-like density)
+                        calories = foodDetails.caloriesPerUnit * (quantity / 100);
+                        break;
+                    case 'l':
+                        // Liter to gram conversion (1000ml = 1000g for water-like density)
+                        calories = foodDetails.caloriesPerUnit * (quantity * 10);
+                        break;
+                    default:
+                        calories = foodDetails.caloriesPerUnit * quantity;
+                }
+                
+                // Round to nearest integer
+                calories = Math.round(calories);
+                
+                // Create food object
+                const foodObject = {
+                    id: Date.now(),
+                    name: foodDetails.name,
+                    quantity: quantity,
+                    unit: selectedUnit,
+                    calories: calories
+                };
+                
+                // Add to foods array
+                addedFoods.push(foodObject);
+                
+                // Update UI
+                updateFoodsList();
+                updateTotalCalories();
+                
+                // Clear inputs
+                foodSearchInput.value = '';
+                quantityInput.value = '1';
+                unitSelect.value = 'piece';
+                foodSuggestionsDiv.classList.remove('show');
+            }
+
+            // Add food when button is clicked
+            addFoodBtn.addEventListener('click', addFoodToList);
+            calculateBtn.addEventListener('click', addFoodToList);
+
+            // Update the foods list display
+            function updateFoodsList() {
+                if (addedFoods.length === 0) {
+                    foodsListContainer.innerHTML = '<p class="no-foods-message">No foods added yet. Search and add foods to calculate total calories.</p>';
+                    return;
+                }
+                
+                foodsListContainer.innerHTML = '';
+                
+                addedFoods.forEach((food, index) => {
+                    const foodItemEl = document.createElement('div');
+                    foodItemEl.className = 'food-item-added';
+                    
+                    foodItemEl.innerHTML = `
+                        <div class="food-info">
+                            <span class="food-name">${food.quantity} ${food.unit} ${food.name}</span>
+                            <div class="food-details">(${food.calories} calories)</div>
+                        </div>
+                        <span class="food-calories">${food.calories} kcal</span>
+                        <button class="remove-food-btn" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    foodsListContainer.appendChild(foodItemEl);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-food-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        addedFoods.splice(index, 1);
+                        updateFoodsList();
+                        updateTotalCalories();
+                    });
+                });
+            }
+
+            // Update the total calories display
+            function updateTotalCalories() {
+                const total = addedFoods.reduce((sum, food) => sum + food.calories, 0);
+                totalCaloriesSpan.textContent = total;
+            }
+
+            // Clear all foods
+            clearCalculatorBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all added foods?')) {
+                    addedFoods = [];
+                    updateFoodsList();
+                    updateTotalCalories();
+                }
+            });
+
+            // Allow Enter key to add food
+            foodSearchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addFoodToList();
+                }
+            });
+        });
     </script>
 </body>
 </html>

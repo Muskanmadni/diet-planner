@@ -49,6 +49,13 @@
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 30px;
+            margin-right: 10px;
         }
 
         nav ul {
@@ -190,7 +197,9 @@
 <body>
     <header>
         <div class="header-content">
-            <div class="logo">NutriGuide</div>
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="NutriGuide Logo">
+            </div>
             <nav>
                 <ul>
                     <li><a href="/dashboard">Dashboard</a></li>
