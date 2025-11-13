@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - NutriGuide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        nav ul li a i {
+            margin-right: 8px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-actions button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .user-actions button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        /* Settings Container */
+        .settings-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input {
+            margin-right: 0.5rem;
+            transform: scale(1.1);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Sections */
+        .settings-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title-sm {
+            margin: 0;
+            color: var(--dark);
+            font-size: 1.25rem;
+        }
+
+        .password-change {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .subscription-info {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            line-height: 1.8;
+        }
+
+        .subscription-info p {
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.2rem 0.5rem;
+            }
+
+            .settings-tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                flex: 1;
+                text-align: center;
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="NutriGuide Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
+                    <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                    <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
+                    <li><a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <button id="profile-btn"><i class="fas fa-user"></i> Profile</button>
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="section-title">Account Settings</h2>
+
+        <div class="settings-container">
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <div class="tab-button active" data-tab="account">Account</div>
+                <div class="tab-button" data-tab="notifications">Notifications</div>
+                <div class="tab-button" data-tab="privacy">Privacy</div>
+                <div class="tab-button" data-tab="subscription">Subscription</div>
+            </div>
+
+            <!-- Account Tab -->
+            <div class="tab-content active" id="account-tab">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Personal Information</h3>
+                    </div>
+                    <form id="personal-info-form">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Display Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="Enter your display name">
+                        </div>
+                        <button type="submit" class="btn"><i class="fas fa-save"></i> Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Password</h3>
+                    </div>
+                    <div class="password-change">
+                        <form id="password-change-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password" class="form-control" placeholder="Enter current password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password" class="form-control" placeholder="Enter new password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm New Password</label>
+                                <input type="password" id="confirm-password" class="form-control" placeholder="Confirm new password" required>
+                            </div>
+                            <button type="submit" class="btn"><i class="fas fa-key"></i> Change Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div class="tab-content" id="notifications-tab">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Notification Preferences</h3>
+                    </div>
+                    <div class="notification-item">
+                        <span>Meal plan reminders</span>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="meal-reminders" checked>
+                            <label for="meal-reminders">On</label>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <span>Daily calorie goals</span>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="calorie-goals" checked>
+                            <label for="calorie-goals">On</label>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <span>Weekly progress reports</span>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="weekly-reports" checked>
+                            <label for="weekly-reports">On</label>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <span>Promotional emails</span>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="promotional-emails">
+                            <label for="promotional-emails">On</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Tab -->
+            <div class="tab-content" id="privacy-tab">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Privacy Settings</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="data-sharing">Data Sharing</label>
+                        <select id="data-sharing" class="form-control">
+                            <option value="private">Keep my data private</option>
+                            <option value="shared">Allow data sharing for research</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-visibility">Profile Visibility</label>
+                        <select id="profile-visibility" class="form-control">
+                            <option value="private">Private (only you)</option>
+                            <option value="friends">Friends only</option>
+                            <option value="public">Public</option>
+                        </select>
+                    </div>
+                    <button id="save-privacy-btn" class="btn"><i class="fas fa-shield-alt"></i> Save Privacy Settings</button>
+                </div>
+            </div>
+
+            <!-- Subscription Tab -->
+            <div class="tab-content" id="subscription-tab">
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Subscription Status</h3>
+                    </div>
+                    <div class="subscription-info">
+                        <p><strong>Current Plan:</strong> <span id="current-plan">Free Forever</span></p>
+                        <p><strong>Status:</strong> <span id="subscription-status">Active</span></p>
+                        <p><strong>Expires:</strong> <span id="subscription-expiry">Never</span></p>
+                        <p>All features are available to you at no cost, forever.</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-header">
+                        <h3 class="section-title-sm">Account Management</h3>
+                    </div>
+                    <button id="delete-account-btn" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setupEventListeners();
+            loadUserData();
+        });
+
+        function setupEventListeners() {
+            // Tab Switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    const tabId = this.getAttribute('data-tab');
+
+                    // Update active tab button
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Show active tab content
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                });
+            });
+
+            // Personal Info Form
+            document.getElementById('personal-info-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                updatePersonalInfo();
+            });
+
+            // Password Change Form
+            document.getElementById('password-change-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                changePassword();
+            });
+
+            // Privacy Save Button
+            document.getElementById('save-privacy-btn').addEventListener('click', savePrivacySettings);
+
+            // Profile Button
+            document.getElementById('profile-btn').addEventListener('click', () => {
+                window.location.href = '/profile';
+            });
+
+            // Logout Button
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    try {
+                        await fetch('/api/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+                        window.location.href = '/login';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        window.location.href = '/login';
+                    }
+                }
+            });
+
+            // Delete Account
+            document.getElementById('delete-account-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                    deleteAccount();
+                }
+            });
+        }
+
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/current_user', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) throw new Error('Failed to load user data');
+
+                const { user } = await response.json();
+
+                // Populate form
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('name').value = user.name || user.email || 'User';
+
+                // Load subscription
+                const subResponse = await fetch('/api/subscription', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (subResponse.ok) {
+                    const sub = await subResponse.json();
+                    document.getElementById('current-plan').textContent = sub.subscription_tier || 'Free Forever';
+                    document.getElementById('subscription-status').textContent = sub.subscription_status || 'Active';
+                    document.getElementById('subscription-expiry').textContent = sub.subscription_end_date
+                        ? new Date(sub.subscription_end_date).toLocaleDateString()
+                        : 'Never';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function updatePersonalInfo() {
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+
+            if (!email) {
+                alert('Email is required.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/current_user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, name })
+                });
+
+                if (response.ok) {
+                    alert('Personal information updated successfully!');
+                } else {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function changePassword() {
+            const current = document.getElementById('current-password').value;
+            const newPass = document.getElementById('new-password').value;
+            const confirm = document.getElementById('confirm-password').value;
+
+            if (newPass !== confirm) {
+                alert('New passwords do not match.');
+                return;
+            }
+            if (newPass.length < 6) {
+                alert('Password must be at least 6 characters.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        current_password: current,
+                        new_password: newPass
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Password changed successfully!');
+                    document.getElementById('password-change-form').reset();
+                } else {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Password change failed');
+                }
+            } catch (error) {
+                console.error('Password error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function savePrivacySettings() {
+            const dataSharing = document.getElementById('data-sharing').value;
+            const visibility = document.getElementById('profile-visibility').value;
+
+            try {
+                const response = await fetch('/api/privacy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ data_sharing: dataSharing, profile_visibility: visibility })
+                });
+
+                if (response.ok) {
+                    alert('Privacy settings saved!');
+                } else {
+                    throw new Error('Failed to save privacy settings');
+                }
+            } catch (error) {
+                console.error('Privacy save error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function deleteAccount() {
+            alert('Account deletion is not implemented in this demo.\n\nIn a real app, this would permanently delete your account and all data.');
+            // In production: await fetch('/api/delete-account', { method: 'DELETE', ... })
+        }
+    </script>
+</body>
+
+</html>

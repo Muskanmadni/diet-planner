@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - NutriGuide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        nav ul li a i {
+            margin-right: 8px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-actions button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .user-actions button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .history-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .history-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .history-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-button {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item-content {
+            flex: 1;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .history-item-date {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .history-item-details {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: var(--light-gray);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+
+        .no-history i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--light-gray);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn:hover:not(.active) {
+            background: var(--light);
+        }
+
+        @media (max-width: 768px) {
+            .history-filters {
+                flex-direction: column;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .history-item-actions {
+                align-self: flex-end;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.2rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="NutriGuide Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
+                    <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                    <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
+                    <li><a href="/history" class="active"><i class="fas fa-history"></i> History</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <button id="profile-btn"><i class="fas fa-user"></i> Profile</button>
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Activity History</h2>
+
+        <div class="history-container">
+            <div class="history-filters">
+                <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <select id="date-range" class="form-control">
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="3months">Last 3 Months</option>
+                        <option value="6months">Last 6 Months</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">History Type</label>
+                    <select id="history-type" class="form-control">
+                        <option value="all">All Activities</option>
+                        <option value="meals">Meals</option>
+                        <option value="workouts">Workouts</option>
+                        <option value="goals">Goals</option>
+                        <option value="weight">Weight Tracking</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Action</label>
+                    <button class="btn" id="apply-filters">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <div class="history-stats">
+                <div class="stat-card">
+                    <div class="stat-value">8,450</div>
+                    <div class="stat-label">Calories Tracked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">32</div>
+                    <div class="stat-label">Meals Recorded</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Workouts Done</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.5</div>
+                    <div class="stat-label">Weight Change (kg)</div>
+                </div>
+            </div>
+
+            <div class="history-tabs">
+                <div class="tab-button active" data-tab="meals">Meals</div>
+                <div class="tab-button" data-tab="workouts">Workouts</div>
+                <div class="tab-button" data-tab="weight">Weight</div>
+                <div class="tab-button" data-tab="goals">Goals</div>
+            </div>
+
+            <div class="tab-content active" id="meals-tab">
+                <ul class="history-list">
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Breakfast: Oatmeal with Berries</span>
+                                <span class="history-item-date">Today, 8:15 AM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Calories: 320 | Carbs: 50g | Protein: 12g | Fat: 8g
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Lunch: Grilled Chicken Salad</span>
+                                <span class="history-item-date">Today, 1:30 PM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Calories: 450 | Carbs: 20g | Protein: 35g | Fat: 25g
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Dinner: Biryani with Raita</span>
+                                <span class="history-item-date">Yesterday, 7:45 PM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Calories: 680 | Carbs: 85g | Protein: 25g | Fat: 20g
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Snack: Fruit Salad</span>
+                                <span class="history-item-date">Nov 10, 4:20 PM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Calories: 120 | Carbs: 30g | Protein: 2g | Fat: 0.5g
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content" id="workouts-tab">
+                <ul class="history-list">
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Cardio Session: Running</span>
+                                <span class="history-item-date">Today, 6:00 AM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Duration: 35 min | Calories Burned: 320 | Intensity: Moderate
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Strength Training</span>
+                                <span class="history-item-date">Nov 10, 7:00 PM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Duration: 45 min | Calories Burned: 280 | Focus: Full Body
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content" id="weight-tab">
+                <ul class="history-list">
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Weight Check-in</span>
+                                <span class="history-item-date">Today, 7:00 AM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Weight: 72.5 kg | Change: -0.2 kg from last week
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Weight Check-in</span>
+                                <span class="history-item-date">Last Monday, 7:00 AM</span>
+                            </div>
+                            <div class="history-item-details">
+                                Weight: 72.7 kg | Change: -0.3 kg from previous
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content" id="goals-tab">
+                <ul class="history-list">
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Goal Progress: Lose Weight</span>
+                                <span class="history-item-date">Today</span>
+                            </div>
+                            <div class="history-item-details">
+                                Progress: 65% | Target: 70kg by Dec 31 | Remaining: 7.3kg
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-header">
+                                <span class="history-item-title">Goal Progress: Calorie Target</span>
+                                <span class="history-item-date">Today</span>
+                            </div>
+                            <div class="history-item-details">
+                                Progress: 1,850/2,200 kcal (84%) | Remaining: 350 kcal
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-btn" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Show active tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                });
+            });
+
+            // Apply filters button
+            document.getElementById('apply-filters').addEventListener('click', function() {
+                applyFilters();
+            });
+
+            // Profile button
+            document.getElementById('profile-btn').addEventListener('click', function() {
+                window.location.href = '/profile';
+            });
+
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', async function() {
+                if(confirm('Are you sure you want to logout?')) {
+                    try {
+                        const response = await fetch('/api/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+
+                        if (response.ok) {
+                            window.location.href = '/login';
+                        } else {
+                            console.error('Logout failed:', await response.text());
+                            // Even if API call fails, redirect to login
+                            window.location.href = '/login';
+                        }
+                    } catch (error) {
+                        console.error('Error during logout:', error);
+                        // Redirect to login even if there's an error
+                        window.location.href = '/login';
+                    }
+                }
+            });
+
+            // Action buttons
+            document.querySelectorAll('.action-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.title.toLowerCase();
+                    const item = this.closest('.history-item');
+                    const title = item.querySelector('.history-item-title').textContent;
+
+                    switch(action) {
+                        case 'edit':
+                            alert(`Edit functionality for: ${title}`);
+                            break;
+                        case 'delete':
+                            if(confirm(`Are you sure you want to delete "${title}"?`)) {
+                                item.remove();
+                            }
+                            break;
+                        case 'view':
+                            alert(`View details for: ${title}`);
+                            break;
+                    }
+                });
+            });
+        }
+
+        function applyFilters() {
+            const dateRange = document.getElementById('date-range').value;
+            const historyType = document.getElementById('history-type').value;
+            
+            alert(`Filters applied: Date Range - ${dateRange}, Type - ${historyType}`);
+            // In a real app, this would update the history list based on filters
+        }
+    </script>
+</body>
+</html>

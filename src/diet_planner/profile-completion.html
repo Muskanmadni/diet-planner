@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriGuide - Complete Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .dashboard-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dashboard-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .dashboard-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/static/images/logo.png" alt="NutriGuide Logo" style="height: 30px; margin: 0 auto 10px; display: block;">
+            <h1 style="margin: 5px 0;">Complete Your Profile</h1>
+            <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Welcome to Smart Diet Planner! Please fill in your details.</p>
+        </div>
+        <div class="form-container">
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="current_weight">Current Weight (kg)</label>
+                    <input type="number" id="current_weight" name="current_weight" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" id="height" name="height" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="goal_type">Goal</label>
+                    <select id="goal_type" name="goal_type" required>
+                        <option value="">Select Goal</option>
+                        <option value="lose">Lose Weight</option>
+                        <option value="gain">Gain Weight</option>
+                        <option value="maintain">Maintain Weight</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight_goal">Target Weight (kg)</label>
+                    <input type="number" id="weight_goal" name="weight_goal" step="0.1" required>
+                </div>
+
+                <button type="submit" class="btn">Complete Registration</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const profileData = {
+                current_weight: parseFloat(formData.get('current_weight')),
+                height: parseFloat(formData.get('height')),
+                gender: formData.get('gender'),
+                goal_type: formData.get('goal_type'),
+                weight_goal: parseFloat(formData.get('weight_goal'))
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Profile completed successfully! Redirecting to dashboard...');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Profile completion failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Profile completion error:', error);
+                alert('An error occurred during profile completion. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

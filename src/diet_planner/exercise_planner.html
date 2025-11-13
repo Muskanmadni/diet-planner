@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Planner - NutriGuide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        nav ul li a i {
+            margin-right: 8px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-actions button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .user-actions button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .exercise-planner-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .upload-section {
+            text-align: center;
+            padding: 2rem;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            background-color: var(--light);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            margin-bottom: 1.5rem;
+            color: var(--gray);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 1.5rem auto;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .results-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .nutrition-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .result-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nutrition-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nutrition-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .exercise-suggestions {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .exercise-suggestions h3 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .exercise-list {
+            list-style: none;
+        }
+
+        .exercise-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .exercise-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.2rem 0.5rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="NutriGuide Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
+                    <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                    <li><a href="/exercise-planner" class="active"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
+                    <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
+                    <li><a href="/history"><i class="fas fa-history"></i> History</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/profile"><button id="profile-btn"><i class="fas fa-user"></i> Profile</button></a>
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Food Plate Analyzer & Exercise Planner</h2>
+
+        <div class="exercise-planner-container">
+            <div class="upload-section">
+                <div class="upload-icon">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3>Upload Your Food Plate</h3>
+                <p class="upload-text">Take a photo of your food plate to analyze its nutritional content and get exercise recommendations</p>
+                
+                <div class="btn-group">
+                    <button class="btn" id="upload-btn">
+                        <i class="fas fa-upload"></i> Upload Photo
+                    </button>
+                    <input type="file" id="image-upload" class="file-input" accept="image/*">
+                    <button class="btn btn-outline" id="analyze-btn" disabled>
+                        <i class="fas fa-search"></i> Analyze Food
+                    </button>
+                </div>
+                
+                <img id="preview-image" class="image-preview" alt="Image Preview">
+            </div>
+
+            <!-- Loading indicator -->
+            <div class="loading" id="loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>Analyzing Your Food Plate...</h3>
+                <p>Please wait while we process your image and generate nutrition analysis and exercise recommendations.</p>
+            </div>
+
+            <!-- Error message -->
+            <div class="error-message" id="error-message">
+                Error message will appear here
+            </div>
+
+            <!-- Results section -->
+            <div class="results-section" id="results-section">
+                <h3 class="results-title">Nutrition Analysis & Exercise Recommendations</h3>
+                
+                <div class="nutrition-results">
+                    <div class="result-card">
+                        <h3><i class="fas fa-apple-alt"></i> Nutrition Analysis</h3>
+                        <div class="nutrition-item">
+                            <span>Total Calories:</span>
+                            <span id="total-calories">0 kcal</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span>Total Carbs:</span>
+                            <span id="total-carbs">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span>Total Protein:</span>
+                            <span id="total-protein">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span>Total Fat:</span>
+                            <span id="total-fat">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span>Sugar:</span>
+                            <span id="sugar">0g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span>Fiber:</span>
+                            <span id="fiber">0g</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3><i class="fas fa-running"></i> Exercise Recommendations</h3>
+                        <p>Recommended exercises to burn approximately <span id="calories-to-burn">0</span> calories:</p>
+                        <ul class="exercise-list" id="exercise-list">
+                            <li class="exercise-item">
+                                <span>Walking (3.5 mph)</span>
+                                <span id="walking-time">0 minutes</span>
+                            </li>
+                            <li class="exercise-item">
+                                <span>Jogging (5 mph)</span>
+                                <span id="jogging-time">0 minutes</span>
+                            </li>
+                            <li class="exercise-item">
+                                <span>Cycling (12-14 mph)</span>
+                                <span id="cycling-time">0 minutes</span>
+                            </li>
+                            <li class="exercise-item">
+                                <span>Swimming (freestyle)</span>
+                                <span id="swimming-time">0 minutes</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="exercise-suggestions">
+                    <h3><i class="fas fa-dumbbell"></i> Personalized Exercise Suggestions</h3>
+                    <p id="exercise-suggestions-text">Your personalized exercise plan will appear here based on your dietary intake and health goals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Upload button
+            document.getElementById('upload-btn').addEventListener('click', function() {
+                document.getElementById('image-upload').click();
+            });
+
+            // File input change
+            document.getElementById('image-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Show the preview
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const preview = document.getElementById('preview-image');
+                        preview.src = event.target.result;
+                        preview.style.display = 'block';
+                        document.getElementById('analyze-btn').disabled = false;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Analyze button
+            document.getElementById('analyze-btn').addEventListener('click', function() {
+                analyzeFoodPlate();
+            });
+
+            // Profile button
+            document.getElementById('profile-btn').addEventListener('click', function() {
+                window.location.href = '/profile';
+            });
+
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', async function() {
+                if(confirm('Are you sure you want to logout?')) {
+                    try {
+                        const response = await fetch('/api/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+
+                        if (response.ok) {
+                            window.location.href = '/login';
+                        } else {
+                            console.error('Logout failed:', await response.text());
+                            // Even if API call fails, redirect to login
+                            window.location.href = '/login';
+                        }
+                    } catch (error) {
+                        console.error('Error during logout:', error);
+                        // Redirect to login even if there's an error
+                        window.location.href = '/login';
+                    }
+                }
+            });
+        }
+
+        async function analyzeFoodPlate() {
+            const fileInput = document.getElementById('image-upload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('Please upload an image first');
+                return;
+            }
+
+            try {
+                // Show loading indicator
+                showLoading(true);
+                hideError();
+                hideResults();
+
+                // For now, we'll use a sample image URL for testing.
+                // In a real implementation, you'd need to upload the image to a server first
+                // and then send that URL to the external API.
+                
+                // Since we can't upload the local file directly to the external API,
+                // we'll use a default example image for demonstration
+                const response = await fetch('/api/analyze-food-plate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        image_url: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Breakfast_foods.jpg' // Default example
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayResults(result);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to analyze food plate');
+                }
+            } catch (error) {
+                console.error('Error analyzing food plate:', error);
+                showError('Error analyzing food plate: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResults(result) {
+            // Extract nutrition information from the API response
+            const analysis = result.analysis;
+            const nutrition = analysis.nutrition || {};
+            
+            // Update nutrition values
+            document.getElementById('total-calories').textContent = nutrition.calories ? `${nutrition.calories} kcal` : '0 kcal';
+            document.getElementById('total-carbs').textContent = nutrition.carbs ? `${nutrition.carbs}g` : '0g';
+            document.getElementById('total-protein').textContent = nutrition.protein ? `${nutrition.protein}g` : '0g';
+            document.getElementById('total-fat').textContent = nutrition.fat ? `${nutrition.fat}g` : '0g';
+            document.getElementById('sugar').textContent = nutrition.sugar ? `${nutrition.sugar}g` : '0g';
+            document.getElementById('fiber').textContent = nutrition.fiber ? `${nutrition.fiber}g` : '0g';
+            document.getElementById('calories-to-burn').textContent = nutrition.calories || '0';
+
+            // Update exercise recommendations
+            if (analysis.exercise_recommendations && analysis.exercise_recommendations.length > 0) {
+                const exercises = analysis.exercise_recommendations;
+                
+                // Assuming the order is walking, jogging, cycling, swimming - match to UI elements
+                document.getElementById('walking-time').textContent = exercises[0] ? exercises[0].time : '0 min';
+                document.getElementById('jogging-time').textContent = exercises[1] ? exercises[1].time : '0 min';
+                document.getElementById('cycling-time').textContent = exercises[2] ? exercises[2].time : '0 min';
+                document.getElementById('swimming-time').textContent = exercises[3] ? exercises[3].time : '0 min';
+            }
+
+            // Update exercise suggestions
+            if (result.message) {
+                document.getElementById('exercise-suggestions-text').textContent = 
+                    result.message;
+            } else {
+                document.getElementById('exercise-suggestions-text').textContent = 
+                    'Based on your meal, we recommend: 30 minutes of strength training to build muscle, followed by 30 minutes of cardio to burn calories. Consider adding yoga for flexibility.';
+            }
+
+            showResults();
+        }
+
+        function showLoading(show) {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            loadingIndicator.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        function hideResults() {
+            document.getElementById('results-section').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

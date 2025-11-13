@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diet Plan - NutriGuide</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ---- ALL ORIGINAL STYLES (unchanged) ---- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
         }
 
         :root {
@@ -22,24 +24,24 @@
             --dark: #212529;
             --gray: #6c757d;
             --light-gray: #e9ecef;
-            --border: #dee2e6;
+            --border: #dee2e6
         }
 
         body {
-            background-color: #f5f7fa;
+            background: #f5f7fa;
             color: #333;
             line-height: 1.6;
-            min-height: 100vh;
+            min-height: 100vh
         }
 
         header {
             background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-            color: white;
-            padding: 0.8rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: #fff;
+            padding: .8rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 1000
         }
 
         .header-container {
@@ -48,72 +50,68 @@
             padding: 0 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center
         }
 
         .logo {
             display: flex;
             align-items: center;
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: bold
         }
 
         .logo img {
             height: 30px;
-            margin-right: 10px;
+            margin-right: 10px
         }
 
         nav ul {
             display: flex;
-            list-style: none;
+            list-style: none
         }
 
         nav ul li {
-            margin-left: 1.5rem;
+            margin-left: 1.5rem
         }
 
         nav ul li a {
-            color: white;
+            color: #fff;
             text-decoration: none;
-            padding: 0.5rem 1rem;
+            padding: .5rem 1rem;
             border-radius: 4px;
-            transition: background-color 0.3s;
+            transition: background .3s;
             display: flex;
-            align-items: center;
+            align-items: center
         }
 
-        nav ul li a:hover, nav ul li a.active {
-            background-color: rgba(255, 255, 255, 0.2);
+        nav ul li a:hover,
+        nav ul li a.active {
+            background: rgba(255, 255, 255, .2)
         }
 
         nav ul li a i {
-            margin-right: 8px;
-        }
-
-        .user-actions {
-            display: flex;
-            align-items: center;
+            margin-right: 8px
         }
 
         .user-actions button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: rgba(255, 255, 255, .2);
+            color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: .5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
             margin-left: 10px;
-            transition: background-color 0.3s;
+            transition: background .3s
         }
 
         .user-actions button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, .3)
         }
 
         .container {
             max-width: 1200px;
             margin: 2rem auto;
-            padding: 0 20px;
+            padding: 0 20px
         }
 
         .section-title {
@@ -121,7 +119,7 @@
             margin-bottom: 2rem;
             color: var(--dark);
             position: relative;
-            padding-bottom: 1rem;
+            padding-bottom: 1rem
         }
 
         .section-title:after {
@@ -132,14 +130,14 @@
             transform: translateX(-50%);
             width: 60px;
             height: 3px;
-            background-color: var(--primary);
+            background: var(--primary)
         }
 
         .meal-planner-container {
-            background: white;
+            background: #fff;
             border-radius: 10px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .05)
         }
 
         .meal-plan-header {
@@ -148,50 +146,50 @@
             align-items: center;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1rem
         }
 
         .meal-plan-title {
             font-size: 1.8rem;
-            color: var(--dark);
+            color: var(--dark)
         }
 
         .meal-plan-actions {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: wrap
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.6rem 1.2rem;
+            background: var(--primary);
+            color: #fff;
+            padding: .6rem 1.2rem;
             border-radius: 5px;
             text-decoration: none;
             font-weight: 500;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            gap: 8px;
+            transition: background .3s, transform .2s;
+            gap: 8px
         }
 
         .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
+            background: var(--primary-dark);
+            transform: translateY(-2px)
         }
 
         .btn-outline {
             background: transparent;
             border: 1px solid var(--primary);
-            color: var(--primary);
+            color: var(--primary)
         }
 
         .btn-outline:hover {
-            background-color: var(--primary);
-            color: white;
+            background: var(--primary);
+            color: #fff
         }
 
         .week-navigation {
@@ -200,8 +198,8 @@
             gap: 15px;
             margin-bottom: 1.5rem;
             padding: 1rem;
-            background-color: var(--light);
-            border-radius: 8px;
+            background: var(--light);
+            border-radius: 8px
         }
 
         .week-navigation button {
@@ -214,19 +212,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.2rem
         }
 
         .week-navigation button:hover {
             background: var(--primary);
-            color: white;
+            color: #fff
         }
 
         .current-week {
             font-weight: 600;
             font-size: 1.1rem;
             flex: 1;
-            text-align: center;
+            text-align: center
         }
 
         .days-tabs {
@@ -234,53 +232,52 @@
             border-bottom: 1px solid var(--border);
             margin-bottom: 1.5rem;
             overflow-x: auto;
-            gap: 5px;
+            gap: 5px
         }
 
         .day-tab {
-            padding: 0.8rem 1.2rem;
+            padding: .8rem 1.2rem;
             cursor: pointer;
             border-radius: 6px;
-            transition: all 0.3s;
-            white-space: nowrap;
+            transition: all .3s;
+            white-space: nowrap
         }
 
         .day-tab:hover {
-            background-color: var(--light);
+            background: var(--light)
         }
 
         .day-tab.active {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            font-weight: bold;
+            color: #fff;
+            font-weight: bold
         }
 
-        /* Box layout for diet plan */
         .diet-plan-container {
             display: none;
-            margin-top: 1.5rem;
+            margin-top: 1.5rem
         }
 
         .day-plan-container {
             display: none;
-            margin-bottom: 2rem;
+            margin-bottom: 2rem
         }
 
         .day-plan-container.active {
-            display: block;
+            display: block
         }
 
         .day-plan-header {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: var(--primary);
-            text-align: center;
+            text-align: center
         }
 
         .meals-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+            gap: 1.5rem
         }
 
         .meal-box {
@@ -288,154 +285,153 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .05)
         }
 
         .meal-header {
             background: var(--primary);
-            color: white;
-            padding: 0.8rem;
+            color: #fff;
+            padding: .8rem;
             border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
+            margin-bottom: 1rem
         }
 
         .meal-time {
-            font-weight: 600;
+            font-weight: 600
         }
 
         .meal-icon {
-            font-size: 1.2rem;
+            font-size: 1.2rem
         }
 
         .meal-content {
-            padding: 0.5rem 0;
+            padding: .5rem 0
         }
 
         .meal-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--light-gray);
+            display: block;
+            padding: .5rem 0;
+            border-bottom: 1px solid var(--light-gray)
         }
 
         .meal-item:last-child {
-            border-bottom: none;
+            border-bottom: none
         }
 
         .meal-item-name {
-            font-weight: 500;
+            font-weight: 500
         }
 
         .meal-item-calories {
-            color: var(--gray);
+            color: var(--gray)
         }
 
         .add-meal-btn {
             display: inline-block;
             margin-top: 1rem;
             color: var(--primary);
-            padding: 0.5rem 1rem;
+            padding: .5rem 1rem;
             border: 1px solid var(--primary);
             border-radius: 5px;
             text-decoration: none;
             font-weight: 500;
-            transition: background-color 0.3s;
+            transition: background .3s
         }
 
         .add-meal-btn:hover {
-            background-color: #e8f5e9;
+            background: #e8f5e9
         }
 
         .no-plan-message {
             text-align: center;
             padding: 2rem;
             color: var(--gray);
-            font-style: italic;
+            font-style: italic
         }
 
         .nutrition-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 2rem
         }
 
         .nutrient-card {
-            background: white;
+            background: #fff;
             border-radius: 8px;
             padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            border: 1px solid var(--border);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+            border: 1px solid var(--border)
         }
 
         .nutrient-value {
             font-size: 1.8rem;
             font-weight: bold;
             color: var(--primary);
-            margin: 0.5rem 0;
+            margin: .5rem 0
         }
 
         .nutrient-label {
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: .9rem
         }
 
         .progress-bar {
             height: 8px;
-            background-color: var(--light-gray);
+            background: var(--light-gray);
             border-radius: 4px;
-            margin-top: 0.5rem;
-            overflow: hidden;
+            margin-top: .5rem;
+            overflow: hidden
         }
 
         .progress {
             height: 100%;
-            background-color: var(--primary);
-            border-radius: 4px;
+            background: var(--primary);
+            border-radius: 4px
         }
 
         .meal-plan-generator {
-            background: white;
+            background: #fff;
             border-radius: 10px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+            margin-top: 2rem
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.5rem
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: .5rem;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--dark)
         }
 
         .form-row {
             display: flex;
             gap: 1rem;
-            flex-wrap: wrap;
+            flex-wrap: wrap
         }
 
         .form-col {
             flex: 1;
-            min-width: 200px;
+            min-width: 200px
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.75rem;
+            padding: .75rem;
             border: 1px solid var(--border);
             border-radius: 5px;
-            font-size: 1rem;
+            font-size: 1rem
         }
 
         .form-group input:focus,
@@ -443,7 +439,7 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, .2)
         }
 
         .modal {
@@ -453,19 +449,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, .5);
             z-index: 2000;
             align-items: center;
-            justify-content: center;
+            justify-content: center
         }
 
         .modal-content {
-            background: white;
+            background: #fff;
             border-radius: 10px;
             width: 90%;
             max-width: 600px;
             max-height: 90vh;
-            overflow-y: auto;
+            overflow-y: auto
         }
 
         .modal-header {
@@ -473,23 +469,23 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center
         }
 
         .modal-title {
             font-size: 1.5rem;
-            color: var(--dark);
+            color: var(--dark)
         }
 
         .modal-close {
             background: none;
             border: none;
             font-size: 1.5rem;
-            cursor: pointer;
+            cursor: pointer
         }
 
         .modal-body {
-            padding: 1.5rem;
+            padding: 1.5rem
         }
 
         .modal-footer {
@@ -497,181 +493,204 @@
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 10px
         }
 
         .subscription-status {
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
-            text-align: center;
+            text-align: center
         }
 
         .status-active {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+            background: #e8f5e9;
+            color: #2e7d32
         }
 
         .status-inactive {
-            background-color: #ffebee;
-            color: #c62828;
+            background: #ffebee;
+            color: #c62828
         }
 
         .nutrition-details {
-            background: white;
+            background: #fff;
             border-radius: 8px;
             padding: 1.2rem;
             margin-top: 1.5rem;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            border: 1px solid var(--border);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+            border: 1px solid var(--border)
         }
 
         .nutrition-title {
             text-align: center;
             margin-bottom: 1rem;
             color: var(--dark);
-            font-size: 1.2rem;
+            font-size: 1.2rem
         }
 
         .nutrition-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
+            gap: 1rem
         }
 
         .nutrition-item {
             text-align: center;
-            padding: 0.8rem;
+            padding: .8rem;
             border-radius: 5px;
-            background-color: #f8f9fa;
+            background: #f8f9fa
         }
 
         .nutrition-value {
             font-size: 1.4rem;
             font-weight: bold;
-            color: var(--primary);
+            color: var(--primary)
         }
 
         .nutrition-label {
-            font-size: 0.8rem;
-            color: var(--gray);
+            font-size: .8rem;
+            color: var(--gray)
         }
 
         .daily-log {
-            margin-top: 2rem;
+            margin-top: 2rem
         }
 
         .log-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1rem
         }
 
         .log-entries {
             max-height: 300px;
-            overflow-y: auto;
+            overflow-y: auto
         }
 
         .log-entry {
             display: flex;
             justify-content: space-between;
-            padding: 0.8rem;
-            border-bottom: 1px solid var(--border);
+            padding: .8rem;
+            border-bottom: 1px solid var(--border)
         }
 
         .log-entry:last-child {
-            border-bottom: none;
+            border-bottom: none
         }
 
-        @media (max-width: 992px) {
+        .simple-plan-content pre {
+            white-space: pre-wrap;
+            font-family: inherit
+        }
+
+        .meal-list {
+            list-style: disc;
+            margin-left: 1.5rem
+        }
+
+        .meal-item {
+            display: flex;
+            justify-content: space-between
+        }
+
+        .meal-name {
+            font-weight: 500
+        }
+
+        .meal-calories {
+            color: var(--gray);
+            font-style: italic
+        }
+
+        @media(max-width:992px) {
             .meals-container {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))
             }
         }
 
-        @media (max-width: 768px) {
+        @media(max-width:768px) {
             .meal-plan-header {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 1rem;
+                gap: 1rem
             }
-            
+
             .meal-plan-actions {
                 flex-direction: row;
                 flex-wrap: wrap;
                 width: auto;
-                justify-content: flex-start;
+                justify-content: flex-start
             }
-            
+
             .form-row {
-                flex-direction: column;
+                flex-direction: column
             }
-            
+
             .form-col {
-                min-width: auto;
+                min-width: auto
             }
-            
+
             .header-container {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 1rem
             }
-            
+
             nav ul {
                 flex-wrap: wrap;
-                justify-content: center;
+                justify-content: center
             }
-            
+
             nav ul li {
-                margin: 0.2rem 0.5rem;
+                margin: .2rem .5rem
             }
-            
+
             .days-tabs {
-                overflow-x: auto;
+                overflow-x: auto
             }
-            
+
             .nutrition-summary {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr
             }
-            
+
             .log-header {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 1rem;
+                gap: 1rem
             }
-            
+
             .btn {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
+                padding: .6rem 1.2rem;
+                font-size: .9rem
             }
         }
 
-        @media (max-width: 576px) {
+        @media(max-width:576px) {
             .container {
-                padding: 0 10px;
+                padding: 0 10px
             }
-            
+
             .meal-plan-title {
-                font-size: 1.5rem;
+                font-size: 1.5rem
             }
-            
+
             .week-navigation {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: .5rem
             }
-            
+
             .current-week {
-                text-align: center;
+                text-align: center
             }
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="header-container">
-            <div class="logo">
-                <img src="/static/images/logo.png" alt="NutriGuide Logo">
-            </div>
+            <div class="logo"><img src="/static/images/logo.png" alt="NutriGuide Logo"></div>
             <nav>
                 <ul>
                     <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
@@ -682,22 +701,19 @@
                     <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </nav>
-            <div class="user-actions">
-                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
+            <div class="user-actions"><button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
         </div>
     </header>
 
     <div class="container">
         <div class="meal-planner-container">
 
-            
+            <!-- ==== GENERATOR ==== -->
             <div class="meal-plan-generator">
                 <h2 class="section-title">Generate New Meal Plan</h2>
-                <div id="current-subscription" class="subscription-status status-inactive">
-                    Loading subscription status...
-                </div>
-                
+                <div id="current-subscription" class="subscription-status status-inactive">Loading subscription
+                    status...</div>
+
                 <form id="generate-plan-form">
                     <div class="form-row">
                         <div class="form-col">
@@ -729,88 +745,90 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="form-row" id="premiumFeatures" style="display: none;">
+
+                    <div class="form-row" id="premiumFeatures" style="display:none;">
                         <div class="form-col">
                             <div class="form-group">
                                 <label for="allergies">Food Allergies/Restrictions</label>
-                                <input type="text" id="allergies" name="allergies" placeholder="e.g., nuts, dairy, gluten">
+                                <input type="text" id="allergies" name="allergies"
+                                    placeholder="e.g., nuts, dairy, gluten">
                             </div>
                         </div>
                         <div class="form-col">
                             <div class="form-group">
                                 <label for="preferences">Medical Conditions</label>
-                                <input type="text" id="preferences" name="preferences" placeholder="e.g., diabetes, hypertension">
+                                <input type="text" id="preferences" name="preferences"
+                                    placeholder="e.g., diabetes, hypertension">
                             </div>
                         </div>
                     </div>
-                    
-                    <button type="button" class="btn" id="generate-plan-btn-form" style="margin-top: 1rem;">
+
+                    <button type="button" class="btn" id="generate-plan-btn-form" style="margin-top:1rem;">
                         <i class="fas fa-magic"></i> Generate Custom Meal Plan
                     </button>
                 </form>
             </div>
 
-            <!-- Diet Plan Container for Generated Plan -->
-            <div id="diet-plan-container" style="display: none; margin-top: 2rem;">
+            <!-- ==== PLAN DISPLAY ==== -->
+            <div id="diet-plan-container" style="display:none; margin-top:2rem;">
                 <div class="meal-plan-header">
                     <h1 class="meal-plan-title">Your Generated Meal Plan</h1>
                     <div class="meal-plan-actions">
-                        <button class="btn btn-outline" id="save-plan-btn">
-                            <i class="fas fa-save"></i> Save Plan
-                        </button>
-                        <button class="btn btn-outline" id="download-pdf-btn">
-                            <i class="fas fa-file-pdf"></i> Download PDF
-                        </button>
+                        <button class="btn btn-outline" id="save-plan-btn"><i class="fas fa-save"></i> Save
+                            Plan</button>
+                        <button class="btn btn-outline" id="download-pdf-btn"><i class="fas fa-file-pdf"></i> Download
+                            PDF</button>
                     </div>
                 </div>
 
-                <!-- Simple Diet Plan Display -->
-                <div class="simple-diet-plan" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 1.5rem;">
-                    <div id="simple-plan-display" style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px;">
-                        <div class="no-plan-message">No meal plan generated yet. Click "Generate New Plan" to create your personalized meal plan.</div>
+                <!-- Simple text / list view -->
+                <div class="simple-diet-plan"
+                    style="background:#fff;border-radius:10px;padding:1.5rem;box-shadow:0 5px 15px rgba(0,0,0,.05);margin-top:1.5rem;">
+                    <div id="simple-plan-display"
+                        style="min-height:400px;max-height:500px;overflow-y:auto;padding:10px;border:1px solid #eee;border-radius:8px;">
+                        <div class="no-plan-message">No meal plan generated yet. Click “Generate New Plan” to create
+                            your personalized meal plan.</div>
                     </div>
                 </div>
             </div>
 
+            <!-- ==== NUTRITION SUMMARY ==== -->
             <div class="nutrition-summary">
                 <div class="nutrient-card">
                     <div class="nutrient-label">Calories</div>
-                    <div class="nutrient-value">2,200</div>
+                    <div class="nutrient-value" data-goal="2200">2,200</div>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 100%"></div>
+                        <div class="progress" style="width:100%"></div>
                     </div>
-                    <div>Goal: 2,200</div>
+                    <div>Goal: <span class="goal-cal">2,200</span></div>
                 </div>
-                
                 <div class="nutrient-card">
                     <div class="nutrient-label">Protein</div>
-                    <div class="nutrient-value">150g</div>
+                    <div class="nutrient-value" data-goal="140">150g</div>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 107%"></div>
+                        <div class="progress" style="width:107%"></div>
                     </div>
-                    <div>Goal: 140g</div>
+                    <div>Goal: <span class="goal-pro">140g</span></div>
                 </div>
-                
                 <div class="nutrient-card">
                     <div class="nutrient-label">Carbs</div>
-                    <div class="nutrient-value">280g</div>
+                    <div class="nutrient-value" data-goal="300">280g</div>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 93%"></div>
+                        <div class="progress" style="width:93%"></div>
                     </div>
-                    <div>Goal: 300g</div>
+                    <div>Goal: <span class="goal-carb">300g</span></div>
                 </div>
-                
                 <div class="nutrient-card">
                     <div class="nutrient-label">Fat</div>
-                    <div class="nutrient-value">85g</div>
+                    <div class="nutrient-value" data-goal="90">85g</div>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 94%"></div>
+                        <div class="progress" style="width:94%"></div>
                     </div>
-                    <div>Goal: 90g</div>
+                    <div>Goal: <span class="goal-fat">90g</span></div>
                 </div>
             </div>
-            
+
+            <!-- ==== DETAILED BREAKDOWN ==== -->
             <div class="nutrition-details">
                 <h3 class="nutrition-title">Nutrition Breakdown</h3>
                 <div class="nutrition-grid">
@@ -832,15 +850,13 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- ==== DAILY LOG ==== -->
             <div class="daily-log">
                 <div class="log-header">
                     <h3>Daily Nutrition Log</h3>
-                    <button class="btn btn-outline" id="log-meal-btn">
-                        <i class="fas fa-plus"></i> Log Meal
-                    </button>
+                    <button class="btn btn-outline" id="log-meal-btn"><i class="fas fa-plus"></i> Log Meal</button>
                 </div>
-                
                 <div class="log-entries">
                     <div class="log-entry">
                         <div>Breakfast: Oatmeal with Berries</div>
@@ -857,21 +873,19 @@
                 </div>
             </div>
         </div>
-        
-
     </div>
 
-    <!-- Generate Plan Modal -->
+    <!-- ==== MODAL ==== -->
     <div id="generate-plan-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Generating Meal Plan</h2>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <p>Generating your personalized meal plan based on your preferences and goals...</p>
-                <div style="text-align: center; margin: 2rem 0;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #4CAF50;"></i>
+                <div style="text-align:center;margin:2rem 0;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:3rem;color:#4CAF50;"></i>
                 </div>
             </div>
         </div>
@@ -879,714 +893,336 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        // Global variables
+        /* ==================== GLOBAL VARS ==================== */
         let currentPlan = null;
         const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
         const mealOrder = ['breakfast', 'lunch', 'snack', 'dinner'];
 
-        // Function to render meal boxes for a specific day
-        function renderMealBoxes(day, meals) {
-            const container = document.getElementById(`${day}-meals`);
-            if (!container) return;
-            
-            // Clear the container
-            container.innerHTML = '';
-            
-            // Define meal types and their icons
-            const mealTypes = [
-                { key: 'breakfast', name: 'Breakfast', icon: 'fas fa-sun' },
-                { key: 'lunch', name: 'Lunch', icon: 'fas fa-utensils' },
-                { key: 'snack', name: 'Snack', icon: 'fas fa-ice-cream' },
-                { key: 'dinner', name: 'Dinner', icon: 'fas fa-moon' }
-            ];
-            
-            let hasMeals = false;
-            
-            mealTypes.forEach(mealType => {
-                const mealData = meals[mealType.key] || meals[mealType.key + 's'] || []; // Handle both 'snack' and 'snacks'
-                
-                if (Array.isArray(mealData) && mealData.length > 0) {
-                    hasMeals = true;
-                    const mealBox = document.createElement('div');
-                    mealBox.className = 'meal-box';
-                    
-                    // Create box with meal data
-                    mealBox.innerHTML = `
-                        <div class="meal-header">
-                            <div class="meal-time">${mealType.name}</div>
-                            <div class="meal-icon"><i class="${mealType.icon}"></i></div>
-                        </div>
-                        <div class="meal-content">
-                            ${mealData.map(item => {
-                                const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                                const calories = (item.calories !== undefined && item.calories !== null) ? 
-                                               (typeof item.calories === 'number' ? item.calories : item.calories) : 
-                                               (item.calorie !== undefined ? item.calorie : 'N/A');
-                                return `
-                                    <div class="meal-item">
-                                        <div class="meal-item-name">${name}</div>
-                                        <div class="meal-item-calories">${calories} kcal</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                        <a href="#" class="add-meal-btn" data-meal-type="${mealType.key}">
-                            <i class="fas fa-plus"></i> Add Item
-                        </a>
-                    `;
-                    
-                    container.appendChild(mealBox);
-                } else {
-                    // Create empty box if no data for this meal type
-                    const mealBox = document.createElement('div');
-                    mealBox.className = 'meal-box';
-                    
-                    mealBox.innerHTML = `
-                        <div class="meal-header">
-                            <div class="meal-time">${mealType.name}</div>
-                            <div class="meal-icon"><i class="${mealType.icon}"></i></div>
-                        </div>
-                        <div class="meal-content">
-                            <div class="meal-item">
-                                <div class="meal-item-name">No items planned</div>
-                            </div>
-                        </div>
-                        <a href="#" class="add-meal-btn" data-meal-type="${mealType.key}">
-                            <i class="fas fa-plus"></i> Add Item
-                        </a>
-                    `;
-                    
-                    container.appendChild(mealBox);
-                }
-            });
-            
-            // If no meals were found, show a message
-            if (!hasMeals) {
-                container.innerHTML = '<div class="no-plan-message">No meals available for this day.</div>';
-            }
-        }
-
-        // Function to render the entire diet plan
-        function renderDietPlan(plan) {
-            if (!plan) {
-                console.error('No plan provided to renderDietPlan');
-                return;
-            }
-            
-            // Show the diet plan container
-            document.getElementById('diet-plan-container').style.display = 'block';
-            
-            // Render each day's meals
-            daysOrder.forEach(day => {
-                const dayPlan = plan[day] || plan[day.charAt(0).toUpperCase() + day.slice(1)] || {};
-                renderMealBoxes(day, dayPlan);
-            });
-        }
-
-        // Function to show the active day's plan
+        /* ==================== UI HELPERS ==================== */
         function showDayPlan(day) {
-            // Hide all day containers
-            const dayContainers = document.querySelectorAll('.day-plan-container');
-            dayContainers.forEach(container => {
-                container.classList.remove('active');
-            });
-            
-            // Show the selected day
-            const selectedContainer = document.getElementById(`${day}-plan`);
-            if (selectedContainer) {
-                selectedContainer.classList.add('active');
-            }
-            
-            // Update active tab
-            const tabs = document.querySelectorAll('.day-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.day === day) {
-                    tab.classList.add('active');
-                }
+            document.querySelectorAll('.day-plan-container').forEach(c => c.classList.remove('active'));
+            const sel = document.getElementById(`${day}-plan`);
+            if (sel) sel.classList.add('active');
+            document.querySelectorAll('.day-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.day === day);
             });
         }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Function to generate new meal plan
-        async function generateNewMealPlan() {
-            const goal = document.getElementById('goal').value;
-            const calories = document.getElementById('calories').value;
-            const dietType = document.getElementById('diet-type').value;
-            const allergies = document.getElementById('allergies')?.value || '';
-            const medicalConditions = document.getElementById('preferences')?.value || '';
+        /* ==================== PLAN RENDERING ==================== */
+        function displaySimpleDietPlan(plan) {
+            const container = document.getElementById('diet-plan-container');
+            const display = document.getElementById('simple-plan-display');
+            container.style.display = 'block';
 
-            if (!goal || !calories || !dietType) {
-                alert('Please fill in all required fields (Goal, Calories, Diet Type) before generating a plan.');
+            if (typeof plan === 'string') {
+                display.innerHTML = `<pre class="simple-plan-content">${plan}</pre>`;
                 return;
             }
 
-            const modal = document.getElementById('generate-plan-modal');
-            modal.style.display = 'flex';
+            let html = '<div class="simple-plan-content">';
+            // NEW consolidated format
+            if (plan.breakfast_suggestions || plan.lunch_suggestions || plan.dinner_suggestions || plan.snack_suggestions) {
+                const sections = [
+                    { key: 'breakfast_suggestions', title: 'Breakfast Options' },
+                    { key: 'lunch_suggestions', title: 'Lunch Options' },
+                    { key: 'dinner_suggestions', title: 'Dinner Options' },
+                    { key: 'snack_suggestions', title: 'Snack Options' }
+                ];
+                sections.forEach(s => {
+                    if (!plan[s.key]) return;
+                    html += `<h3>${s.title}</h3><ul class="meal-list">`;
+                    plan[s.key].forEach(it => {
+                        const name = it.name || it.meal_name || String(it);
+                        const cal = it.calories ?? it.calorie ?? 'N/A';
+                        const protein = it.protein ? `, Protein: ${it.protein}g` : '';
+                        const carbs = it.carbs ? `, Carbs: ${it.carbs}g` : '';
+                        const fat = it.fat ? `, Fat: ${it.fat}g` : '';
+                        const desc = it.description ? ` - ${it.description}` : '';
+                        html += `<li class="meal-item"><span class="meal-name">${name}</span><br><span class="meal-calories">${cal} kcal${protein}${carbs}${fat}${desc}</span></li>`;
+                    });
+                    html += '</ul>';
+                });
+            } else {
+                // 7-day format with days in correct sequence
+                const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                for (const day of daysOrder) {
+                    if (!plan.hasOwnProperty(day)) continue;
+                    html += `<h3>${day.charAt(0).toUpperCase() + day.slice(1)}'s Plan</h3><div class="day-meals">`;
+                    for (const meal in plan[day]) {
+                        const items = plan[day][meal];
+                        if (!Array.isArray(items) || !items.length) continue;
+                        html += `<h4>${meal.charAt(0).toUpperCase() + meal.slice(1)}</h4><ul class="meal-list">`;
+                        items.forEach(it => {
+                            const name = it.name || it.meal_name || String(it);
+                            const cal = it.calories ?? it.calorie ?? 'N/A';
+                            const protein = it.protein ? `, Protein: ${it.protein}g` : '';
+                            const carbs = it.carbs ? `, Carbs: ${it.carbs}g` : '';
+                            const fat = it.fat ? `, Fat: ${it.fat}g` : '';
+                            const desc = it.description ? ` - ${it.description}` : '';
+                            html += `<li class="meal-item"><span class="meal-name">${name}</span><br><span class="meal-calories">${cal} kcal${protein}${carbs}${fat}${desc}</span></li>`;
+                        });
+                        html += '</ul>';
+                    }
+                    html += '</div>';
+                }
+            }
+            html += '</div>';
+            display.innerHTML = html;
+            updateNutritionValues(plan);
+        }
 
+        /* ==================== NUTRITION CALC ==================== */
+        async function updateNutritionValues(plan) {
+            const cards = document.querySelectorAll('.nutrient-card');
+
+            // Load user's actual profile data to get real goals
+            let userData = null;
             try {
-                // Check user's subscription status to determine endpoint
-                const subscriptionResponse = await fetch('/api/subscription/status', {
+                const response = await fetch('/api/current_user', {
                     method: 'GET',
                     credentials: 'include'
                 });
-                
-                let endpoint = '/api/diet-plan'; // Default to general endpoint that works for both free and premium
-                let isPremium = false;
-                
-                if (subscriptionResponse.ok) {
-                    const subData = await subscriptionResponse.json();
-                    isPremium = subData.subscription_status === 'active';
-                    console.log('Subscription status:', subData);
-                    // Use the general endpoint which handles both premium and free based on the user's subscription
-                    endpoint = '/api/diet-plan';
-                } else {
-                    // If subscription check fails, assume free user
-                    endpoint = '/api/diet-plan';
-                    console.log("Could not check subscription status, using general endpoint");
-                }
-
-                const requestBody = {
-                    goal: goal,
-                    calorie_target: parseInt(calories) || 2000, // Provide default if NaN
-                    diet_preference: dietType,
-                    allergies: allergies ? allergies.split(',').map(item => item.trim()).filter(item => item) : [],
-                    medical_conditions: medicalConditions ? medicalConditions.split(',').map(item => item.trim()).filter(item => item) : []
-                };
-
-                console.log('Request body:', requestBody);
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include', // This is important to include session cookies
-                    body: JSON.stringify(requestBody)
-                });
-
-                console.log('API response status:', response.status);
 
                 if (response.ok) {
                     const result = await response.json();
-                    
-                    console.log("API Response:", result); // Log for debugging
-                    console.log("Plan type:", result.plan_type);
-                    console.log("Diet plan type:", typeof result.diet_plan);
-                    console.log("Diet plan structure:", result.diet_plan);
-                    
-                    // Check if diet_plan is a structured object with days
-                    const isStructuredPlan = result.diet_plan && 
-                        typeof result.diet_plan === 'object' && 
-                        !result.diet_plan.full_plan &&  // Not an AI text response wrapped in full_plan
-                        Object.keys(result.diet_plan).some(key => daysOrder.includes(key.toLowerCase()) || 
-                                                           daysOrder.includes(key.toLowerCase().substring(0, key.length-1))); // Handle both 'monday' and 'mondayplan'
-                    
-                    // Handle different response types based on plan
-                    if (result.plan_type && (result.plan_type.includes('ai_generated') || result.plan_type.includes('premium'))) {
-                        // AI-generated plan response
-                        console.log('Handling AI-generated plan');
-                        document.querySelector('.meal-plan-header h1').textContent = 'AI-Generated Meal Plan';
-                        updateMealPlanUIWithAIResponse(result.original_response);
-                    } else if (result.plan_type && result.plan_type.includes('basic_fallback')) {
-                        // Fallback plan response (text-based)
-                        console.log('Handling basic fallback plan');
-                        document.querySelector('.meal-plan-header h1').textContent = 'Your Meal Plan';
-                        updateMealPlanUIWithAIResponse(result.original_response);
-                    } else if (isStructuredPlan || result.plan_type === 'basic_free_plan') {
-                        // Structured plan response (free or fallback with structured data)
-                        console.log('Handling structured plan');
-                        document.querySelector('.meal-plan-header h1').textContent = 'Your Meal Plan';
-                        updateMealPlanUIWithStructuredResult(result.diet_plan, result.avg_daily_calories);
-                    } else if (result.diet_plan && result.diet_plan.full_plan) {
-                        // AI response wrapped in full_plan
-                        console.log('Handling AI response with full_plan wrapper');
-                        document.querySelector('.meal-plan-header h1').textContent = 'Your Meal Plan';
-                        updateMealPlanUIWithAIResponse(result.diet_plan.full_plan || result.original_response);
-                    } else {
-                        // Fallback: treat as text response
-                        console.log('Handling fallback text response');
-                        document.querySelector('.meal-plan-header h1').textContent = 'Your Meal Plan';
-                        updateMealPlanUIWithText(result.original_response || (result.diet_plan && typeof result.diet_plan === 'string' ? result.diet_plan : JSON.stringify(result.diet_plan)) || result.message || "Diet plan generated successfully!");
-                    }
-                    
-                    // Always store the plan if it exists in the response, regardless of response type
-                    if (isStructuredPlan) {
-                        currentPlan = result.diet_plan;
-                        console.log('Stored current plan:', currentPlan);
-                    } else if (result.diet_plan && typeof result.diet_plan === 'object') {
-                        // In case the diet_plan is nested differently
-                        currentPlan = result.diet_plan;
-                        console.log('Stored current plan (nested):', currentPlan);
-                    }
-                    
-                    // Close modal and show success
-                    document.getElementById('generate-plan-modal').style.display = 'none';
-                    alert('Your custom meal plan has been generated successfully!');
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to generate meal plan. Server responded with: ' + response.status);
+                    userData = result.user;
                 }
             } catch (error) {
-                console.error('Error generating meal plan:', error);
-                
-                // Close modal
-                const modal = document.getElementById('generate-plan-modal');
-                if (modal) {
-                    modal.style.display = 'none';
-                }
-                
-                // Show user-friendly error message
-                let errorMessage = 'Failed to generate meal plan. ';
-                if (error.message) {
-                    errorMessage += error.message;
-                } else {
-                    errorMessage += 'Please try again later or check your internet connection.';
-                }
-                alert(errorMessage);
-                
-                console.error('Full error details:', error);
-            }
-        }
-
-        function updateMealPlanUIWithStructuredResult(dietPlan, avgDailyCalories) {
-            // This function updates the meal plan UI with structured data (free/basic plan)
-            if (!dietPlan) {
-                console.error('No diet plan data provided');
-                return;
+                console.error('Error fetching user data:', error);
             }
 
-            // Update nutrition summary
-            if (avgDailyCalories) {
-                document.querySelector('.nutrient-value').textContent = Math.round(avgDailyCalories);
-            }
-            
-            // Store the generated plan for switching between days
-            currentPlan = dietPlan;
-            
-            // Normalize the plan structure to match our expected format
-            const normalizedPlan = normalisePlan(dietPlan);
-            
-            // Show the diet plan container
-            document.getElementById('diet-plan-container').style.display = 'block';
-            
-            // Display the diet plan in simple format
-            displaySimpleDietPlan(dietPlan);
-        }
-
-        // Normalize backend object (handles Monday/MONDAY etc.)
-        function normalisePlan(raw) {
-            const norm = {};
-            daysOrder.forEach(day => {
-                // Check for various capitalization formats and plural forms
-                const src = raw[day] || 
-                           raw[day + 's'] || // Handle 'monday' and 'mondays'
-                           raw[day.toUpperCase()] || 
-                           raw[day.toUpperCase() + 'S'] ||
-                           raw[day.charAt(0).toUpperCase() + day.slice(1)] ||
-                           raw[day.charAt(0).toUpperCase() + day.slice(1) + 's'] ||
-                           raw[day.charAt(0).toUpperCase() + day.slice(1).toLowerCase()] ||
-                           raw[day.charAt(0).toUpperCase() + day.slice(1).toLowerCase() + 's'] || {};
-                norm[day] = src;
-            });
-            return norm;
-        }
-
-        function updateMealPlanUIWithAIResponse(aiResponse) {
-            // This function displays the AI-generated response after parsing
-            if (!aiResponse) {
-                console.error('No AI response provided');
-                return;
+            // Use user's actual daily calorie target from profile, fallback to form value
+            let dailyCalorieTarget = 2200; // Default
+            if (userData && userData.daily_calories) {
+                dailyCalorieTarget = Math.round(userData.daily_calories);
+            } else {
+                const calorieInput = document.getElementById('calories');
+                if (calorieInput && calorieInput.value) {
+                    dailyCalorieTarget = parseInt(calorieInput.value) || 2200;
+                }
             }
 
-            try {
-                // First, try to parse as JSON if it looks like structured data
-                let planData = null;
-                const trimmedResponse = aiResponse.trim();
-                
-                if (trimmedResponse.startsWith('{') || trimmedResponse.startsWith('[')) {
-                    try {
-                        planData = JSON.parse(aiResponse);
-                        console.log('Parsed as JSON:', planData);
-                    } catch (jsonError) {
-                        console.log('Not valid JSON, proceeding with text parsing');
-                        planData = null;
-                    }
-                }
-                
-                // If not JSON, try to parse as structured text
-                if (!planData) {
-                    planData = parseAIDietPlan(aiResponse);
-                    console.log('Parsed as text structure:', planData);
-                }
-                
-                // Check if we got valid plan data with actual meals
-                const hasMealData = planData && 
-                    typeof planData === 'object' && 
-                    Object.keys(planData).length > 0 &&
-                    Object.values(planData).some(day => 
-                        Object.values(day).some(mealList => Array.isArray(mealList) && mealList.length > 0)
-                    );
-                
-                if (hasMealData) {
-                    console.log('Valid meal data found, updating UI with plan data');
-                    // Update the meal boxes with the new plan using simple display
-                    currentPlan = planData;
-                    displaySimpleDietPlan(planData);
-                } else {
-                    console.log('No valid meal data found, showing as raw response');
-                    // If we can't parse properly, display the raw response in simple format
-                    displaySimpleDietPlan(aiResponse);
-                }
-            } catch (error) {
-                console.error('Error in updateMealPlanUIWithAIResponse:', error);
-                // Show error message in the simple display
-                const displayElement = document.getElementById('simple-plan-display');
-                if (displayElement) {
-                    displayElement.innerHTML = `<div class="no-plan-message">Error parsing diet plan: ${error.message}</div>`;
-                }
+            // Get user's specific nutrition goals (these should come from profile calculations)
+            let calGoal = dailyCalorieTarget;
+            let proGoal = 140; // Default protein goal
+            let carbGoal = 300; // Default carb goal
+            let fatGoal = 90; // Default fat goal
+
+            // Update with user's actual goals if available
+            if (userData) {
+                // The actual goals should be calculated based on user's profile in backend
+                // For now, using the default values but in a real app these would come from user profile
             }
-        }
-        
-        function parseAIDietPlan(textResponse) {
-            // Enhanced function to parse AI response and convert to structured format
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack']; // Standard meal types
-            const result = {};
-            
-            // Initialize result with empty day objects
-            days.forEach(day => {
-                result[day.toLowerCase()] = {};
-            });
-            
-            // Clean up the response text to normalize line endings and spaces
-            const cleanResponse = textResponse.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            
-            // First, try to parse as JSON if it looks like it might be structured data
-            try {
-                // Check if the response looks like it might be JSON
-                if (cleanResponse.trim().startsWith('{') || cleanResponse.trim().startsWith('[')) {
-                    const parsedJson = JSON.parse(cleanResponse);
-                    if (typeof parsedJson === 'object' && parsedJson !== null) {
-                        // If it's a valid JSON object, try to map it to the expected structure
-                        return mapJsonToPlanStructure(parsedJson);
-                    }
-                }
-            } catch (e) {
-                // If JSON parsing fails, continue with text parsing
-                console.log('Response is not valid JSON, proceeding with text parsing');
+
+            let totalCals = 0;
+            let totalPro = 0;
+            let totalCarb = 0;
+            let totalFat = 0;
+
+            // Function to add nutritional values from a single item
+            function addItem(it) {
+                if (it.calories) totalCals += +it.calories;
+                if (it.protein) totalPro += +it.protein;
+                if (it.carbs) totalCarb += +it.carbs;
+                if (it.fat) totalFat += +it.fat;
             }
-            
-            // Create a basic structure trying to extract day and meal information
-            for (const day of days) {
-                // Look for day headers in various formats
-                // Patterns like: "Monday:", "Monday -", "MONDAY:", "Day 1: Monday", etc.
-                const dayRegex = new RegExp(`${day}[\\s\n]*[:\\-][^]*?(?=\\n\\s*\\w+\\s*[:\\-]|\\n\\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\\s*[:\\-]|$)`, 'ig');
-                const dayMatch = findBestMatch(cleanResponse, dayRegex);
-                
-                if (dayMatch) {
-                    const dayContent = dayMatch;
-                    
-                    for (const meal of meals) {
-                        // Look for patterns like "Breakfast: " or "LUNCH -" within the day content
-                        const mealPatterns = [
-                            new RegExp(`${meal}[\\s\n]*[:=]([^]*?)(?=\\n\\s*\\w+\\s*[:=]|\\n\\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|$)`, 'i'),
-                            new RegExp(`${meal}\\s+of[\\s\n]*([^]*?)(?=\\n\\s*\\w+\\s+of|\\n\\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|$)`, 'i') // "Breakfast of..."
-                        ];
-                        
-                        let mealItems = [];
-                        for (const pattern of mealPatterns) {
-                            const mealMatch = dayContent.match(pattern);
-                            if (mealMatch) {
-                                mealItems = extractMealItems(mealMatch[1]);
-                                break;
-                            }
-                        }
-                        
-                        result[day.toLowerCase()][meal.toLowerCase()] = mealItems;
-                    }
-                }
-            }
-            
-            // If we still don't have a proper structure, try alternative parsing approach
-            // Look for patterns like "Monday Breakfast:" or "Breakfast on Monday"
-            for (const day of days) {
-                for (const meal of meals) {
-                    // Pattern: "Monday Breakfast:" or "Monday - Breakfast:" 
-                    const pattern1 = new RegExp(`${day}\\s+${meal}[\\s\n]*[:=]([^]*?)(?=\\n\\s*\\w+\\s+\\w+[:=]|\\n\\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|$)`, 'i');
-                    const match1 = cleanResponse.match(pattern1);
-                    if (match1) {
-                        result[day.toLowerCase()][meal.toLowerCase()] = extractMealItems(match1[1]);
-                    }
-                    
-                    // Pattern: "Breakfast on Monday:" or "Lunch for Tuesday:"
-                    const pattern2 = new RegExp(`${meal}\\s+(?:on|for)\\s+${day}[\\s\n]*[:=]([^]*?)(?=\\n\\s*\\w+\\s+(?:on|for)\\s+\\w+[:=]|\\n\\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|$)`, 'i');
-                    const match2 = cleanResponse.match(pattern2);
-                    if (match2) {
-                        result[day.toLowerCase()][meal.toLowerCase()] = extractMealItems(match2[1]);
-                    }
-                }
-            }
-            
-            // If no structured data was found, return empty object
-            if (Object.keys(result).length === 0 || Object.values(result).every(day => Object.values(day).every(meal => meal.length === 0))) {
-                console.log("Could not parse structured data from AI response");
-                // Try to create a minimal structure by extracting any food items mentioned
-                for (const day of days) {
-                    const dayLower = day.toLowerCase();
-                    if (!result[dayLower]) result[dayLower] = {};
-                    
-                    // Just place all extracted items under breakfast as a fallback
-                    result[dayLower]['breakfast'] = extractMealItems(cleanResponse);
-                }
-            }
-            
-            return result;
-        }
-        
-        // Helper function to find the best match when multiple matches exist
-        function findBestMatch(text, regex) {
-            const matches = text.match(regex);
-            if (matches && matches.length > 0) {
-                // Return the longest match as the 'best' match
-                return matches.reduce((longest, current) => current.length > longest.length ? current : longest);
-            }
-            return null;
-        }
-        
-        // Helper function to map JSON responses to the expected structure
-        function mapJsonToPlanStructure(jsonData) {
-            const result = {};
-            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            for (const day of days) {
-                // Check for various formats in the JSON data
-                const dayKey = Object.keys(jsonData).find(key => 
-                    key.toLowerCase() === day || 
-                    key.toLowerCase() === day + 's' || 
-                    key.toLowerCase() === day.charAt(0).toUpperCase() + day.slice(1) ||
-                    key.toLowerCase() === day.charAt(0).toUpperCase() + day.slice(1) + 's'
-                );
-                
-                if (dayKey) {
-                    const dayData = jsonData[dayKey];
-                    result[day] = {};
-                    
-                    // Process each meal type in the day data
-                    for (const key in dayData) {
-                        const mealType = key.toLowerCase();
-                        const mealData = dayData[key];
-                        
-                        // Convert the meal data to our expected format
-                        if (Array.isArray(mealData)) {
-                            // If it's already an array of items
-                            result[day][mealType] = mealData.map(item => {
-                                if (typeof item === 'string') {
-                                    return { name: item, calories: 'N/A' };
-                                } else if (typeof item === 'object' && item !== null) {
-                                    return item;
-                                } else {
-                                    return { name: String(item), calories: 'N/A' };
-                                }
+
+            // Handle consolidated format (suggestions)
+            if (plan.breakfast_suggestions || plan.lunch_suggestions || plan.dinner_suggestions || plan.snack_suggestions) {
+                if (plan.breakfast_suggestions) plan.breakfast_suggestions.forEach(addItem);
+                if (plan.lunch_suggestions) plan.lunch_suggestions.forEach(addItem);
+                if (plan.dinner_suggestions) plan.dinner_suggestions.forEach(addItem);
+                if (plan.snack_suggestions) plan.snack_suggestions.forEach(addItem);
+            } else {
+                // Handle 7-day format - calculate values for the first day only (or average)
+                // Let's calculate values for a single representative day
+                let firstDayProcessed = false;
+                for (const day in plan) {
+                    if (!plan.hasOwnProperty(day) || firstDayProcessed) continue;
+
+                    for (const meal in plan[day]) {
+                        if (plan[day][meal] && Array.isArray(plan[day][meal])) {
+                            plan[day][meal].forEach(item => {
+                                if (item.calories) totalCals += +item.calories;
+                                if (item.protein) totalPro += +item.protein;
+                                if (item.carbs) totalCarb += +item.carbs;
+                                if (item.fat) totalFat += +item.fat;
                             });
-                        } else if (typeof mealData === 'object' && mealData !== null) {
-                            // If it's an object with properties
-                            result[day][mealType] = [{
-                                name: mealData.name || mealData.food || mealData.item || key,
-                                calories: mealData.calories || mealData.cals || mealData.kcal || 'N/A'
-                            }];
-                        } else {
-                            // If it's a simple value
-                            result[day][mealType] = [{ name: String(mealData), calories: 'N/A' }];
                         }
                     }
-                } else {
-                    // Initialize empty object for this day if not present in JSON
-                    result[day] = {};
+                    firstDayProcessed = true; // Only process first day to get daily values
                 }
-            }
-            
-            return result;
-        }
-        
-        function extractMealItems(mealText) {
-            if (!mealText) return [];
-            
-            // Extract individual meal items from meal description
-            const items = [];
-            // Look for bullet points, numbered lists, and common meal formats
-            const lines = mealText.split(/\n|;\s*\n/);
-            
-            for (const line of lines) {
-                let cleanLine = line.trim();
-                
-                // Skip if line is too short or doesn't contain relevant information
-                if (!cleanLine || cleanLine.length < 3) continue;
-                
-                // Skip lines that are clearly not meal items
-                if (cleanLine.toLowerCase().includes('total') || 
-                    cleanLine.toLowerCase().includes('summary') || 
-                    cleanLine.toLowerCase().includes('note') ||
-                    cleanLine.toLowerCase().includes('instruction') ||
-                    cleanLine.toLowerCase().includes('tip') ||
-                    cleanLine.match(/^\d+\s*(gram|kg|g|lbs|oz|cup|tbsp|tsp|ml|l)/i)) {
-                    continue;
-                }
-                
-                // Try to extract items with calories in various formats
-                // Formats like: "Roti with Daal (190 kcal)", "Biryani - 250 calories", "Chicken curry: 200 cal"
-                let itemMatch = cleanLine.match(/([^(]+)\s*\((\d+(?:\.\d+)?)\s*(?:cal|kcal|calories?)\)/i);
-                if (!itemMatch) {
-                    itemMatch = cleanLine.match(/([^-]+)\s*[-:]\s*(\d+(?:\.\d+)?)\s*(?:cal|kcal|calories?)/i);
-                }
-                if (!itemMatch) {
-                    itemMatch = cleanLine.match(/([^-:]+)\s*:\s*(\d+(?:\.\d+)?)\s*(?:cal|kcal|calories?)/i);
-                }
-                
-                if (itemMatch) {
-                    // Found item with calorie information
-                    const name = itemMatch[1].trim().replace(/^\s*[-*]\s*|\d+\.\s*/, '');
-                    const calories = itemMatch[2];
-                    if (name && name.length > 1) {
-                        items.push({
-                            name: name,
-                            calories: calories
-                        });
-                    }
-                } else {
-                    // Extract just the food item name without calorie info
-                    let foodName = '';
-                    
-                    // Handle various formats
-                    if (cleanLine.includes('-')) {
-                        // Format like "Roti - Pakistani bread" or "2. Roti - with daal"
-                        const parts = cleanLine.split('-');
-                        foodName = parts[0].replace(/^\s*[-*]\s*|\d+\.\s*/, '').trim();
-                    } else if (cleanLine.includes('*')) {
-                        // Format like "* Roti with Daal"
-                        foodName = cleanLine.replace(/^\s*[*]\s*|\d+\.\s*/, '').trim();
-                    } else if (cleanLine.match(/^\d+\./)) {
-                        // Format like "1. Roti with Daal"
-                        foodName = cleanLine.replace(/^\d+\.\s*/, '').trim();
-                    } else if (cleanLine.match(/^[-*]\s*/)) {
-                        // Format like "- Roti with Daal"
-                        foodName = cleanLine.replace(/^[-*]\s*/, '').trim();
-                    } else {
-                        // Just the food name
-                        foodName = cleanLine.trim();
-                    }
-                    
-                    // Only add if it's a reasonable length and looks like a food item
-                    if (foodName && foodName.length > 2) {
-                        items.push({
-                            name: foodName,
-                            calories: 'N/A'
-                        });
-                    }
-                }
-            }
-            
-            // If we couldn't parse with the above formats, try a more general approach
-            if (items.length === 0 && mealText) {
-                // Look for common food-related phrases
-                const foodItems = mealText.split(/[;,]+/).map(item => item.trim()).filter(item => item.length > 2);
-                
-                items.push(...foodItems.map(name => ({
-                    name: name,
-                    calories: 'N/A'
-                })));
-            }
-            
-            return items;
-        }
-        
-        function updateMealPlanUIWithText(textResponse) {
-            // This function displays text-based response
-            if (!textResponse) {
-                console.error('No text response provided');
-                return;
             }
 
-            // Handle the text response the same way as AI response
-            // since it might also contain structured information
-            updateMealPlanUIWithAIResponse(textResponse);
+            // Use actual values from plan if available, otherwise use estimates
+            const estCals = totalCals > 0 ? totalCals : calGoal;
+            const estPro = totalPro > 0 ? totalPro : Math.round(estCals * 0.15 / 4);
+            const estCarb = totalCarb > 0 ? totalCarb : Math.round(estCals * 0.55 / 4);
+            const estFat = totalFat > 0 ? totalFat : Math.round(estCals * 0.30 / 9);
+
+            // Update UI
+            cards[0].querySelector('.nutrient-value').textContent = estCals.toLocaleString();
+            cards[1].querySelector('.nutrient-value').textContent = estPro + 'g';
+            cards[2].querySelector('.nutrient-value').textContent = estCarb + 'g';
+            cards[3].querySelector('.nutrient-value').textContent = estFat + 'g';
+
+            // Update goal text to reflect user's actual targets
+            cards[0].querySelector('.nutrient-label').textContent = 'Calories (Daily Goal: ' + calGoal.toLocaleString() + ')';
+            cards[1].querySelector('.nutrient-label').textContent = 'Protein (Daily Goal: ' + proGoal + 'g)';
+            cards[2].querySelector('.nutrient-label').textContent = 'Carbs (Daily Goal: ' + carbGoal + 'g)';
+            cards[3].querySelector('.nutrient-label').textContent = 'Fat (Daily Goal: ' + fatGoal + 'g)';
+
+            // Update progress bars based on user's actual goals
+            const prog = cards[0].querySelectorAll('.progress');
+            prog[0].style.width = Math.min(100, Math.round(estCals / calGoal * 100)) + '%';
+            prog[1].style.width = Math.min(100, Math.round(estPro / proGoal * 100)) + '%';
+            prog[2].style.width = Math.min(100, Math.round(estCarb / carbGoal * 100)) + '%';
+            prog[3].style.width = Math.min(100, Math.round(estFat / fatGoal * 100)) + '%';
         }
 
-        // Function to open add meal modal
-        function openAddMealModal(mealType) {
-            // In a real app, this would open an add meal modal
-            alert(`Add meal functionality for ${mealType}`);
-        }
+        /* ==================== API CALL ==================== */
+        async function generateNewMealPlan() {
+            const goal = document.getElementById('goal').value;
+            const cals = +document.getElementById('calories').value || 2200;
+            const type = document.getElementById('diet-type').value;
+            const allergies = document.getElementById('allergies')?.value || '';
+            const med = document.getElementById('preferences')?.value || '';
 
-        // Function to save current plan
-        function saveCurrentPlan() {
+            if (!goal || !cals || !type) { alert('Fill required fields'); return; }
+
+            openModal('generate-plan-modal');
+
             try {
-                alert('Meal plan saved successfully!');
-            } catch (error) {
-                console.error('Error saving plan:', error);
-                alert('Error saving meal plan: ' + error.message);
+                const subRes = await fetch('/api/subscription/status', { credentials: 'include' });
+                let isPremium = false;
+                if (subRes.ok) { const d = await subRes.json(); isPremium = d.subscription_status === 'active'; }
+
+                const body = {
+                    goal,
+                    calorie_target: cals,
+                    diet_preference: type,
+                    allergies: allergies ? allergies.split(',').map(s => s.trim()).filter(Boolean) : [],
+                    medical_conditions: med ? med.split(',').map(s => s.trim()).filter(Boolean) : []
+                };
+
+                const res = await fetch('/api/diet-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Server error'); }
+
+                const data = await res.json();
+                closeModal('generate-plan-modal');
+
+                // ---- decide how to show ----
+                if (data.plan_type?.includes('ai_generated') || data.original_response) {
+                    displayWEBPlan(data.original_response || data.diet_plan?.full_plan || '');
+                } else if (data.diet_plan && typeof data.diet_plan === 'object') {
+                    currentPlan = data.diet_plan;
+                    displaySimpleDietPlan(data.diet_plan);
+                } else {
+                    displaySimpleDietPlan('Unexpected response format.');
+                }
+
+                alert('Meal plan generated!');
+            } catch (e) {
+                closeModal('generate-plan-modal');
+                alert('Error: ' + e.message);
+                console.error(e);
             }
         }
 
-        // Function to load user data from backend
+        /* ==================== OTHER UI ACTIONS ==================== */
+        function downloadPDF() {
+            const el = document.querySelector('.meal-planner-container');
+            const opt = {
+                margin: 10,
+                filename: 'diet-plan.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(el).save();
+        }
+        function saveCurrentPlan() { alert('Plan saved! (demo)'); }
         async function loadUserData() {
             try {
                 const response = await fetch('/api/current_user', {
                     method: 'GET',
                     credentials: 'include'
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     const user = result.user;
-                    
+
                     if(user) {
                         // Update form defaults with user data if available
                         if(user.daily_calories) {
                             document.getElementById('calories').value = Math.round(user.daily_calories);
                         }
-                        
+
                         if(user.goal_type) {
                             document.getElementById('goal').value = user.goal_type;
                         }
-                        
-                        // Update nutrition summary with user's calorie target
+
+                        // Update nutrition summary with user's calorie target and goals
                         if(user.daily_calories) {
                             const calorieValue = Math.round(user.daily_calories);
-                            const nutrientValues = document.querySelectorAll('.nutrient-value');
-                            
-                            if (nutrientValues.length >= 4) {
-                                // Calories (first element)
-                                nutrientValues[0].textContent = calorieValue.toString();
-                                
-                                // Estimate protein, carbs, and fat based on calorie target
-                                const estimatedProtein = Math.round((calorieValue * 0.15) / 4); // ~15% of calories as protein
-                                const estimatedCarbs = Math.round((calorieValue * 0.55) / 4);   // ~55% as carbs
-                                const estimatedFat = Math.round((calorieValue * 0.30) / 9);     // ~30% as fat
-                                
-                                // Update protein (second element)
-                                nutrientValues[1].textContent = estimatedProtein + 'g';
-                                
-                                // Update carbs (third element)
-                                nutrientValues[2].textContent = estimatedCarbs + 'g';
-                                
-                                // Update fat (fourth element)
-                                nutrientValues[3].textContent = estimatedFat + 'g';
-                            }
-                            
-                            // Update progress bars
-                            const progressBars = document.querySelectorAll('.progress');
-                            if (progressBars.length >= 4) {
-                                const caloriePercent = Math.min(100, Math.round((calorieValue / 2200) * 100));
-                                progressBars[0].style.width = caloriePercent + '%';
-                                
-                                const proteinPercent = Math.min(150, Math.round((estimatedProtein / 140) * 100));
-                                progressBars[1].style.width = proteinPercent + '%';
-                                
-                                const carbsPercent = Math.min(100, Math.round((estimatedCarbs / 300) * 100));
-                                progressBars[2].style.width = carbsPercent + '%';
-                                
-                                const fatPercent = Math.min(100, Math.round((estimatedFat / 90) * 100));
-                                progressBars[3].style.width = fatPercent + '%';
+                            const nutrientCards = document.querySelectorAll('.nutrient-card');
+
+                            if (nutrientCards.length >= 4) {
+                                // Update Calories card (first card)
+                                const calCard = nutrientCards[0];
+                                calCard.querySelector('.nutrient-value').textContent = calorieValue.toLocaleString();
+                                calCard.querySelector('.goal-cal').textContent = calorieValue.toLocaleString();
+                                calCard.querySelector('.nutrient-label').textContent = `Calories (Daily Goal: ${calorieValue.toLocaleString()})`;
+
+                                // Calculate macronutrient goals based on calorie target
+                                const proteinGoal = Math.round((calorieValue * 0.15) / 4); // ~15% calories as protein
+                                const carbGoal = Math.round((calorieValue * 0.55) / 4);   // ~55% as carbs
+                                const fatGoal = Math.round((calorieValue * 0.30) / 9);     // ~30% as fat
+
+                                // Update Protein card (second card)
+                                const proCard = nutrientCards[1];
+                                proCard.querySelector('.goal-pro').textContent = proteinGoal + 'g';
+                                proCard.querySelector('.nutrient-label').textContent = `Protein (Daily Goal: ${proteinGoal}g)`;
+
+                                // Update Carbs card (third card)
+                                const carbCard = nutrientCards[2];
+                                carbCard.querySelector('.goal-carb').textContent = carbGoal + 'g';
+                                carbCard.querySelector('.nutrient-label').textContent = `Carbs (Daily Goal: ${carbGoal}g)`;
+
+                                // Update Fat card (fourth card)
+                                const fatCard = nutrientCards[3];
+                                fatCard.querySelector('.goal-fat').textContent = fatGoal + 'g';
+                                fatCard.querySelector('.nutrient-label').textContent = `Fat (Daily Goal: ${fatGoal}g)`;
+
+                                // Update initial values to match user goals
+                                proCard.querySelector('.nutrient-value').textContent = Math.round(proteinGoal * 1.07) + 'g'; // 107% of goal as example
+                                carbCard.querySelector('.nutrient-value').textContent = Math.round(carbGoal * 0.93) + 'g';  // 93% of goal as example
+                                fatCard.querySelector('.nutrient-value').textContent = Math.round(fatGoal * 0.94) + 'g';    // 94% of goal as example
+
+                                // Update progress bars based on user's calorie target
+                                const progressBars = document.querySelectorAll('.progress');
+                                if (progressBars.length >= 4) {
+                                    const caloriePercent = Math.min(100, Math.round((calorieValue / calorieValue) * 100));
+                                    progressBars[0].style.width = caloriePercent + '%';
+
+                                    const proteinPercent = Math.min(150, Math.round((proteinGoal * 1.07) / proteinGoal * 100));
+                                    progressBars[1].style.width = proteinPercent + '%';
+
+                                    const carbsPercent = Math.min(100, Math.round((carbGoal * 0.93) / carbGoal * 100));
+                                    progressBars[2].style.width = carbsPercent + '%';
+
+                                    const fatPercent = Math.min(100, Math.round((fatGoal * 0.94) / fatGoal * 100));
+                                    progressBars[3].style.width = fatPercent + '%';
+                                }
                             }
                         }
                     }
@@ -1595,421 +1231,62 @@
                 console.error('Error loading user data:', error);
             }
         }
-
-        // Load subscription status
         async function loadSubscriptionStatus() {
             try {
-                const response = await fetch('/api/subscription/status', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    const statusElement = document.getElementById('current-subscription');
-                    
-                    if (result.subscription_status === 'active') {
-                        statusElement.className = 'subscription-status status-active';
-                        statusElement.textContent = `Premium Plan Active! Ends on ${new Date(result.subscription_end_date).toLocaleDateString()}`;
-                        
-                        // Show premium features
-                        document.getElementById('premiumFeatures').style.display = 'flex';
-                        document.getElementById('generate-plan-btn-form').innerHTML = '<i class="fas fa-magic"></i> Generate AI Diet Plan';
-                        // Hide premium features section since user already has access
-                        document.getElementById('premium-features-section').style.display = 'none';
-                    } else {
-                        statusElement.className = 'subscription-status status-inactive';
-                        statusElement.textContent = 'Free Plan - Limited features available. Upgrade to Premium for full AI-powered diet plans.';
-                        
-                        // Hide premium features for free users
-                        document.getElementById('premiumFeatures').style.display = 'none';
-                        document.getElementById('generate-plan-btn-form').innerHTML = '<i class="fas fa-magic"></i> Generate Basic Diet Plan';
-                        // Show premium features section to encourage upgrade
-                        document.getElementById('premium-features-section').style.display = 'block';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading subscription status:', error);
-            }
-        }
-        
-        // Subscribe to a plan
-        async function subscribe(planId) {
-            try {
-                const response = await fetch('/api/subscription/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ plan_id: planId })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert(`Subscription successful! You now have access to premium features. ${result.plan.name} plan ends on ${new Date(result.end_date).toLocaleDateString()}`);
-                    // Reload page to update UI
-                    window.location.reload();
+                const r = await fetch('/api/subscription/status', { credentials: 'include' });
+                if (!r.ok) throw '';
+                const d = await r.json();
+                const el = document.getElementById('current-subscription');
+                if (d.subscription_status === 'active') {
+                    el.className = 'subscription-status status-active';
+                    el.textContent = `Premium Active – ends ${new Date(d.subscription_end_date).toLocaleDateString()}`;
+                    document.getElementById('premiumFeatures').style.display = 'flex';
+                    document.getElementById('generate-plan-btn-form').innerHTML = '<i class="fas fa-magic"></i> Generate AI Diet Plan';
                 } else {
-                    alert('Subscription failed: ' + (result.error || 'Unknown error'));
+                    el.className = 'subscription-status status-inactive';
+                    el.textContent = 'Free Plan – upgrade for AI plans';
+                    document.getElementById('premiumFeatures').style.display = 'none';
+                    document.getElementById('generate-plan-btn-form').innerHTML = '<i class="fas fa-magic"></i> Generate Basic Diet Plan';
                 }
-            } catch (error) {
-                console.error('Error subscribing:', error);
-                alert('An error occurred while processing your subscription. Please try again.');
-            }
-        }
-        
-        // Function to download the meal plan as PDF
-        function downloadPDF() {
-            const element = document.querySelector('.meal-planner-container');
-            
-            // Additional styling for PDF
-            const opt = {
-                margin: 10,
-                filename: 'diet-plan.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            // Generate the PDF
-            html2pdf().set(opt).from(element).save();
+            } catch { }
         }
 
-        // Function to calculate and update nutrition values based on diet plan
-        function updateNutritionValues(dietPlan) {
-            if (!dietPlan) return;
-            
-            // Initialize nutrition values
-            let totalCalories = 0;
-            let samplePlan = false;
+        /* ==================== INIT ==================== */
+        document.addEventListener('DOMContentLoaded', () => {
 
-            // Check if it's the new consolidated format
-            if (dietPlan.breakfast_suggestions || dietPlan.lunch_suggestions || 
-                dietPlan.dinner_suggestions || dietPlan.snack_suggestions) {
-                
-                samplePlan = true;
-                // For now, just use a representative value from the first suggestion of each type
-                if (dietPlan.breakfast_suggestions && dietPlan.breakfast_suggestions.length > 0) {
-                    const sampleItem = dietPlan.breakfast_suggestions[0];
-                    if (sampleItem.calories) totalCalories += parseFloat(sampleItem.calories);
-                }
-                if (dietPlan.lunch_suggestions && dietPlan.lunch_suggestions.length > 0) {
-                    const sampleItem = dietPlan.lunch_suggestions[0];
-                    if (sampleItem.calories) totalCalories += parseFloat(sampleItem.calories);
-                }
-                if (dietPlan.dinner_suggestions && dietPlan.dinner_suggestions.length > 0) {
-                    const sampleItem = dietPlan.dinner_suggestions[0];
-                    if (sampleItem.calories) totalCalories += parseFloat(sampleItem.calories);
-                }
-                if (dietPlan.snack_suggestions && dietPlan.snack_suggestions.length > 0) {
-                    const sampleItem = dietPlan.snack_suggestions[0];
-                    if (sampleItem.calories) totalCalories += parseFloat(sampleItem.calories);
-                }
-            } else {
-                // Old 7-day format
-                for (const day in dietPlan) {
-                    if (dietPlan.hasOwnProperty(day)) {
-                        const meals = dietPlan[day];
-                        if (meals && typeof meals === 'object') {
-                            for (const mealType in meals) {
-                                if (meals.hasOwnProperty(mealType)) {
-                                    const mealItems = meals[mealType];
-                                    if (Array.isArray(mealItems)) {
-                                        mealItems.forEach(item => {
-                                            if (item.calories) {
-                                                totalCalories += parseFloat(item.calories);
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // generate day containers (once)
+            const daysContainer = document.createElement('div');
+            daysContainer.id = 'days-container';
+            document.querySelector('.meal-planner-container').insertBefore(daysContainer, document.getElementById('diet-plan-container'));
 
-            // If we have a meaningful calorie count from the plan, use it
-            if (totalCalories > 0) {
-                // Update the nutrition summary cards only if totalCalories is substantial
-                const calorieGoal = 2200; // Default goal
-                const proteinGoal = 140;  // Default goal
-                const carbGoal = 300;     // Default goal
-                const fatGoal = 90;       // Default goal
+            daysOrder.forEach(d => {
+                const tab = `<div class="day-tab" data-day="${d}">${d.charAt(0).toUpperCase() + d.slice(1)}</div>`;
+                document.querySelector('.days-tabs')?.insertAdjacentHTML('beforeend', tab);
 
-                // Estimate based on proportions
-                const estimatedCalories = totalCalories > 0 ? Math.round(totalCalories) : 2200;
-                const estimatedProtein = Math.round((estimatedCalories * 0.15) / 4); // ~15% calories from protein
-                const estimatedCarbs = Math.round((estimatedCalories * 0.55) / 4);   // ~55% calories from carbs
-                const estimatedFat = Math.round((estimatedCalories * 0.30) / 9);     // ~30% calories from fat
+                const planDiv = `<div id="${d}-plan" class="day-plan-container"><div id="${d}-meals" class="meals-container"></div></div>`;
+                daysContainer.insertAdjacentHTML('beforeend', planDiv);
+            });
 
-                // Update nutrient values
-                const nutrientValues = document.querySelectorAll('.nutrient-value');
-                if (nutrientValues.length >= 4) {
-                    // Calories (first element)
-                    nutrientValues[0].textContent = estimatedCalories.toString();
-                    
-                    // Protein (second element)
-                    nutrientValues[1].textContent = estimatedProtein + 'g';
-                    
-                    // Carbs (third element)
-                    nutrientValues[2].textContent = estimatedCarbs + 'g';
-                    
-                    // Fat (fourth element)
-                    nutrientValues[3].textContent = estimatedFat + 'g';
-                }
-
-                // Update progress bars
-                const progressBars = document.querySelectorAll('.progress');
-                if (progressBars.length >= 4) {
-                    const caloriePercent = Math.min(150, Math.round((estimatedCalories / calorieGoal) * 100));
-                    progressBars[0].style.width = caloriePercent + '%';
-
-                    const proteinPercent = Math.min(150, Math.round((estimatedProtein / proteinGoal) * 100));
-                    progressBars[1].style.width = proteinPercent + '%';
-
-                    const carbsPercent = Math.min(150, Math.round((estimatedCarbs / carbGoal) * 100));
-                    progressBars[2].style.width = carbsPercent + '%';
-
-                    const fatPercent = Math.min(150, Math.round((estimatedFat / fatGoal) * 100));
-                    progressBars[3].style.width = fatPercent + '%';
-                }
-            }
-        }
-        
-        // Function to display diet plan in simple format
-        function displaySimpleDietPlan(dietPlan) {
-            // Show the diet plan container
-            const container = document.getElementById('diet-plan-container');
-            if (container) {
-                container.style.display = 'block';
-            }
-
-            const displayElement = document.getElementById('simple-plan-display');
-            if (!displayElement) {
-                console.error('Simple plan display element not found');
-                return;
-            }
-
-            // Check if dietPlan is a string (AI response) or an object (structured plan)
-            if (typeof dietPlan === 'string') {
-                // If it's a string, display it directly
-                displayElement.innerHTML = '<div class="simple-plan-content">' + dietPlan + '</div>';
-            } else if (typeof dietPlan === 'object' && dietPlan !== null) {
-                // If it's an object, format it in a readable way
-                let planHtml = '<div class="simple-plan-content">';
-
-                // Check if this is the new consolidated format
-                if (dietPlan.breakfast_suggestions || dietPlan.lunch_suggestions || 
-                    dietPlan.dinner_suggestions || dietPlan.snack_suggestions) {
-                    
-                    // New consolidated format
-                    if (dietPlan.breakfast_suggestions) {
-                        planHtml += '<h3>Breakfast Options</h3>';
-                        planHtml += '<ul class="meal-list">';
-                        dietPlan.breakfast_suggestions.forEach(item => {
-                            const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                            const calories = (item.calories !== undefined && item.calories !== null) ?
-                                           (typeof item.calories === 'number' ? item.calories : item.calories) :
-                                           (item.calorie !== undefined ? item.calorie : 'N/A');
-                            planHtml += '<li class="meal-item"><span class="meal-name">' + name + '</span> <span class="meal-calories">' + calories + ' kcal</span></li>';
-                        });
-                        planHtml += '</ul>';
-                    }
-                    
-                    if (dietPlan.lunch_suggestions) {
-                        planHtml += '<h3>Lunch Options</h3>';
-                        planHtml += '<ul class="meal-list">';
-                        dietPlan.lunch_suggestions.forEach(item => {
-                            const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                            const calories = (item.calories !== undefined && item.calories !== null) ?
-                                           (typeof item.calories === 'number' ? item.calories : item.calories) :
-                                           (item.calorie !== undefined ? item.calorie : 'N/A');
-                            planHtml += '<li class="meal-item"><span class="meal-name">' + name + '</span> <span class="meal-calories">' + calories + ' kcal</span></li>';
-                        });
-                        planHtml += '</ul>';
-                    }
-                    
-                    if (dietPlan.dinner_suggestions) {
-                        planHtml += '<h3>Dinner Options</h3>';
-                        planHtml += '<ul class="meal-list">';
-                        dietPlan.dinner_suggestions.forEach(item => {
-                            const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                            const calories = (item.calories !== undefined && item.calories !== null) ?
-                                           (typeof item.calories === 'number' ? item.calories : item.calories) :
-                                           (item.calorie !== undefined ? item.calorie : 'N/A');
-                            planHtml += '<li class="meal-item"><span class="meal-name">' + name + '</span> <span class="meal-calories">' + calories + ' kcal</span></li>';
-                        });
-                        planHtml += '</ul>';
-                    }
-                    
-                    if (dietPlan.snack_suggestions) {
-                        planHtml += '<h3>Snack Options</h3>';
-                        planHtml += '<ul class="meal-list">';
-                        dietPlan.snack_suggestions.forEach(item => {
-                            const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                            const calories = (item.calories !== undefined && item.calories !== null) ?
-                                           (typeof item.calories === 'number' ? item.calories : item.calories) :
-                                           (item.calorie !== undefined ? item.calorie : 'N/A');
-                            planHtml += '<li class="meal-item"><span class="meal-name">' + name + '</span> <span class="meal-calories">' + calories + ' kcal</span></li>';
-                        });
-                        planHtml += '</ul>';
-                    }
-                } else {
-                    // Old 7-day format (for backward compatibility)
-                    for (const day in dietPlan) {
-                        if (dietPlan.hasOwnProperty(day)) {
-                            const meals = dietPlan[day];
-                            if (meals && typeof meals === 'object') {
-                                planHtml += '<h3>' + day.charAt(0).toUpperCase() + day.slice(1) + '\'s Plan</h3>';
-                                planHtml += '<div class="day-meals">';
-
-                                for (const mealType in meals) {
-                                    if (meals.hasOwnProperty(mealType)) {
-                                        const mealItems = meals[mealType];
-                                        if (Array.isArray(mealItems) && mealItems.length > 0) {
-                                            planHtml += '<h4>' + mealType.charAt(0).toUpperCase() + mealType.slice(1) + '</h4>';
-                                            planHtml += '<ul class="meal-list">';
-
-                                            for (let i = 0; i < mealItems.length; i++) {
-                                                const item = mealItems[i];
-                                                const name = item.name || item.meal_name || (typeof item === 'string' ? item : 'Meal item');
-                                                const calories = (item.calories !== undefined && item.calories !== null) ?
-                                                               (typeof item.calories === 'number' ? item.calories : item.calories) :
-                                                               (item.calorie !== undefined ? item.calorie : 'N/A');
-                                                planHtml += '<li class="meal-item"><span class="meal-name">' + name + '</span> <span class="meal-calories">' + calories + ' kcal</span></li>';
-                                            }
-
-                                            planHtml += '</ul>';
-                                        }
-                                    }
-                                }
-
-                                planHtml += '</div>';
-                            }
-                        }
-                    }
-                }
-
-                planHtml += '</div>';
-                displayElement.innerHTML = planHtml;
-                
-                // Update the nutrition summary based on the plan
-                updateNutritionValues(dietPlan);
-            } else {
-                // If no valid plan is found, show a message
-                displayElement.innerHTML = '<div class="no-plan-message">No meal plan data available.</div>';
-            }
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the application
             loadUserData();
             loadSubscriptionStatus();
-            
-            // Set up event listeners
-            document.getElementById('generate-plan-btn')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Generate New Plan button clicked');
-                generateNewMealPlan();
-            });
-            
-            document.getElementById('generate-plan-btn-form')?.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent any form submission
-                e.stopPropagation(); // Stop event bubbling
-                console.log('Generate plan button clicked');
-                generateNewMealPlan();
-            });
-            
-            // Also prevent form submission
-            const generatePlanForm = document.getElementById('generate-plan-form');
-            if (generatePlanForm) {
-                generatePlanForm.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Prevent form submission
-                    return false;
-                });
-            }
-            
-            // Save plan button
-            document.getElementById('save-plan-btn').addEventListener('click', function() {
-                saveCurrentPlan();
-            });
-            
-            // Log meal button
-            document.getElementById('log-meal-btn').addEventListener('click', function() {
-                alert('Log meal functionality would open form here');
-            });
-            
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', async function() {
-                if(confirm('Are you sure you want to logout?')) {
-                    try {
-                        const response = await fetch('/api/logout', {
-                            method: 'POST',
-                            credentials: 'include'
-                        });
-                        
-                        if (response.ok) {
-                            window.location.href = '/login';
-                        } else {
-                            console.error('Logout failed:', await response.text());
-                            // Even if API call fails, redirect to login
-                            window.location.href = '/login';
-                        }
-                    } catch (error) {
-                        console.error('Error during logout:', error);
-                        // Redirect to login even if there's an error
-                        window.location.href = '/login';
-                    }
-                }
-            });
-            
-            // Day tabs - show the selected day's plan
-            document.querySelectorAll('.day-tab').forEach(tab => {
-                tab.onclick = function() {
-                    const day = this.dataset.day;
-                    showDayPlan(day);
-                };
-            });
-            
-            // PDF Download button
-            document.getElementById('download-pdf-btn').addEventListener('click', function() {
-                downloadPDF();
-            });
 
-            // Week Navigation buttons
-            document.getElementById('prev-week')?.addEventListener('click', function() {
-                alert('Previous week functionality would go here');
-            });
+            // buttons
+            document.getElementById('generate-plan-btn-form').addEventListener('click', generateNewMealPlan);
+            document.getElementById('save-plan-btn').addEventListener('click', saveCurrentPlan);
+            document.getElementById('download-pdf-btn').addEventListener('click', downloadPDF);
+            document.getElementById('log-meal-btn').addEventListener('click', () => alert('Log meal form would open here'));
 
-            document.getElementById('next-week')?.addEventListener('click', function() {
-                alert('Next week functionality would go here');
-            });
-            
-            // Modal functionality
-            const modals = document.querySelectorAll('.modal');
-            const modalCloses = document.querySelectorAll('.modal-close');
-            
-            modalCloses.forEach(close => {
-                close.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
-                });
-            });
-            
-            window.addEventListener('click', function(event) {
-                modals.forEach(modal => {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            });
-            
-            // Initially show Monday as the active day
+            // day tabs
+            document.querySelectorAll('.day-tab').forEach(t => t.addEventListener('click', () => showDayPlan(t.dataset.day)));
+
+            // modal close
+            document.querySelectorAll('.modal-close,.modal').forEach(el => el.addEventListener('click', e => {
+                if (e.target.classList.contains('modal') || e.target.classList.contains('modal-close')) closeModal('generate-plan-modal');
+            }));
+
             showDayPlan('monday');
         });
     </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,11 +33,12 @@
             min-height: 100vh;
         }
 
+        /* Header */
         header {
             background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
             color: white;
             padding: 0.8rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -82,7 +84,8 @@
             align-items: center;
         }
 
-        nav ul li a:hover, nav ul li a.active {
+        nav ul li a:hover,
+        nav ul li a.active {
             background-color: rgba(255, 255, 255, 0.2);
         }
 
@@ -110,6 +113,7 @@
             background-color: rgba(255, 255, 255, 0.3);
         }
 
+        /* Layout */
         .container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -135,11 +139,12 @@
             background-color: var(--primary);
         }
 
+        /* Filters */
         .recipe-filters {
             background: white;
             border-radius: 10px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             margin-bottom: 1.5rem;
         }
 
@@ -162,7 +167,8 @@
             color: var(--dark);
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -179,12 +185,16 @@
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .search-btn:hover {
             background-color: var(--primary-dark);
         }
 
+        /* Recipe Grid */
         .recipes-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -195,7 +205,7 @@
             background: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s;
         }
 
@@ -237,6 +247,7 @@
         .recipe-description {
             color: var(--gray);
             margin-bottom: 1rem;
+            font-size: 0.95rem;
         }
 
         .recipe-nutrition {
@@ -306,46 +317,138 @@
             color: var(--light-gray);
         }
 
-        .upgrade-section {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .upgrade-section h3 {
-            margin-bottom: 1rem;
-        }
-
-        .subscription-options {
+        /* Modal */
+        .recipe-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
         }
 
-        .subscription-plan {
-            background: white;
-            color: #333;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .recipe-modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .recipe-modal-header {
             padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            width: 300px;
-        }
-
-        .subscription-plan .btn {
-            background-color: #ff6b6b;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--primary);
             color: white;
-            margin-top: 1rem;
+            border-radius: 10px 10px 0 0;
         }
 
-        .subscription-plan .btn:hover {
-            background-color: #e55a5a;
+        .recipe-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
         }
 
+        .close-modal {
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            color: #ffccbc;
+        }
+
+        .recipe-modal-body {
+            padding: 1.5rem;
+        }
+
+        .recipe-ingredients h3,
+        .recipe-instructions h3 {
+            color: var(--primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .recipe-ingredients ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .recipe-ingredients li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .recipe-ingredients li:before {
+            content: "•";
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        .instructions-content {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+            white-space: pre-line;
+            font-size: 0.95rem;
+        }
+
+        .recipe-info {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .recipe-info p {
+            margin: 0.5rem 0;
+        }
+
+        .recipe-nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .nutrition-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--light);
+            border-radius: 6px;
+        }
+
+        .nutrition-item .nutrition-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .nutrition-item .nutrition-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Responsive */
         @media (max-width: 992px) {
             .recipes-container {
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -356,31 +459,36 @@
             .filters-row {
                 flex-direction: column;
             }
-            
+
             .filter-group {
                 min-width: auto;
             }
-            
+
             .header-container {
                 flex-direction: column;
                 gap: 1rem;
             }
-            
+
             nav ul {
                 flex-wrap: wrap;
                 justify-content: center;
             }
-            
+
             nav ul li {
                 margin: 0.2rem 0.5rem;
             }
-            
+
             .recipe-actions {
                 flex-direction: column;
             }
-            
-            .add-to-plan-btn, .view-details-btn {
+
+            .add-to-plan-btn,
+            .view-details-btn {
                 width: 100%;
+            }
+
+            .recipe-nutrition-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -388,18 +496,24 @@
             .container {
                 padding: 0 10px;
             }
-            
+
             .section-title {
                 font-size: 1.5rem;
             }
-            
+
             .search-btn {
                 width: 100%;
+            }
+
+            .recipe-modal-content {
+                width: 95%;
             }
         }
     </style>
 </head>
+
 <body>
+    <!-- Header -->
     <header>
         <div class="header-container">
             <div class="logo">
@@ -411,27 +525,30 @@
                     <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
                     <li><a href="/recipes" class="active"><i class="fas fa-utensils"></i> Recipes</a></li>
                     <li><a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                    <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
                     <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/history"><i class="fas fa-history"></i> History</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
-                <button id="profile-btn"><i class="fas fa-user"></i> Profile</button>
+                <a href="/profile"><button id="profile-btn"><i class="fas fa-user"></i> Profile</button></a>
                 <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
     </header>
 
+    <!-- Main Content -->
     <div class="container">
         <h2 class="section-title">Recipe Database</h2>
-        
+
+        <!-- Filters -->
         <div class="recipe-filters">
             <div class="filters-row">
                 <div class="filter-group">
                     <label class="filter-label">Search Recipes</label>
                     <input type="text" id="search-input" placeholder="Search by name, ingredient...">
                 </div>
-                
                 <div class="filter-group">
                     <label class="filter-label">Meal Type</label>
                     <select id="meal-type">
@@ -442,7 +559,6 @@
                         <option value="snack">Snack</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label class="filter-label">Diet Type</label>
                     <select id="diet-type">
@@ -453,435 +569,129 @@
                         <option value="high-protein">High Protein</option>
                     </select>
                 </div>
-                
                 <button class="search-btn" id="search-btn">
                     <i class="fas fa-search"></i> Search
                 </button>
             </div>
         </div>
-        
+
+        <!-- Recipe Grid -->
         <div class="recipes-container" id="recipes-container">
-            <!-- Recipe cards will be loaded here -->
-            <div class="recipe-card">
-                <div class="recipe-image">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <div class="recipe-body">
-                    <h3 class="recipe-title">Grilled Chicken Salad</h3>
-                    <div class="recipe-meta">
-                        <div><i class="far fa-clock"></i> 25 min</div>
-                        <div><i class="fas fa-bolt"></i> 420 kcal</div>
-                    </div>
-                    <p class="recipe-description">Fresh grilled chicken breast with mixed greens, cherry tomatoes, and balsamic vinaigrette.</p>
-                    
-                    <div class="recipe-nutrition">
-                        <div>
-                            <div class="nutrition-label">Protein</div>
-                            <div class="nutrition-value">35g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Carbs</div>
-                            <div class="nutrition-value">12g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Fat</div>
-                            <div class="nutrition-value">28g</div>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-actions">
-                        <button class="add-to-plan-btn">Add to Plan</button>
-                        <button class="view-details-btn">View</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="recipe-card">
-                <div class="recipe-image">
-                    <i class="fas fa-blender"></i>
-                </div>
-                <div class="recipe-body">
-                    <h3 class="recipe-title">Berry Smoothie Bowl</h3>
-                    <div class="recipe-meta">
-                        <div><i class="far fa-clock"></i> 10 min</div>
-                        <div><i class="fas fa-bolt"></i> 320 kcal</div>
-                    </div>
-                    <p class="recipe-description">Delicious smoothie bowl with mixed berries, banana, and granola.</p>
-                    
-                    <div class="recipe-nutrition">
-                        <div>
-                            <div class="nutrition-label">Protein</div>
-                            <div class="nutrition-value">8g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Carbs</div>
-                            <div class="nutrition-value">52g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Fat</div>
-                            <div class="nutrition-value">10g</div>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-actions">
-                        <button class="add-to-plan-btn">Add to Plan</button>
-                        <button class="view-details-btn">View</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="recipe-card">
-                <div class="recipe-image">
-                    <i class="fas fa-fish"></i>
-                </div>
-                <div class="recipe-body">
-                    <h3 class="recipe-title">Baked Salmon with Vegetables</h3>
-                    <div class="recipe-meta">
-                        <div><i class="far fa-clock"></i> 35 min</div>
-                        <div><i class="fas fa-bolt"></i> 380 kcal</div>
-                    </div>
-                    <p class="recipe-description">Oven-baked salmon with roasted vegetables and herbs.</p>
-                    
-                    <div class="recipe-nutrition">
-                        <div>
-                            <div class="nutrition-label">Protein</div>
-                            <div class="nutrition-value">32g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Carbs</div>
-                            <div class="nutrition-value">15g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Fat</div>
-                            <div class="nutrition-value">25g</div>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-actions">
-                        <button class="add-to-plan-btn">Add to Plan</button>
-                        <button class="view-details-btn">View</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="recipe-card">
-                <div class="recipe-image">
-                    <i class="fas fa-bread-slice"></i>
-                </div>
-                <div class="recipe-body">
-                    <h3 class="recipe-title">Avocado Toast</h3>
-                    <div class="recipe-meta">
-                        <div><i class="far fa-clock"></i> 10 min</div>
-                        <div><i class="fas fa-bolt"></i> 280 kcal</div>
-                    </div>
-                    <p class="recipe-description">Whole grain toast with mashed avocado, cherry tomatoes, and poached egg.</p>
-                    
-                    <div class="recipe-nutrition">
-                        <div>
-                            <div class="nutrition-label">Protein</div>
-                            <div class="nutrition-value">12g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Carbs</div>
-                            <div class="nutrition-value">25g</div>
-                        </div>
-                        <div>
-                            <div class="nutrition-label">Fat</div>
-                            <div class="nutrition-value">18g</div>
-                        </div>
-                    </div>
-                    
-                    <div class="recipe-actions">
-                        <button class="add-to-plan-btn">Add to Plan</button>
-                        <button class="view-details-btn">View</button>
-                    </div>
-                </div>
-            </div>
+            <!-- Recipes loaded dynamically -->
         </div>
     </div>
 
-    <!-- Premium Features Section for Free Users -->
-    <div id="premium-features-section" style="display: none;">
-        <div class="upgrade-section">
-            <h3>👩‍🍳 Unlock Premium Recipe Features!</h3>
-            <p>Upgrade to Premium for AI-generated recipes based on your dietary preferences, nutritional needs, and ingredients on hand.</p>
-            
-            <div class="subscription-options">
-                <div class="subscription-plan">
-                    <h3>Pro Monthly</h3>
-                    <div class="price">Rs. 500/month</div>
-                    <ul>
-                        <li>AI-Powered Recipe Generation</li>
-                        <li>Custom Dietary Restrictions</li>
-                        <li>Nutrition Analysis</li>
-                        <li>Ingredient Suggestions</li>
-                        <li>Step-by-Step Instructions</li>
-                        <li>Cooking Tips & Techniques</li>
-                    </ul>
-                    <button class="btn" onclick="subscribe('pro_monthly')">Subscribe Now</button>
-                </div>
-                
-                <div class="subscription-plan">
-                    <h3>Pro Yearly</h3>
-                    <div class="price">Rs. 1500/year</div>
-                    <p style="color: #000; font-weight: bold;">Save 50% with annual plan!</p>
-                    <ul>
-                        <li>AI-Powered Recipe Generation</li>
-                        <li>Custom Dietary Restrictions</li>
-                        <li>Nutrition Analysis</li>
-                        <li>Ingredient Suggestions</li>
-                        <li>Step-by-Step Instructions</li>
-                        <li>Cooking Tips & Techniques</li>
-                    </ul>
-                    <button class="btn" onclick="subscribe('pro_yearly')">Subscribe Yearly</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup event listeners
+        document.addEventListener('DOMContentLoaded', function () {
             setupEventListeners();
-            
-            // Load initial recipes
             loadRecipes();
         });
 
         function setupEventListeners() {
-            // Search button
-            document.getElementById('search-btn').addEventListener('click', function() {
-                searchRecipes();
+            // Search
+            document.getElementById('search-btn').addEventListener('click', searchRecipes);
+            document.getElementById('search-input').addEventListener('keypress', e => {
+                if (e.key === 'Enter') searchRecipes();
             });
-            
-            // Search input with Enter key
-            document.getElementById('search-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchRecipes();
-                }
-            });
-            
-            // Profile button
-            document.getElementById('profile-btn').addEventListener('click', function() {
+
+            // Navigation
+            document.getElementById('profile-btn').addEventListener('click', () => {
                 window.location.href = '/profile';
             });
-            
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', async function() {
-                if(confirm('Are you sure you want to logout?')) {
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                if (confirm('Are you sure you want to logout?')) {
                     try {
-                        const response = await fetch('/api/logout', {
-                            method: 'POST',
-                            credentials: 'include'
-                        });
-                        
-                        if (response.ok) {
-                            window.location.href = '/login';
-                        } else {
-                            console.error('Logout failed:', await response.text());
-                            // Even if API call fails, redirect to login
-                            window.location.href = '/login';
-                        }
-                    } catch (error) {
-                        console.error('Error during logout:', error);
-                        // Redirect to login even if there's an error
+                        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                        window.location.href = '/login';
+                    } catch (err) {
                         window.location.href = '/login';
                     }
                 }
             });
-            
-            // Add to plan buttons
-            const addToPlanButtons = document.querySelectorAll('.add-to-plan-btn');
-            addToPlanButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const recipeCard = this.closest('.recipe-card');
-                    const recipeName = recipeCard.querySelector('.recipe-title').textContent;
-                    alert(`"${recipeName}" added to your meal plan!`);
-                });
-            });
-            
-            // View details buttons
-            const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
-            viewDetailsButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const recipeCard = this.closest('.recipe-card');
-                    const recipeName = recipeCard.querySelector('.recipe-title').textContent;
-                    alert(`Viewing details for "${recipeName}"`);
-                });
-            });
         }
 
         async function searchRecipes() {
-            const searchQuery = document.getElementById('search-input').value;
-            const mealType = document.getElementById('meal-type').value;
-            const dietType = document.getElementById('diet-type').value;
-            
-            try {
-                // In a real app, this would call the backend API
-                // For now, we'll simulate the search
-                console.log(`Searching for: ${searchQuery}, Meal: ${mealType}, Diet: ${dietType}`);
-                
-                // Show loading state
-                const container = document.getElementById('recipes-container');
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; grid-column: 1 / -1;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #4CAF50;"></i>
-                        <p>Searching recipes...</p>
-                    </div>
-                `;
-                
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // Load filtered recipes
-                loadRecipes(searchQuery, mealType, dietType);
-            } catch (error) {
-                console.error('Error searching recipes:', error);
-                alert('Error searching recipes');
-            }
+            const query = document.getElementById('search-input').value.trim();
+            const meal = document.getElementById('meal-type').value;
+            const diet = document.getElementById('diet-type').value;
+
+            await loadRecipes(query, meal, diet);
         }
 
-        async function loadRecipes(searchQuery = '', mealType = '', dietType = '') {
+        async function loadRecipes(search = '', meal = '', diet = '') {
+            const container = document.getElementById('recipes-container');
+            container.innerHTML = '<div class="no-results"><i class="fas fa-spinner fa-spin"></i><p>Loading recipes...</p></div>';
+
             try {
-                // In a real app, this would fetch recipes from the backend API
-                // For now, we'll use mock data based on filters
-                const recipes = getMockRecipes(searchQuery, mealType, dietType);
-                
-                // Render recipes
+                const params = new URLSearchParams();
+                if (search) params.append('search', search);
+                if (meal) params.append('mealType', meal);
+                if (diet) params.append('dietType', diet);
+
+                const res = await fetch(`/api/pakistani-recipes?${params}`, {
+                    credentials: 'include'
+                });
+
+                if (!res.ok) throw new Error('Failed to load recipes');
+
+                const data = await res.json();
+                const recipes = data.recipes.map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    description: r.description,
+                    prepTime: r.prepTime || 20,
+                    calories: r.calories || 350,
+                    protein: r.protein || 20,
+                    carbs: r.carbs || 30,
+                    fat: r.fat || 15,
+                    mealType: r.mealType || 'lunch',
+                    dietType: r.dietType || 'balanced',
+                    ingredients: r.ingredients || [],
+                    instructions: r.instructions || 'No instructions provided.',
+                    image: getRecipeIcon(r.name)
+                }));
+
                 renderRecipes(recipes);
-            } catch (error) {
-                console.error('Error loading recipes:', error);
-                document.getElementById('recipes-container').innerHTML = `
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h3>Error Loading Recipes</h3>
-                        <p>There was an error loading recipes. Please try again.</p>
-                    </div>
-                `;
+                        <p>Please try again later.</p>
+                    </div>`;
             }
         }
 
-        function getMockRecipes(searchQuery, mealType, dietType) {
-            // This would be replaced with actual API call to backend
-            // For now, return mock data with filtering
-            let recipes = [
-                {
-                    id: 1,
-                    name: 'Grilled Chicken Salad',
-                    description: 'Fresh grilled chicken breast with mixed greens, cherry tomatoes, and balsamic vinaigrette.',
-                    prepTime: 25,
-                    calories: 420,
-                    protein: 35,
-                    carbs: 12,
-                    fat: 28,
-                    mealType: 'lunch',
-                    dietType: 'balanced',
-                    image: 'utensils'
-                },
-                {
-                    id: 2,
-                    name: 'Berry Smoothie Bowl',
-                    description: 'Delicious smoothie bowl with mixed berries, banana, and granola.',
-                    prepTime: 10,
-                    calories: 320,
-                    protein: 8,
-                    carbs: 52,
-                    fat: 10,
-                    mealType: 'breakfast',
-                    dietType: 'vegetarian',
-                    image: 'blender'
-                },
-                {
-                    id: 3,
-                    name: 'Baked Salmon with Vegetables',
-                    description: 'Oven-baked salmon with roasted vegetables and herbs.',
-                    prepTime: 35,
-                    calories: 380,
-                    protein: 32,
-                    carbs: 15,
-                    fat: 25,
-                    mealType: 'dinner',
-                    dietType: 'balanced',
-                    image: 'fish'
-                },
-                {
-                    id: 4,
-                    name: 'Avocado Toast',
-                    description: 'Whole grain toast with mashed avocado, cherry tomatoes, and poached egg.',
-                    prepTime: 10,
-                    calories: 280,
-                    protein: 12,
-                    carbs: 25,
-                    fat: 18,
-                    mealType: 'breakfast',
-                    dietType: 'vegetarian',
-                    image: 'bread-slice'
-                },
-                {
-                    id: 5,
-                    name: 'Vegetable Stir Fry',
-                    description: 'Colorful vegetables stir-fried with tofu and soy sauce.',
-                    prepTime: 20,
-                    calories: 250,
-                    protein: 15,
-                    carbs: 30,
-                    fat: 8,
-                    mealType: 'dinner',
-                    dietType: 'vegan',
-                    image: 'carrot'
-                },
-                {
-                    id: 6,
-                    name: 'Greek Yogurt Parfait',
-                    description: 'Layered Greek yogurt with berries and granola.',
-                    prepTime: 5,
-                    calories: 200,
-                    protein: 18,
-                    carbs: 25,
-                    fat: 5,
-                    mealType: 'snack',
-                    dietType: 'vegetarian',
-                    image: 'ice-cream'
-                }
-            ];
-
-            // Apply filters
-            if (searchQuery) {
-                recipes = recipes.filter(recipe => 
-                    recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            }
-            
-            if (mealType) {
-                recipes = recipes.filter(recipe => recipe.mealType === mealType);
-            }
-            
-            if (dietType) {
-                recipes = recipes.filter(recipe => recipe.dietType === dietType);
-            }
-
-            return recipes;
+        function getRecipeIcon(name) {
+            const n = name.toLowerCase();
+            if (n.includes('chicken') || n.includes('gosht') || n.includes('kebab')) return 'drumstick-bite';
+            if (n.includes('daal') || n.includes('rice') || n.includes('biryani')) return 'bowl-rice';
+            if (n.includes('karahi')) return 'utensils';
+            if (n.includes('pulao') || n.includes('haleem')) return 'bowl-food';
+            if (n.includes('sweet') || n.includes('sahi')) return 'ice-cream';
+            return 'utensils';
         }
 
         function renderRecipes(recipes) {
             const container = document.getElementById('recipes-container');
-            
+
             if (recipes.length === 0) {
                 container.innerHTML = `
                     <div class="no-results">
                         <i class="fas fa-search"></i>
                         <h3>No Recipes Found</h3>
-                        <p>Try adjusting your search criteria.</p>
-                    </div>
-                `;
+                        <p>Try adjusting your search filters.</p>
+                    </div>`;
                 return;
             }
-            
-            let html = '';
-            recipes.forEach(recipe => {
-                html += `
-                    <div class="recipe-card">
+
+            container.innerHTML = recipes.map(recipe => {
+                const data = JSON.stringify(recipe).replace(/"/g, '&quot;');
+                return `
+                    <div class="recipe-card" data-recipe-data="${data}">
                         <div class="recipe-image">
                             <i class="fas fa-${recipe.image}"></i>
                         </div>
@@ -892,114 +702,97 @@
                                 <div><i class="fas fa-bolt"></i> ${recipe.calories} kcal</div>
                             </div>
                             <p class="recipe-description">${recipe.description}</p>
-                            
                             <div class="recipe-nutrition">
-                                <div>
-                                    <div class="nutrition-label">Protein</div>
-                                    <div class="nutrition-value">${recipe.protein}g</div>
-                                </div>
-                                <div>
-                                    <div class="nutrition-label">Carbs</div>
-                                    <div class="nutrition-value">${recipe.carbs}g</div>
-                                </div>
-                                <div>
-                                    <div class="nutrition-label">Fat</div>
-                                    <div class="nutrition-value">${recipe.fat}g</div>
-                                </div>
+                                <div><div class="nutrition-label">Protein</div><div class="nutrition-value">${recipe.protein}g</div></div>
+                                <div><div class="nutrition-label">Carbs</div><div class="nutrition-value">${recipe.carbs}g</div></div>
+                                <div><div class="nutrition-label">Fat</div><div class="nutrition-value">${recipe.fat}g</div></div>
                             </div>
-                            
                             <div class="recipe-actions">
-                                <button class="add-to-plan-btn" data-recipe-id="${recipe.id}">Add to Plan</button>
-                                <button class="view-details-btn" data-recipe-id="${recipe.id}">View</button>
+                                <button class="add-to-plan-btn" data-id="${recipe.id}">Add to Plan</button>
+                                <button class="view-details-btn">View</button>
                             </div>
                         </div>
+                    </div>`;
+            }).join('');
+
+            // Bind actions
+            document.querySelectorAll('.add-to-plan-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const name = this.closest('.recipe-card').querySelector('.recipe-title').textContent;
+                    alert(`"${name}" added to your meal plan!`);
+                });
+            });
+
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const card = this.closest('.recipe-card');
+                    const data = JSON.parse(card.getAttribute('data-recipe-data'));
+                    showRecipeModal(data);
+                });
+            });
+        }
+
+        function showRecipeModal(recipe) {
+            const modal = document.createElement('div');
+            modal.className = 'recipe-modal';
+            modal.innerHTML = `
+                <div class="recipe-modal-content">
+                    <div class="recipe-modal-header">
+                        <h2>${recipe.name}</h2>
+                        <button class="close-modal">&times;</button>
                     </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Add event listeners to new buttons
-            document.querySelectorAll('.add-to-plan-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const recipeId = this.getAttribute('data-recipe-id');
-                    const recipeName = this.closest('.recipe-card').querySelector('.recipe-title').textContent;
-                    addToPlan(recipeId, recipeName);
-                });
-            });
-            
-            document.querySelectorAll('.view-details-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const recipeId = this.getAttribute('data-recipe-id');
-                    viewRecipeDetails(recipeId);
-                });
-            });
-        }
+                    <div class="recipe-modal-body">
+                        <div class="recipe-info">
+                            <p><strong>Description:</strong> ${recipe.description}</p>
+                            <p><strong>Prep Time:</strong> ${recipe.prepTime} minutes</p>
+                            <p><strong>Calories:</strong> ${recipe.calories} kcal</p>
+                        </div>
 
-        function addToPlan(recipeId, recipeName) {
-            // In a real app, this would add the recipe to the user's meal plan
-            // For now, just show an alert
-            alert(`"${recipeName}" added to your meal plan!`);
-        }
+                        <div class="recipe-nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-label">Protein</div>
+                                <div class="nutrition-value">${recipe.protein}g</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-label">Carbs</div>
+                                <div class="nutrition-value">${recipe.carbs}g</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-label">Fat</div>
+                                <div class="nutrition-value">${recipe.fat}g</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-label">Meal</div>
+                                <div class="nutrition-value">${recipe.mealType}</div>
+                            </div>
+                        </div>
 
-        function viewRecipeDetails(recipeId) {
-            // In a real app, this would show the full recipe details
-            // For now, just show an alert
-            alert(`Viewing details for recipe ID: ${recipeId}`);
+                        <div class="recipe-ingredients">
+                            <h3>Ingredients</h3>
+                            <ul>
+                                ${recipe.ingredients.length ? recipe.ingredients.map(i => `<li>${i}</li>`).join('') : '<li>No ingredients listed</li>'}
+                            </ul>
+                        </div>
+
+                        <div class="recipe-instructions">
+                            <h3>Instructions</h3>
+                            <div class="instructions-content">${recipe.instructions}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            modal.addEventListener('click', e => {
+                if (e.target === modal) document.body.removeChild(modal);
+            });
         }
-        
-        // Subscribe to a plan
-        async function subscribe(planId) {
-            try {
-                const response = await fetch('/api/subscription/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ plan_id: planId })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert(`Subscription successful! You now have access to premium features. ${result.plan.name} plan ends on ${new Date(result.end_date).toLocaleDateString()}`);
-                    // Reload page to update UI
-                    window.location.reload();
-                } else {
-                    alert('Subscription failed: ' + (result.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error subscribing:', error);
-                alert('An error occurred while processing your subscription. Please try again.');
-            }
-        }
-        
-        // Function to load subscription status
-        async function loadSubscriptionStatus() {
-            try {
-                const response = await fetch('/api/subscription/status', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Hide premium features section if user has active subscription
-                    if (result.subscription_status === 'active') {
-                        document.getElementById('premium-features-section').style.display = 'none';
-                    } else {
-                        document.getElementById('premium-features-section').style.display = 'block';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading subscription status:', error);
-            }
-        }
-        
-        // Load subscription status when page loads
-        loadSubscriptionStatus();
     </script>
 </body>
+
 </html>

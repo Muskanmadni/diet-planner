@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriGuide - Transform Your Health Journey</title>
+    <title>NutriGuide - Dashboard & Calories Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -32,12 +33,12 @@
             min-height: 100vh;
         }
 
-        /* Header Styles */
+        /* Header */
         header {
             background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
             color: white;
             padding: 0.8rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -52,15 +53,8 @@
             align-items: center;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
         .logo img {
-            height: 30px;
+            height: 40px;
             margin-right: 10px;
         }
 
@@ -81,19 +75,11 @@
             transition: background-color 0.3s;
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         nav ul li a:hover {
             background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        nav ul li a i {
-            margin-right: 8px;
-        }
-
-        .user-actions {
-            display: flex;
-            align-items: center;
         }
 
         .user-actions button {
@@ -111,12 +97,177 @@
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Calories Calculator Styles */
+        /* Hero */
+        .hero {
+            background: linear-gradient(rgba(46, 125, 49, 0.8), rgba(46, 125, 49, 0.9)), url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 5rem 1rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 0.5rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            text-decoration: none;
+            color: var(--dark);
+            border-radius: 5px;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: #e8f5e9;
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Calories Calculator */
         .calories-calculator-container {
             background: white;
             border-radius: 10px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
         .calculator-header {
@@ -145,6 +296,7 @@
 
         .form-group {
             margin-bottom: 1rem;
+            position: relative;
         }
 
         .form-group label {
@@ -154,7 +306,8 @@
             color: var(--dark);
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -173,17 +326,19 @@
             margin-bottom: 0;
         }
 
+        /* Food Suggestions */
         .food-suggestions-dropdown {
             position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
             background: white;
             border: 1px solid var(--border);
             border-radius: 5px;
-            width: 100%;
             max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
-            margin-top: 0.25rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: none;
         }
 
@@ -205,6 +360,7 @@
             background-color: var(--light-gray);
         }
 
+        /* Added Foods */
         .added-foods-list {
             margin-top: 1.5rem;
         }
@@ -251,6 +407,7 @@
         .food-calories {
             font-weight: 600;
             color: var(--primary);
+            margin-right: 1rem;
         }
 
         .remove-food-btn {
@@ -264,6 +421,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.8rem;
         }
 
         .no-foods-message {
@@ -283,303 +441,9 @@
             font-size: 1.2rem;
         }
 
-        .total-calories-display h3 {
-            margin: 0;
-        }
-
         .total-calories-display span {
             font-weight: bold;
-            color: #ffeb3b; /* Yellow to highlight the total */
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(46, 125, 49, 0.8), rgba(46, 125, 49, 0.9)), url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            text-align: center;
-            padding: 5rem 1rem;
-        }
-
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: var(--accent);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .btn:hover {
-            background-color: #F57C00;
-            transform: translateY(-2px);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--dark);
-            position: relative;
-            padding-bottom: 1rem;
-        }
-
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background-color: var(--primary);
-        }
-
-        /* Dashboard Layout */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 3fr;
-            gap: 2rem;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .sidebar h3 {
-            margin-bottom: 1.5rem;
-            color: var(--dark);
-            border-bottom: 2px solid var(--light-gray);
-            padding-bottom: 0.5rem;
-        }
-
-        .stats-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--primary);
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0.5rem 0;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .sidebar-menu {
-            margin-top: 2rem;
-        }
-
-        .sidebar-menu ul {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 0.8rem;
-            text-decoration: none;
-            color: var(--dark);
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar-menu a:hover, 
-        .sidebar-menu a.active {
-            background-color: #e8f5e9;
-            color: var(--primary);
-        }
-
-        .sidebar-menu a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .meal-planner-container {
-            margin-bottom: 2rem;
-        }
-
-        .meal-plan-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .meal-plan-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .week-navigation {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .week-navigation button {
-            background: var(--light-gray);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .week-navigation button:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Day Tabs */
-        .days-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-            overflow-x: auto;
-        }
-
-        .day-tab {
-            padding: 0.8rem 1.2rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-        }
-
-        .day-tab.active {
-            border-bottom: 3px solid var(--primary);
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        /* Meal Cards */
-        .meals-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .meal-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            border: 1px solid var(--border);
-        }
-
-        .meal-header {
-            background: var(--primary);
-            color: white;
-            padding: 0.8rem;
-            text-align: center;
-        }
-
-        .meal-body {
-            padding: 1.2rem;
-        }
-
-        .meal-item {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        .meal-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border: none;
-        }
-
-        .meal-title {
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            color: var(--dark);
-        }
-
-        .meal-calories {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .add-meal-btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            color: var(--primary);
-            border: 1px dashed var(--primary);
-            padding: 0.8rem;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
-
-        .add-meal-btn:hover {
-            background-color: #e8f5e9;
+            color: #ffeb3b;
         }
 
         /* Nutrition Summary */
@@ -595,7 +459,7 @@
             border-radius: 8px;
             padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
             border: 1px solid var(--border);
         }
 
@@ -611,21 +475,7 @@
             font-size: 0.9rem;
         }
 
-        .progress-bar {
-            height: 8px;
-            background-color: var(--light-gray);
-            border-radius: 4px;
-            margin-top: 0.5rem;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background-color: var(--primary);
-            border-radius: 4px;
-        }
-
-        /* Features Section */
+        /* Features */
         .features {
             padding: 4rem 0;
             background: white;
@@ -641,7 +491,7 @@
             text-align: center;
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s;
         }
 
@@ -653,11 +503,6 @@
             font-size: 3rem;
             color: var(--primary);
             margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            margin-bottom: 1rem;
-            color: var(--dark);
         }
 
         /* Footer */
@@ -696,10 +541,6 @@
             list-style: none;
         }
 
-        .footer-links li {
-            margin-bottom: 0.8rem;
-        }
-
         .footer-links a {
             color: #adb5bd;
             text-decoration: none;
@@ -718,7 +559,7 @@
             color: #adb5bd;
         }
 
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 992px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -730,66 +571,22 @@
                 flex-direction: column;
                 gap: 1rem;
             }
-            
+
             nav ul {
                 flex-wrap: wrap;
                 justify-content: center;
             }
-            
-            nav ul li {
-                margin: 0.2rem 0.5rem;
-            }
-            
-            .hero {
-                padding: 3rem 1rem;
-            }
-            
+
             .hero h1 {
                 font-size: 1.8rem;
             }
-            
-            .hero p {
-                font-size: 0.9rem;
-            }
-            
-            .btn {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
-            }
-            
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .meals-container {
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            }
-            
-            .meal-plan-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 1rem;
-            }
-            
-            .meal-plan-actions {
+
+            .calculator-actions {
                 flex-direction: column;
             }
-            
-            .days-tabs {
-                overflow-x: auto;
-            }
-            
-            .nutrition-summary {
-                grid-template-columns: 1fr;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .user-actions {
-                flex-wrap: wrap;
-                justify-content: center;
+
+            .form-row {
+                flex-direction: column;
             }
         }
 
@@ -797,38 +594,37 @@
             .container {
                 padding: 0 10px;
             }
-            
-            .sidebar {
-                margin-bottom: 2rem;
-            }
-            
+
             .hero h1 {
                 font-size: 1.5rem;
             }
-            
-            .hero p {
-                font-size: 0.8rem;
-            }
-            
-            .section-title {
-                font-size: 1.3rem;
+
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 0.5rem 0;
             }
         }
     </style>
 </head>
+
 <body>
+    <!-- Header -->
     <header>
         <div class="header-container">
             <div class="logo">
-                <img src="/static/images/logo(2).png" alt="NutriGuide Logo" style="height: 150px; width: 200px; margin-right: 10px;">
+                <img src="/static/images/logo(2).png" alt="NutriGuide Logo">
             </div>
             <nav>
                 <ul>
                     <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
-                    <li><a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
+                    <li><a href="/dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                    <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
                     <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
-                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/history"><i class="fas fa-history"></i> History</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
@@ -838,6 +634,7 @@
         </div>
     </header>
 
+    <!-- Hero -->
     <section class="hero">
         <div class="hero-content">
             <h1>Personalized Meal Plans That Fit Your Life</h1>
@@ -847,50 +644,47 @@
         </div>
     </section>
 
+    <!-- Dashboard -->
     <div class="container">
         <div class="dashboard">
+            <!-- Sidebar -->
             <div class="sidebar">
                 <h3>Your Stats</h3>
-                
                 <div class="stats-card">
                     <div class="stat-label">Current Weight</div>
                     <div class="stat-value" id="current-weight">75 kg</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 65%"></div>
-                    </div>
+                    <div class="progress-bar"><div class="progress" style="width: 65%"></div></div>
                 </div>
-                
                 <div class="stats-card">
                     <div class="stat-label">Goal Weight</div>
                     <div class="stat-value" id="goal-weight">70 kg</div>
                 </div>
-                
                 <div class="stats-card">
                     <div class="stat-label">BMI</div>
                     <div class="stat-value" id="bmi-value">24.2</div>
                 </div>
-                
                 <div class="stats-card">
                     <div class="stat-label">Today's Calories</div>
                     <div class="stat-value" id="today-calories">1,850 / 2,200</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 84%"></div>
-                    </div>
+                    <div class="progress-bar"><div class="progress" style="width: 84%"></div></div>
                 </div>
-                
+
                 <div class="sidebar-menu">
                     <ul>
                         <li><a href="/dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li><a href="/diet-plan"><i class="fas fa-calendar-check"></i> Meal Plans</a></li>
-                        <li><a href="#"><i class="fas fa-utensils"></i> Recipes</a></li>
-                        <li><a href="#"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
-                        <li><a href="#"><i class="fas fa-chart-pie"></i> Nutrition Tracking</a></li>
-                        <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+                        <li><a href="/diet_plan"><i class="fas fa-calendar-check"></i> Meal Plans</a></li>
+                        <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
+                        <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
+                        <li><a href="/nutrition_tracking"><i class="fas fa-chart-pie"></i> Nutrition Tracking</a></li>
+                        <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
+                        <li><a href="/history"><i class="fas fa-history"></i> History</a></li>
                     </ul>
                 </div>
             </div>
-            
+
+            <!-- Main Content -->
             <div class="main-content">
+                <!-- Calories Calculator -->
                 <div class="calories-calculator-container">
                     <div class="calculator-header">
                         <h2>Calories Calculator</h2>
@@ -906,6 +700,7 @@
                             <input type="text" id="food-search" placeholder="Enter food name (e.g. apple, rice, chicken)" autocomplete="off">
                             <div id="food-suggestions" class="food-suggestions-dropdown"></div>
                         </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="quantity">Quantity:</label>
@@ -927,6 +722,7 @@
                                 </select>
                             </div>
                         </div>
+
                         <button id="calculate-btn" class="btn" style="width: 100%; background-color: #2196F3;">
                             <i class="fas fa-calculator"></i> Calculate Calories
                         </button>
@@ -942,111 +738,55 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- Nutrition Summary -->
                 <div class="nutrition-summary">
                     <div class="nutrient-card">
                         <div class="nutrient-label">Calories</div>
                         <div class="nutrient-value">2,100</div>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 95%"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress" style="width: 95%"></div></div>
                         <div>Goal: 2,200</div>
                     </div>
-                    
                     <div class="nutrient-card">
                         <div class="nutrient-label">Protein</div>
                         <div class="nutrient-value">125g</div>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 89%"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress" style="width: 89%"></div></div>
                         <div>Goal: 140g</div>
                     </div>
-                    
                     <div class="nutrient-card">
                         <div class="nutrient-label">Carbs</div>
                         <div class="nutrient-value">240g</div>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 80%"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress" style="width: 80%"></div></div>
                         <div>Goal: 300g</div>
                     </div>
-                    
                     <div class="nutrient-card">
                         <div class="nutrient-label">Fat</div>
                         <div class="nutrient-value">85g</div>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 94%"></div>
-                        </div>
+                        <div class="progress-bar"><div class="progress" style="width: 94%"></div></div>
                         <div>Goal: 90g</div>
-                    </div>
-                </div>
-                
-                <!-- Premium Features Section for Free Users -->
-                <div id="premium-features-section" style="display: none;">
-                    <div class="upgrade-section" style="background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%); color: white; padding: 2rem; border-radius: 10px; text-align: center; margin: 2rem 0;">
-                        <h3>🌟 Unlock Premium Features!</h3>
-                        <p>Upgrade to Premium for advanced diet plans with personalized recommendations, detailed nutritional analysis, and much more.</p>
-                        
-                        <div class="subscription-options">
-                            <div class="subscription-plan" style="background: white; color: #333; padding: 1.5rem; border-radius: 8px; text-align: center; margin: 1rem; display: inline-block; width: 300px; margin: 0 1rem;">
-                                <h3>Pro Monthly</h3>
-                                <div class="price">Rs. 500/month</div>
-                                <ul style="text-align: left; margin: 1rem 0; padding-left: 1rem;">
-                                    <li>Personalised Weekly Meal Plan</li>
-                                    <li>Automatic Macro Distribution</li>
-                                    <li>Unlimited Custom Meals</li>
-                                    <li>Smart Recipe Suggestions</li>
-                                    <li>Shopping List Generator</li>
-                                    <li>Advanced AI Recommendations</li>
-                                </ul>
-                                <button class="btn" onclick="subscribe('pro_monthly')" style="background-color: #ff6b6b; color: white; margin-top: 1rem;">Subscribe Now</button>
-                            </div>
-                            
-                            <div class="subscription-plan" style="background: white; color: #333; padding: 1.5rem; border-radius: 8px; text-align: center; margin: 1rem; display: inline-block; width: 300px; margin: 0 1rem;">
-                                <h3>Pro Yearly</h3>
-                                <div class="price">Rs. 1500/year</div>
-                                <p style="color: #000; font-weight: bold;">Save 50% with annual plan!</p>
-                                <ul style="text-align: left; margin: 1rem 0; padding-left: 1rem;">
-                                    <li>Personalised Weekly Meal Plan</li>
-                                    <li>Automatic Macro Distribution</li>
-                                    <li>Unlimited Custom Meals</li>
-                                    <li>Smart Recipe Suggestions</li>
-                                    <li>Shopping List Generator</li>
-                                    <li>Advanced AI Recommendations</li>
-                                </ul>
-                                <button class="btn" onclick="subscribe('pro_yearly')" style="background-color: #ff6b6b; color: white; margin-top: 1rem;">Subscribe Yearly</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Features -->
     <section class="features">
         <div class="container">
             <h2 class="section-title">Powerful Features</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-robot"></i></div>
                     <h3>AI-Powered Plans</h3>
                     <p>Get personalized meal plans generated by our AI nutritionist based on your goals, preferences, and dietary restrictions.</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-balance-scale"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-balance-scale"></i></div>
                     <h3>Weight Management</h3>
                     <p>Set and track your weight goals with scientifically-backed plans for healthy weight loss or gain.</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-shopping-cart"></i></div>
                     <h3>Shopping Lists</h3>
                     <p>Automatically generate shopping lists from your meal plans to make grocery shopping effortless.</p>
                 </div>
@@ -1054,13 +794,13 @@
         </div>
     </section>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h3>EatThisMuch Clone</h3>
+                <h3>NutriGuide</h3>
                 <p>Your personal nutrition assistant for creating healthy, personalized meal plans that fit your lifestyle.</p>
             </div>
-            
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul class="footer-links">
@@ -1071,7 +811,6 @@
                     <li><a href="/settings">Settings</a></li>
                 </ul>
             </div>
-            
             <div class="footer-section">
                 <h3>Support</h3>
                 <ul class="footer-links">
@@ -1083,418 +822,290 @@
                 </ul>
             </div>
         </div>
-        
         <div class="copyright">
-            <p>&copy; 2025 EatThisMuch Clone. All rights reserved.</p>
+            <p>&copy; 2025 NutriGuide. All rights reserved.</p>
         </div>
     </footer>
 
+    <!-- JavaScript -->
     <script>
-        // Simple script for demo functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Day tab switching
-            const dayTabs = document.querySelectorAll('.day-tab');
-            dayTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    dayTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            setupEventListeners();
+            loadUserData();
+        });
+
+        function setupEventListeners() {
+            // Profile & Logout
+            document.getElementById('profile-btn').addEventListener('click', () => {
+                window.location.href = '/profile';
             });
-            
-            // Profile button
-            document.getElementById('profile-btn').addEventListener('click', function() {
-                alert('Profile page would open here');
-            });
-            
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', async function() {
-                if(confirm('Are you sure you want to logout?')) {
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                if (confirm('Are you sure you want to logout?')) {
                     try {
-                        const response = await fetch('/api/logout', {
-                            method: 'POST',
-                            credentials: 'include'
-                        });
-                        
-                        if (response.ok) {
-                            window.location.href = '/login';
-                        } else {
-                            console.error('Logout failed:', await response.text());
-                            // Even if API call fails, redirect to login
-                            window.location.href = '/login';
-                        }
-                    } catch (error) {
-                        console.error('Error during logout:', error);
-                        // Redirect to login even if there's an error
+                        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+                        window.location.href = '/login';
+                    } catch {
                         window.location.href = '/login';
                     }
                 }
             });
-            
-            // Load user data
-            loadUserData();
-        });
-        
-        // Function to load user data from backend
+        }
+
+        // Load user stats from API
         async function loadUserData() {
             try {
-                const response = await fetch('/api/current_user', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    const user = result.user;
-                    
-                    if(user) {
-                        document.getElementById('current-weight').textContent = user.current_weight ? user.current_weight + ' kg' : 'N/A';
-                        document.getElementById('goal-weight').textContent = user.weight_goal ? user.weight_goal + ' kg' : 'N/A';
-                        document.getElementById('bmi-value').textContent = user.bmi ? user.bmi : 'N/A';
-                        document.getElementById('today-calories').textContent = user.daily_calories ? user.daily_calories : 'N/A';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
-        
-        // Subscribe to a plan
-        async function subscribe(planId) {
-            try {
-                const response = await fetch('/api/subscription/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ plan_id: planId })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert(`Subscription successful! You now have access to premium features. ${result.plan.name} plan ends on ${new Date(result.end_date).toLocaleDateString()}`);
-                    // Reload page to update UI
-                    window.location.reload();
-                } else {
-                    alert('Subscription failed: ' + (result.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error subscribing:', error);
-                alert('An error occurred while processing your subscription. Please try again.');
-            }
-        }
-        
-        // Function to load subscription status
-        async function loadSubscriptionStatus() {
-            try {
-                const response = await fetch('/api/subscription/status', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Hide premium features section if user has active subscription
-                    if (result.subscription_status === 'active') {
-                        document.getElementById('premium-features-section').style.display = 'none';
-                    } else {
-                        document.getElementById('premium-features-section').style.display = 'block';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading subscription status:', error);
-            }
-        }
-        
-        // Load subscription status when page loads
-        loadSubscriptionStatus();
-        
-        // Calories Calculator functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Food database with calorie information
-            const foodDatabase = {
-                'apple': { name: 'Apple', caloriesPerUnit: 52, unit: 'piece' },
-                'banana': { name: 'Banana', caloriesPerUnit: 89, unit: 'piece' },
-                'orange': { name: 'Orange', caloriesPerUnit: 47, unit: 'piece' },
-                'mango': { name: 'Mango', caloriesPerUnit: 60, unit: 'piece' },
-                'grapes': { name: 'Grapes', caloriesPerUnit: 69, unit: 'gram' }, // Per 100g
-                'watermelon': { name: 'Watermelon', caloriesPerUnit: 30, unit: 'gram' }, // Per 100g
-                'strawberry': { name: 'Strawberry', caloriesPerUnit: 32, unit: 'gram' }, // Per 100g
-                'blueberry': { name: 'Blueberry', caloriesPerUnit: 57, unit: 'gram' }, // Per 100g
-                'cherry': { name: 'Cherry', caloriesPerUnit: 63, unit: 'gram' }, // Per 100g
-                'peach': { name: 'Peach', caloriesPerUnit: 39, unit: 'gram' }, // Per 100g
-                'plum': { name: 'Plum', caloriesPerUnit: 46, unit: 'piece' },
-                'pineapple': { name: 'Pineapple', caloriesPerUnit: 50, unit: 'gram' }, // Per 100g
-                
-                // Grains
-                'rice': { name: 'Rice (cooked)', caloriesPerUnit: 130, unit: 'cup' }, // Per cup
-                'brown rice': { name: 'Brown Rice (cooked)', caloriesPerUnit: 216, unit: 'cup' }, // Per cup
-                'oats': { name: 'Oats (dry)', caloriesPerUnit: 389, unit: 'cup' }, // Per cup
-                'quinoa': { name: 'Quinoa (cooked)', caloriesPerUnit: 222, unit: 'cup' }, // Per cup
-                'bread': { name: 'Bread (white)', caloriesPerUnit: 79, unit: 'slice' }, // Per slice
-                'whole wheat bread': { name: 'Whole Wheat Bread', caloriesPerUnit: 70, unit: 'slice' }, // Per slice
-                'pasta': { name: 'Pasta (cooked)', caloriesPerUnit: 131, unit: 'cup' }, // Per cup
-                'noodles': { name: 'Noodles (cooked)', caloriesPerUnit: 138, unit: 'cup' }, // Per cup
-                
-                // Proteins
-                'chicken': { name: 'Chicken Breast (cooked)', caloriesPerUnit: 165, unit: 'piece' }, // Per 100g
-                'beef': { name: 'Beef (cooked)', caloriesPerUnit: 250, unit: 'piece' }, // Per 100g
-                'fish': { name: 'Fish (salmon)', caloriesPerUnit: 206, unit: 'piece' }, // Per 100g
-                'egg': { name: 'Egg', caloriesPerUnit: 70, unit: 'piece' },
-                'tofu': { name: 'Tofu', caloriesPerUnit: 144, unit: 'piece' }, // Per 100g
-                'paneer': { name: 'Paneer', caloriesPerUnit: 291, unit: 'piece' }, // Per 100g
-                'dal': { name: 'Lentils (cooked)', caloriesPerUnit: 116, unit: 'cup' }, // Per cup
-                
-                // Dairy
-                'milk': { name: 'Milk (whole)', caloriesPerUnit: 103, unit: 'cup' }, // Per cup
-                'yogurt': { name: 'Yogurt (plain)', caloriesPerUnit: 59, unit: 'cup' }, // Per cup
-                'cheese': { name: 'Cheese (cheddar)', caloriesPerUnit: 113, unit: 'slice' }, // Per slice
-                'butter': { name: 'Butter', caloriesPerUnit: 102, unit: 'tbsp' }, // Per tbsp
-                'ghee': { name: 'Ghee', caloriesPerUnit: 135, unit: 'tbsp' }, // Per tbsp
-                
-                // Vegetables
-                'spinach': { name: 'Spinach', caloriesPerUnit: 23, unit: 'cup' }, // Per cup
-                'broccoli': { name: 'Broccoli', caloriesPerUnit: 25, unit: 'cup' }, // Per cup
-                'carrot': { name: 'Carrot', caloriesPerUnit: 25, unit: 'cup' }, // Per cup
-                'potato': { name: 'Potato', caloriesPerUnit: 77, unit: 'piece' }, // Per medium potato
-                'tomato': { name: 'Tomato', caloriesPerUnit: 22, unit: 'piece' }, // Per medium tomato
-                'onion': { name: 'Onion', caloriesPerUnit: 40, unit: 'piece' }, // Per medium onion
-                'garlic': { name: 'Garlic', caloriesPerUnit: 4, unit: 'cloves' }, // Per clove
-                'ginger': { name: 'Ginger', caloriesPerUnit: 80, unit: 'tbsp' }, // Per tbsp
-                
-                // Snacks
-                'biscuit': { name: 'Biscuit', caloriesPerUnit: 40, unit: 'piece' },
-                'chips': { name: 'Chips', caloriesPerUnit: 152, unit: 'oz' }, // Per oz
-                'nuts': { name: 'Mixed Nuts', caloriesPerUnit: 163, unit: 'oz' }, // Per oz
-                'almonds': { name: 'Almonds', caloriesPerUnit: 164, unit: 'oz' }, // Per oz
-                'cashews': { name: 'Cashews', caloriesPerUnit: 157, unit: 'oz' }, // Per oz
-                'walnuts': { name: 'Walnuts', caloriesPerUnit: 185, unit: 'oz' }, // Per oz
-                'dates': { name: 'Dates', caloriesPerUnit: 282, unit: 'piece' }, // Per 100g
-                'raisins': { name: 'Raisins', caloriesPerUnit: 299, unit: 'cup' }, // Per cup
-            };
+                const res = await fetch('/api/current_user', { credentials: 'include' });
+                if (res.ok) {
+                    const { user } = await res.json();
+                    if (user) {
+                        document.getElementById('current-weight').textContent = `${user.current_weight || 'N/A'} kg`;
+                        document.getElementById('goal-weight').textContent = `${user.weight_goal || 'N/A'} kg`;
+                        document.getElementById('bmi-value').textContent = user.bmi || 'N/A';
 
-            // Get DOM elements
-            const foodSearchInput = document.getElementById('food-search');
-            const quantityInput = document.getElementById('quantity');
-            const unitSelect = document.getElementById('unit');
-            const calculateBtn = document.getElementById('calculate-btn');
-            const foodsListContainer = document.getElementById('foods-list-container');
-            const totalCaloriesSpan = document.getElementById('total-calories');
-            const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
-            const foodSuggestionsDiv = document.getElementById('food-suggestions');
-            const addFoodBtn = document.getElementById('add-food-btn');
+                        // Update nutrition summary with user's calorie target and goals
+                        if(user.daily_calories) {
+                            const calorieValue = Math.round(user.daily_calories);
+                            // Format as "consumed / goal" instead of "value / value"
+                            document.getElementById('today-calories').textContent = `0 / ${calorieValue.toLocaleString()}`;
 
-            // Added foods array
-            let addedFoods = [];
+                            const nutrientCards = document.querySelectorAll('.nutrient-card');
 
-            // Food search with suggestions
-            foodSearchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                // Hide suggestions if no search term
-                if (!searchTerm) {
-                    foodSuggestionsDiv.classList.remove('show');
-                    return;
-                }
-                
-                // Find matching foods
-                const matches = Object.keys(foodDatabase).filter(food => 
-                    food.includes(searchTerm)
-                );
-                
-                // Show suggestions if matches found
-                if (matches.length > 0) {
-                    foodSuggestionsDiv.innerHTML = '';
-                    matches.forEach(match => {
-                        const foodItem = foodDatabase[match];
-                        const suggestionItem = document.createElement('div');
-                        suggestionItem.className = 'food-suggestion-item';
-                        suggestionItem.textContent = `${foodItem.name} (${foodItem.unit})`;
-                        suggestionItem.addEventListener('click', function() {
-                            foodSearchInput.value = match;
-                            foodSuggestionsDiv.classList.remove('show');
-                            // Auto-select the unit based on the food
-                            if (foodItem.unit) {
-                                unitSelect.value = foodItem.unit;
+                            if (nutrientCards.length >= 4) {
+                                // Update Calories card (first card)
+                                const calCard = nutrientCards[0];
+                                calCard.querySelector('.nutrient-value').textContent = calorieValue.toLocaleString();
+                                calCard.querySelector('.progress').style.width = '100%';
+                                // Find and update the goal div element - preserve the "Goal: " prefix
+                                const calGoalDiv = calCard.querySelector('div:last-child');
+                                if (calGoalDiv && calGoalDiv.textContent.includes('Goal:')) {
+                                    calGoalDiv.textContent = `Goal: ${calorieValue.toLocaleString()}`;
+                                }
+
+                                // Calculate macronutrient goals based on calorie target
+                                const proteinGoal = Math.round((calorieValue * 0.15) / 4); // ~15% calories as protein
+                                const carbGoal = Math.round((calorieValue * 0.55) / 4);   // ~55% as carbs
+                                const fatGoal = Math.round((calorieValue * 0.30) / 9);     // ~30% as fat
+
+                                // Update Protein card (second card)
+                                const proCard = nutrientCards[1];
+                                proCard.querySelector('.nutrient-value').textContent = Math.round(proteinGoal * 0.89) + 'g'; // 89% of goal as example
+                                proCard.querySelector('.progress').style.width = '89%';
+                                const proGoalDiv = proCard.querySelector('div:last-child');
+                                if (proGoalDiv && proGoalDiv.textContent.includes('Goal:')) {
+                                    proGoalDiv.textContent = `Goal: ${proteinGoal}g`;
+                                }
+
+                                // Update Carbs card (third card)
+                                const carbCard = nutrientCards[2];
+                                carbCard.querySelector('.nutrient-value').textContent = Math.round(carbGoal * 0.80) + 'g'; // 80% of goal as example
+                                carbCard.querySelector('.progress').style.width = '80%';
+                                const carbGoalElements = carbCard.querySelectorAll('div');
+                                for (let div of carbGoalElements) {
+                                    if (div.textContent.includes('Goal:')) {
+                                        div.textContent = `Goal: ${carbGoal}g`;
+                                        break;
+                                    }
+                                }
+
+                                // Update Fat card (fourth card)
+                                const fatCard = nutrientCards[3];
+                                fatCard.querySelector('.nutrient-value').textContent = Math.round(fatGoal * 0.94) + 'g'; // 94% of goal as example
+                                fatCard.querySelector('.progress').style.width = '94%';
+                                const fatGoalElements = fatCard.querySelectorAll('div');
+                                for (let div of fatGoalElements) {
+                                    if (div.textContent.includes('Goal:')) {
+                                        div.textContent = `Goal: ${fatGoal}g`;
+                                        break;
+                                    }
+                                }
                             }
-                        });
-                        foodSuggestionsDiv.appendChild(suggestionItem);
-                    });
-                    foodSuggestionsDiv.classList.add('show');
-                } else {
-                    foodSuggestionsDiv.classList.remove('show');
+                        } else {
+                            document.getElementById('today-calories').textContent = user.daily_calories || 'N/A';
+                        }
+                    }
                 }
-            });
+            } catch (err) {
+                console.error('Failed to load user data:', err);
+            }
+        }
 
-            // Hide suggestions when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!foodSearchInput.contains(e.target) && !foodSuggestionsDiv.contains(e.target)) {
-                    foodSuggestionsDiv.classList.remove('show');
-                }
-            });
+        // === CALORIES CALCULATOR ===
+        const foodDatabase = {
+            'apple': { name: 'Apple', calories: 52, unit: 'piece' },
+            'banana': { name: 'Banana', calories: 89, unit: 'piece' },
+            'orange': { name: 'Orange', calories: 47, unit: 'piece' },
+            'mango': { name: 'Mango', calories: 60, unit: 'piece' },
+            'grapes': { name: 'Grapes', calories: 69, unit: 'gram' },
+            'watermelon': { name: 'Watermelon', calories: 30, unit: 'gram' },
+            'rice': { name: 'Rice (cooked)', calories: 130, unit: 'cup' },
+            'chicken': { name: 'Chicken Breast', calories: 165, unit: 'gram' },
+            'egg': { name: 'Egg', calories: 70, unit: 'piece' },
+            'milk': { name: 'Milk (whole)', calories: 103, unit: 'cup' },
+            'bread': { name: 'Bread (white)', calories: 79, unit: 'slice' },
+            'potato': { name: 'Potato', calories: 77, unit: 'piece' },
+            'dal': { name: 'Lentils (cooked)', calories: 116, unit: 'cup' },
+            'paneer': { name: 'Paneer', calories: 291, unit: 'gram' },
+            'ghee': { name: 'Ghee', calories: 135, unit: 'tbsp' },
+            'almonds': { name: 'Almonds', calories: 164, unit: 'oz' }
+        };
 
-            // Calculate and add food to list
-            function addFoodToList() {
-                const foodName = foodSearchInput.value.trim().toLowerCase();
-                const quantity = parseFloat(quantityInput.value);
-                
-                if (!foodName) {
-                    alert('Please enter a food name');
-                    return;
-                }
-                
-                if (!quantity || quantity <= 0) {
-                    alert('Please enter a valid quantity');
-                    return;
-                }
-                
-                // Find the food in the database
-                const foodItem = Object.keys(foodDatabase).find(key => key.includes(foodName) || foodName.includes(key));
-                if (!foodItem) {
-                    alert('Food not found. Please select a food from the suggestions.');
-                    return;
-                }
-                
-                const foodDetails = foodDatabase[foodItem];
-                const selectedUnit = unitSelect.value;
-                
-                // Calculate calories based on unit
-                let calories = 0;
-                switch(selectedUnit) {
-                    case 'piece':
-                        calories = foodDetails.caloriesPerUnit * quantity;
-                        break;
-                    case 'gram':
-                        // For grams, the calories per unit is already per gram
-                        calories = foodDetails.caloriesPerUnit * quantity;
-                        break;
-                    case 'kg':
-                        // Convert kg to grams
-                        calories = foodDetails.caloriesPerUnit * (quantity * 1000);
-                        break;
-                    case 'oz':
-                        // Convert oz to grams (1 oz ≈ 28.35g)
-                        calories = foodDetails.caloriesPerUnit * (quantity * 28.35);
-                        break;
-                    case 'lb':
-                        // Convert lb to grams (1 lb ≈ 453.592g)
-                        calories = foodDetails.caloriesPerUnit * (quantity * 453.592);
-                        break;
-                    case 'cup':
-                        calories = foodDetails.caloriesPerUnit * quantity;
-                        break;
-                    case 'tbsp':
-                        // Tablespoon to grams conversion varies by ingredient, using generic 15g per tbsp
-                        calories = foodDetails.caloriesPerUnit * (quantity * 15);
-                        break;
-                    case 'tsp':
-                        // Teaspoon to grams conversion, using generic 5g per tsp
-                        calories = foodDetails.caloriesPerUnit * (quantity * 5);
-                        break;
-                    case 'ml':
-                        // Milliliter to gram conversion (1:1 for water-like density)
-                        calories = foodDetails.caloriesPerUnit * (quantity / 100);
-                        break;
-                    case 'l':
-                        // Liter to gram conversion (1000ml = 1000g for water-like density)
-                        calories = foodDetails.caloriesPerUnit * (quantity * 10);
-                        break;
-                    default:
-                        calories = foodDetails.caloriesPerUnit * quantity;
-                }
-                
-                // Round to nearest integer
-                calories = Math.round(calories);
-                
-                // Create food object
-                const foodObject = {
-                    id: Date.now(),
-                    name: foodDetails.name,
-                    quantity: quantity,
-                    unit: selectedUnit,
-                    calories: calories
+        const elements = {
+            search: document.getElementById('food-search'),
+            quantity: document.getElementById('quantity'),
+            unit: document.getElementById('unit'),
+            suggestions: document.getElementById('food-suggestions'),
+            list: document.getElementById('foods-list-container'),
+            total: document.getElementById('total-calories'),
+            addBtn: document.getElementById('add-food-btn'),
+            calcBtn: document.getElementById('calculate-btn'),
+            clearBtn: document.getElementById('clear-calculator-btn')
+        };
+
+        let addedFoods = [];
+
+        // Search with suggestions
+        elements.search.addEventListener('input', function () {
+            const term = this.value.toLowerCase().trim();
+            elements.suggestions.innerHTML = '';
+            elements.suggestions.classList.remove('show');
+
+            if (!term) return;
+
+            const matches = Object.keys(foodDatabase)
+                .filter(key => key.includes(term) || foodDatabase[key].name.toLowerCase().includes(term))
+                .slice(0, 8);
+
+            if (matches.length === 0) return;
+
+            matches.forEach(key => {
+                const food = foodDatabase[key];
+                const item = document.createElement('div');
+                item.className = 'food-suggestion-item';
+                item.textContent = `${food.name} (${food.calories} kcal/${food.unit})`;
+                item.onclick = () => {
+                    elements.search.value = key;
+                    elements.unit.value = food.unit;
+                    elements.suggestions.classList.remove('show');
+                    elements.quantity.focus();
                 };
-                
-                // Add to foods array
-                addedFoods.push(foodObject);
-                
-                // Update UI
-                updateFoodsList();
-                updateTotalCalories();
-                
-                // Clear inputs
-                foodSearchInput.value = '';
-                quantityInput.value = '1';
-                unitSelect.value = 'piece';
-                foodSuggestionsDiv.classList.remove('show');
-            }
-
-            // Add food when button is clicked
-            addFoodBtn.addEventListener('click', addFoodToList);
-            calculateBtn.addEventListener('click', addFoodToList);
-
-            // Update the foods list display
-            function updateFoodsList() {
-                if (addedFoods.length === 0) {
-                    foodsListContainer.innerHTML = '<p class="no-foods-message">No foods added yet. Search and add foods to calculate total calories.</p>';
-                    return;
-                }
-                
-                foodsListContainer.innerHTML = '';
-                
-                addedFoods.forEach((food, index) => {
-                    const foodItemEl = document.createElement('div');
-                    foodItemEl.className = 'food-item-added';
-                    
-                    foodItemEl.innerHTML = `
-                        <div class="food-info">
-                            <span class="food-name">${food.quantity} ${food.unit} ${food.name}</span>
-                            <div class="food-details">(${food.calories} calories)</div>
-                        </div>
-                        <span class="food-calories">${food.calories} kcal</span>
-                        <button class="remove-food-btn" data-index="${index}">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    
-                    foodsListContainer.appendChild(foodItemEl);
-                });
-                
-                // Add event listeners to remove buttons
-                document.querySelectorAll('.remove-food-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        addedFoods.splice(index, 1);
-                        updateFoodsList();
-                        updateTotalCalories();
-                    });
-                });
-            }
-
-            // Update the total calories display
-            function updateTotalCalories() {
-                const total = addedFoods.reduce((sum, food) => sum + food.calories, 0);
-                totalCaloriesSpan.textContent = total;
-            }
-
-            // Clear all foods
-            clearCalculatorBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all added foods?')) {
-                    addedFoods = [];
-                    updateFoodsList();
-                    updateTotalCalories();
-                }
+                elements.suggestions.appendChild(item);
             });
 
-            // Allow Enter key to add food
-            foodSearchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    addFoodToList();
-                }
+            elements.suggestions.classList.add('show');
+        });
+
+        // Hide suggestions on outside click
+        document.addEventListener('click', e => {
+            if (!elements.search.contains(e.target) && !elements.suggestions.contains(e.target)) {
+                elements.suggestions.classList.remove('show');
+            }
+        });
+
+        // Add food
+        function addFood() {
+            const name = elements.search.value.trim().toLowerCase();
+            const qty = parseFloat(elements.quantity.value);
+            const unit = elements.unit.value;
+
+            if (!name || !qty || qty <= 0) {
+                alert('Please enter valid food and quantity');
+                return;
+            }
+
+            const foodKey = Object.keys(foodDatabase).find(k =>
+                k === name || foodDatabase[k].name.toLowerCase().includes(name)
+            );
+
+            if (!foodKey) {
+                alert('Food not found. Please select from suggestions.');
+                return;
+            }
+
+            const food = foodDatabase[foodKey];
+            let calories = food.calories;
+
+            // Unit conversion
+            switch (unit) {
+                case 'gram': calories *= qty; break;
+                case 'kg': calories *= qty * 1000; break;
+                case 'oz': calories *= qty * 28.35; break;
+                case 'lb': calories *= qty * 453.592; break;
+                case 'cup': case 'piece': case 'slice': calories *= qty; break;
+                case 'tbsp': calories *= qty * 15; break;
+                case 'tsp': calories *= qty * 5; break;
+                case 'ml': calories *= qty / 100; break;
+                case 'l': calories *= qty * 10; break;
+            }
+
+            calories = Math.round(calories);
+
+            addedFoods.push({
+                id: Date.now(),
+                name: food.name,
+                qty, unit, calories
             });
+
+            updateList();
+            updateTotal();
+            resetForm();
+        }
+
+        function updateList() {
+            if (addedFoods.length === 0) {
+                elements.list.innerHTML = '<p class="no-foods-message">No foods added yet.</p>';
+                return;
+            }
+
+            elements.list.innerHTML = addedFoods.map((f, i) => `
+                <div class="food-item-added">
+                    <div class="food-info">
+                        <div class="food-name">${f.qty} ${f.unit} ${f.name}</div>
+                        <div class="food-details">(${f.calories} kcal)</div>
+                    </div>
+                    <div class="food-calories">${f.calories} kcal</div>
+                    <button class="remove-food-btn" data-id="${f.id}">×</button>
+                </div>
+            `).join('');
+
+            // Remove buttons
+            document.querySelectorAll('.remove-food-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const id = parseInt(btn.dataset.id);
+                    addedFoods = addedFoods.filter(f => f.id !== id);
+                    updateList();
+                    updateTotal();
+                };
+            });
+        }
+
+        function updateTotal() {
+            const total = addedFoods.reduce((sum, f) => sum + f.calories, 0);
+            elements.total.textContent = total;
+        }
+
+        function resetForm() {
+            elements.search.value = '';
+            elements.quantity.value = '1';
+            elements.unit.value = 'piece';
+            elements.suggestions.classList.remove('show');
+        }
+
+        // Event Listeners
+        elements.addBtn.onclick = addFood;
+        elements.calcBtn.onclick = addFood;
+        elements.clearBtn.onclick = () => {
+            if (confirm('Clear all foods?')) {
+                addedFoods = [];
+                updateList();
+                updateTotal();
+            }
+        };
+
+        elements.search.addEventListener('keypress', e => {
+            if (e.key === 'Enter') addFood();
         });
     </script>
 </body>
+
 </html>
