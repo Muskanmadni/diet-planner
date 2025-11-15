@@ -1,1 +1,2 @@
 from src.diet_planner.app import app
+application = app
