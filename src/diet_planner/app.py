@@ -29,8 +29,11 @@ database_url = os.environ.get('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+    # Use a temporary directory for the SQLite database in a serverless environment
+    temp_dir = '/tmp'
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(temp_dir, 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
