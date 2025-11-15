@@ -4,10 +4,7 @@
     {
       "src": "wsgi.py",
       "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.9"
-      }
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
     }
   ],
   "routes": [
@@ -15,11 +12,5 @@
       "src": "/(.*)",
       "dest": "wsgi.py"
     }
-  ],
-  "functions": {
-    "wsgi.py": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  }
+  ]
 }
