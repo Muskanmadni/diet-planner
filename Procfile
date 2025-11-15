@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app
+web: gunicorn src.diet_planner.app:app --bind 0.0.0.0:$PORT --workers 2
