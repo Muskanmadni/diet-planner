@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import os
+import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
@@ -406,12 +407,11 @@ def chatbot():
             return jsonify({'error': 'User message is required'}), 400
         if 'Mujhe expert se baat karni hai' in user_message:
             return jsonify({'response': 'Aap ke sawal ka jawab dena zaroori hai. Kripya apna contact number ya email provide karein taake hum aap se expert ke through rabta kar sakein.', 'needs_expert': True}), 200
-        current_model = get_configured_model()
-        if current_model is None:
+        if model is None:
             return jsonify({'response': 'Sorry, the AI model is not available. Please contact the administrator.', 'needs_expert': False}), 500
         system_instruction = "Aap Pakistani diet aur health matters par baat karne wale nutritionist hain. Jawab Roman Urdu mein dena. Sirf Pakistani diet, traditional foods, aur health concerns par bat karna. Koi bhi non-Pakistani diet ya western foods ke baare mein bat karne se mana karna. jawab chota hoga, seedha aur asan alfaaz mein jawab dein."
         try:
-            response = current_model.generate_content(f"{system_instruction} User ka sawal: {user_message}")
+            response = model.generate_content(f"{system_instruction} User ka sawal: {user_message}")
             bot_response = response.text if response and hasattr(response, 'text') else "Maaf kijiye, aapka sawal samajh nahi aaya. Kripya din mein Pakistani khana ya sehat ke bare mein pochhein."
         except Exception as gen_error:
             print(f"Error generating content: {gen_error}")
@@ -604,8 +604,8 @@ def current_user():
         db.session.rollback()
 # Recipe generation using AI
 def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
-    current_model = get_configured_model()
-    if current_model is None:
+    global model
+    if model is None:
         # Return mock data if model is not available
         return [
             {
@@ -638,7 +638,7 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
     prompt += ". Provide the response in JSON format with these fields: name, description, prepTime (in minutes), calories, protein (in grams), carbs (in grams), fat (in grams), mealType (breakfast, lunch, dinner, snack), dietType (vegetarian, non-vegetarian, vegan, etc.), cuisine, ingredients (array), instructions (string with steps)."
     
     try:
-        response = current_model.generate_content(prompt)
+        response = model.generate_content(prompt)
         # Try to parse the response as JSON
         import re
         json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
@@ -821,9 +821,8 @@ def get_pakistani_recipes():
         meal_type = request.args.get('mealType', '').lower()
         diet_type = request.args.get('dietType', '').lower()
         
-        # Get model and check if it's available
-        current_model = get_configured_model()
-        if current_model is not None:
+        # If AI model is available, try to generate recipes
+        if model is not None:
             try:
                 # Build prompt based on search criteria
                 prompt_parts = ["Generate Pakistani recipes in JSON format:"]
@@ -844,7 +843,7 @@ def get_pakistani_recipes():
                 
                 prompt = " ".join(prompt_parts)
                 
-                response = current_model.generate_content(prompt)
+                response = model.generate_content(prompt)
                 
                 # Try to extract JSON from response
                 response_text = response.text.strip()
@@ -1362,8 +1361,7 @@ def generate_weekly_meal_plan():
         allergies = data.get('allergies', [])
         medical_conditions = data.get('medical_conditions', [])
 
-        current_model = get_configured_model()
-        if current_model is None:
+        if model is None:
             import random
             # Return 7-day plan structure in correct sequence that matches frontend expectations
             days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
