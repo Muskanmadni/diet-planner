@@ -7,7 +7,6 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
-import jwt
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
