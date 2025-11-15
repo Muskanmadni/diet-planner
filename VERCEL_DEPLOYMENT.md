@@ -11,6 +11,7 @@ Before deploying, you'll need to set the following environment variables in your
 
 - `GEMINI_API_KEY`: Your Google Gemini API key for AI features
 - `SECRET_KEY`: Secret key for Flask sessions (use a strong random string)
+- `DATABASE_URL`: Database URL for production (e.g., PostgreSQL). If not set, the app will use SQLite for development.
 - `AUTH0_CLIENT_ID`: Your Auth0 client ID (if using Auth0 authentication)
 - `AUTH0_CLIENT_SECRET`: Your Auth0 client secret
 - `AUTH0_DOMAIN`: Your Auth0 domain
@@ -41,9 +42,20 @@ Before deploying, you'll need to set the following environment variables in your
 - `requirements.txt`: Lists all Python dependencies
 - `src/diet_planner/app.py`: Main Flask application
 
+## Database Configuration
+
+### For Development (using SQLite):
+The application will automatically create and use a local SQLite database if no `DATABASE_URL` is provided.
+
+### For Production (recommended):
+1. Set up a hosted database (e.g. PostgreSQL, MySQL)
+2. Set the `DATABASE_URL` environment variable to your database connection string
+3. Example PostgreSQL connection string: `postgresql://username:password@host:port/database_name`
+
+**Note**: Using SQLite in serverless environments like Vercel can be problematic due to the stateless nature of serverless functions. For production use, a hosted database is strongly recommended.
+
 ## Notes
 
-- The application uses SQLite as its database, which works for development but for production you might want to use PostgreSQL or another database that works better in serverless environments
 - All HTML templates are stored in the `src/diet_planner/` directory
 - Static assets (images) are stored in `src/diet_planner/static/images/`
 - The app includes authentication, nutrition tracking, recipe generation, and diet planning features
@@ -55,3 +67,4 @@ If you encounter issues:
 2. Verify that your Git repository contains all necessary files
 3. Make sure the `requirements.txt` file includes all dependencies
 4. Review the build logs in your Vercel dashboard for specific error messages
+5. For database issues in production, ensure you're using a hosted database service
