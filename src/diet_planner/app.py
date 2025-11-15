@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import os
+
 import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
