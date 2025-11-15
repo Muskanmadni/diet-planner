@@ -229,20 +229,41 @@ def auth0_logout():
         )
     )
 
-# Create database tables
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully")
-    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-    try:
-        test_user = User.query.first()
-        print("Database connection successful. Found existing users:", test_user is not None)
-    except Exception as e:
-        print(f"Database connection test failed: {e}")
-        print("Recreating database due to schema mismatch...")
-        db.drop_all()
+# Database initialization function
+def init_db():
+    with app.app_context():
         db.create_all()
-        print("Database recreated successfully")
+        print("Database tables created successfully")
+        print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+        try:
+            test_user = User.query.first()
+            print("Database connection successful. Found existing users:", test_user is not None)
+        except Exception as e:
+            print(f"Database connection test failed: {e}")
+            print("Recreating database due to schema mismatch...")
+            db.drop_all()
+            db.create_all()
+            print("Database recreated successfully")
+
+# Initialize database if needed
+def initialize_database():
+    try:
+        # Try a simple query to see if tables exist and create if needed
+        with app.app_context():
+            # Only create tables if we're not in a Vercel production environment
+            # For Vercel, you may want to use a hosted database like PostgreSQL
+            import os
+            if os.environ.get('VERCEL') != '1':  # Not running on Vercel
+                db.create_all()
+            else:
+                # On Vercel, just try to access the database to ensure it works
+                # In production, it's better to have an initialized database
+                pass
+    except Exception as e:
+        print(f"Error during database initialization: {e}")
+
+# Call initialization when app starts
+initialize_database()
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:

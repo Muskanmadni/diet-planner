@@ -8,6 +8,7 @@ sys.path.insert(0, project_root)
 # Change to the project directory
 os.chdir(project_root)
 
+# Import the app from the correct location
 from src.diet_planner.app import app
 
 # For Vercel deployment, the WSGI server will look for 'application' as the WSGI callable
