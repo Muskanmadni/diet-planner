@@ -4,12 +4,18 @@
     {
       "src": "wsgi.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "static/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "wsgi.py"
-    }
+    { "src": "/api/(.*)", "dest": "wsgi.py" },
+    { "src": "/(.*)", "dest": "/$1.html" }
   ]
 }
