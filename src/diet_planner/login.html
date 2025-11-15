@@ -6,72 +6,141 @@
     <title>NutriGuide - Login</title>
 
     <style>
-        * {margin:0;padding:0;box-sizing:border-box;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family:Arial,sans-serif;
-            background:linear-gradient(135deg,#4CAF50,#45a049);
-            color:#333;line-height:1.6;
-            min-height:100vh;
-            display:flex;justify-content:center;align-items:center;
-            padding:20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .container {max-width:500px;width:100%;background:#fff;border-radius:10px;
-            box-shadow:0 10px 20px rgba(0,0,0,.2);overflow:hidden;}
-        .header {background:#4CAF50;color:#fff;padding:25px;text-align:center;}
-        .header h1 {margin:0;font-size:1.8rem;}
-        .form-container {padding:30px;}
-        .form-group {margin-bottom:20px;}
-        .form-group label {display:block;margin-bottom:8px;font-weight:bold;color:#555;}
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
         .form-group input {
-            width:100%;padding:12px;border:1px solid #ddd;border-radius:5px;
-            font-size:16px;transition:border-color .3s;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
+
         .form-group input:focus {
-            outline:none;border-color:#4CAF50;
-            box-shadow:0 0 5px rgba(76,175,80,.3);
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
         }
+
         .btn {
-            width:100%;padding:14px;background:#4CAF50;color:#fff;
-            border:none;border-radius:5px;font-size:16px;cursor:pointer;
-            transition:background .3s;
+            width: 100%;
+            padding: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .btn:hover {background:#45a049;}
-        .btn:active {transform:translateY(1px);}
-        .register-link {text-align:center;margin-top:20px;}
-        .register-link a {color:#4CAF50;text-decoration:none;font-weight:bold;}
-        .register-link a:hover {text-decoration:underline;}
-        .error-message {color:#d32f2f;margin-top:5px;font-size:14px;}
-        .divider {text-align:center;margin:20px 0;position:relative;color:#888;}
-        .divider::before {
-            content:'';position:absolute;top:50%;left:0;right:0;height:1px;
-            background:#ddd;
+
+        .btn:hover {
+            background-color: #45a049;
         }
-        .divider span {background:#fff;padding:0 1rem;}
-        .auth0-btn {
-            display:block;width:100%;padding:12px;background:#eb4d4b;
-            color:#fff;text-align:center;border-radius:5px;
-            text-decoration:none;font-weight:600;transition:background .3s;
+
+        .btn:active {
+            transform: translateY(1px);
         }
-        .auth0-btn:hover {background:#c44543;}
-        @media (max-width:600px){
-            .container{margin:10px;}
-            .form-container{padding:20px;}
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="/static/images/logo(2).png" alt="NutriGuide Logo"
-                 style="height:30px;margin:0 auto 10px;display:block;">
-            <p style="margin:0 0 5px 0;font-size:1.2rem;">NUTRIGUIDE</p>
-            <h1 style="margin:5px 0;">Login to Your Account</h1>
-            <p style="margin:5px 0 0 0;font-size:0.9rem;">Welcome Back to Smart Diet Planner</p>
+            <img src="/static/images/logo(2).png" alt="NutriGuide Logo" style="height: 30px; margin: 0 auto 10px; display: block;">
+            <p style="margin: 0 0 5px 0; font-size: 1.2rem;">NUTRIGUIDE</p>
+            <h1 style="margin: 5px 0;">Login to Your Account</h1>
+            <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Welcome Back to Smart Diet Planner</p>
         </div>
-
         <div class="form-container">
 
-            <!-- Email / Password form -->
+
+            <!-- Traditional login form -->
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email Address</label>
@@ -86,14 +155,6 @@
                 <button type="submit" class="btn">Login with Email & Password</button>
             </form>
 
-            <!-- Divider -->
-            <div class="divider"><span>OR</span></div>
-
-            <!-- Auth0 Universal Login (Google, Apple, Email, etc.) -->
-            <a href="/auth0/login" class="auth0-btn">
-                Continue with Google / Email
-            </a>
-
             <div class="register-link">
                 <p>Don't have an account? <a href="/register">Register here</a></p>
             </div>
@@ -101,31 +162,196 @@
     </div>
 
     <script>
-        // ---------- Email/Password login ----------
-        document.getElementById('loginForm').addEventListener('submit', async e => {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+        // Get Clerk frontend API key from backend
+        async function loadClerk() {
+            // Wait for Clerk to be loaded with a timeout
+            const waitForClerk = () => {
+                return new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 20; // 10 seconds at 500ms intervals
+                    
+                    const checkClerk = () => {
+                        if (typeof window.Clerk !== 'undefined') {
+                            resolve(window.Clerk);
+                        } else if (attempts >= maxAttempts) {
+                            reject(new Error('Clerk library failed to load after 10 seconds'));
+                        } else {
+                            attempts++;
+                            setTimeout(checkClerk, 500);
+                        }
+                    };
+                    
+                    checkClerk();
+                });
+            };
 
             try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                // Wait for Clerk library to load
+                await waitForClerk();
+                
+                const response = await fetch('/api/clerk-key');
+                const data = await response.json();
+                
+                if (data.clerkFrontendApi) {
+                    // Initialize Clerk with error handling
+                    try {
+                        await window.Clerk.load({
+                            frontendApi: data.clerkFrontendApi,
+                        });
+                        
+                        // Wait for Clerk to be ready and then mount the component
+                        window.Clerk.addListener((event) => {
+                            if (event.user) {
+                                // User is signed in
+                                window.location.href = '/dashboard';
+                            }
+                        });
+                        
+                        // Mount the sign-in component after Clerk is loaded with Google OAuth button configuration
+                        await window.Clerk.mountSignIn('#clerk-sign-in', {
+                            appearance: {
+                                elements: {
+                                    socialButtons: {
+                                        marginTop: '16px'
+                                    },
+                                    socialButtonsBlockButton: "flex",
+                                    socialButtonsBlockButtonText: "Sign in with",
+                                    socialButtonsBlockButtonGoogle: {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }
+                                }
+                            },
+                            signInUrl: '/login',
+                            signUpUrl: '/register',
+                            // Ensure social providers are enabled
+                            socialButtons: {
+                                providers: ['google']
+                            }
+                        });
+                    } catch (initError) {
+                        console.error('Error initializing Clerk:', initError);
+                        document.getElementById('clerk-container').innerHTML = '<p style="color: red;">Error initializing Clerk. Please refresh the page.</p>';
+                    }
+                } else {
+                    console.error('Clerk frontend API key not configured');
+                    document.getElementById('clerk-container').innerHTML = '<p style="color: red;">Clerk authentication is not configured. Please contact the administrator.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading Clerk:', error);
+                document.getElementById('clerk-container').innerHTML = '<p style="color: red;">' + error.message + '</p>';
+            }
+        }
 
-                const data = await res.json();
-
-                if (res.ok) {
+        // Google OAuth callback function
+        function handleCredentialResponse(response) {
+            // Here we would send the Google ID token to the backend
+            // to either create a new user or sign in an existing one
+            console.log("Google ID Token: " + response.credential);
+            
+            // Send to backend to authenticate or create user
+            fetch('/api/google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    credential: response.credential
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user) {
+                    // Successful login
+                    alert('Google login successful! Redirecting to dashboard...');
                     window.location.href = '/dashboard';
                 } else {
-                    alert('Login failed: ' + (data.error || 'Unknown error'));
+                    alert('Google login failed: ' + (data.error || 'Unknown error'));
                 }
-            } catch (err) {
-                console.error(err);
-                alert('Network error – please try again.');
+            })
+            .catch(error => {
+                console.error('Error with Google login:', error);
+                alert('An error occurred during Google login. Please try again.');
+            });
+        }
+
+        // Initialize Google Sign-In after page loads
+        function initializeGoogleSignIn() {
+            // Fetch Google client ID from backend
+            fetch('/api/google-config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.googleClientId) {
+                        // Update the Google Sign-In button with actual client ID
+                        const googleDiv = document.getElementById('g_id_onload');
+                        if (googleDiv) {
+                            googleDiv.setAttribute('data-client_id', data.googleClientId);
+                            
+                            // Re-render the button if library is already loaded
+                            if (window.google && window.google.accounts) {
+                                window.google.accounts.id.initialize({
+                                    client_id: data.googleClientId,
+                                    callback: handleCredentialResponse,
+                                    auto_select: false
+                                });
+                                
+                                window.google.accounts.id.renderButton(
+                                    document.getElementById("g_id_onload"),
+                                    { 
+                                        theme: "outline", 
+                                        size: "large", 
+                                        type: "standard",
+                                        shape: "rectangular",
+                                        text: "signin_with",
+                                        logo_alignment: "left"
+                                    }  
+                                );
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading Google config:', error);
+                    document.getElementById('custom-google-signin').innerHTML = '<p style="color: red;">Error loading Google authentication.</p>';
+                });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Login successful! Redirecting to dashboard...');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Login failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('An error occurred during login. Please try again.');
             }
+        });
+
+        // Initialize Google Sign-In when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGoogleSignIn();
         });
     </script>
 </body>

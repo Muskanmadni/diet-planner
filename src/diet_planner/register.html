@@ -6,137 +6,160 @@
     <title>NutriGuide - Register</title>
 
     <style>
-        * {margin:0;padding:0;box-sizing:border-box;}
-        body{
-            font-family:Arial,sans-serif;
-            background:linear-gradient(135deg,#4CAF50,#45a049);
-            color:#333;line-height:1.6;
-            min-height:100vh;
-            display:flex;justify-content:center;align-items:center;
-            padding:20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container{
-            max-width:500px;width:100%;background:#fff;border-radius:10px;
-            box-shadow:0 10px 20px rgba(0,0,0,.2);overflow:hidden;
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .header{
-            background:#4CAF50;color:#fff;padding:25px;text-align:center;
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
-        .header h1{margin:0;font-size:1.8rem;}
-        .form-container{padding:30px;}
-        .form-group{margin-bottom:20px;}
-        .form-group label{
-            display:block;margin-bottom:8px;font-weight:bold;color:#555;
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 25px;
+            text-align: center;
         }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
         .form-group input,
-        .form-group select{
-            width:100%;padding:12px;border:1px solid #ddd;border-radius:5px;
-            font-size:16px;transition:border-color .3s;
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
+
         .form-group input:focus,
-        .form-group select:focus{
-            outline:none;border-color:#4CAF50;
-            box-shadow:0 0 5px rgba(76,175,80,.3);
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
         }
-        .btn{
-            width:100%;padding:14px;background:#4CAF50;color:#fff;
-            border:none;border-radius:5px;font-size:16px;cursor:pointer;
-            transition:background .3s;
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .btn:hover{background:#45a049;}
-        .btn:active{transform:translateY(1px);}
-        .login-link{
-            text-align:center;margin-top:20px;
+
+        .btn:hover {
+            background-color: #45a049;
         }
-        .login-link a{
-            color:#4CAF50;text-decoration:none;font-weight:bold;
+
+        .btn:active {
+            transform: translateY(1px);
         }
-        .login-link a:hover{text-decoration:underline;}
-        .divider{
-            text-align:center;margin:20px 0;position:relative;color:#888;
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
         }
-        .divider::before{
-            content:'';position:absolute;top:50%;left:0;right:0;height:1px;
-            background:#ddd;
+
+        .login-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
         }
-        .divider span{background:#fff;padding:0 1rem;}
-        .auth0-btn{
-            display:block;width:100%;padding:12px;background:#eb4d4b;
-            color:#fff;text-align:center;border-radius:5px;
-            text-decoration:none;font-weight:600;transition:background .3s;
+
+        .login-link a:hover {
+            text-decoration: underline;
         }
-        .auth0-btn:hover{background:#c44543;}
-        @media(max-width:600px){
-            .container{margin:10px;}
-            .form-container{padding:20px;}
+
+        .error-message {
+            color: #d32f2f;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="/static/images/logo.png" alt="NutriGuide Logo"
-                 style="height:30px;margin:0 auto 10px;display:block;">
-            <h1 style="margin:5px 0;">Create Account</h1>
-            <p style="margin:5px 0 0 0;font-size:0.9rem;">Join Smart Diet Planner Today</p>
+            <img src="/static/images/logo.png" alt="NutriGuide Logo" style="height: 30px; margin: 0 auto 10px; display: block;">
+            <h1 style="margin: 5px 0;">Create Account</h1>
+            <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Join Smart Diet Planner Today</p>
         </div>
-
         <div class="form-container">
 
-            <!-- ==== STEP 1 – Email & Password ==== -->
-            <div id="step1">
-                <h2 style="text-align:center;margin-bottom:20px;">Create Account</h2>
-                <p style="text-align:center;margin-bottom:25px;color:#666;">
-                    Enter your account details to get started
-                </p>
 
-                <form id="step1Form">
-                    <div class="form-group">
-                        <label for="reg_email">Email Address</label>
-                        <input type="email" id="reg_email" required>
-                    </div>
+            <!-- Profile form for users who sign up with Clerk -->
+            <div id="profileFormSection" style="display: none;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Complete Your Profile</h2>
+                <p style="text-align: center; margin-bottom: 25px; color: #666;">Please fill in the details below to customize your experience.</p>
 
-                    <div class="form-group">
-                        <label for="reg_password">Password</label>
-                        <input type="password" id="reg_password" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reg_confirm_password">Confirm Password</label>
-                        <input type="password" id="reg_confirm_password" required>
-                    </div>
-
-                    <button type="submit" class="btn">Continue to Profile</button>
-                </form>
-
-                <!-- Divider + Auth0 button -->
-                <div class="divider"><span>OR</span></div>
-                <a href="/auth0/login" class="auth0-btn">
-                    Continue with Google / Email
-                </a>
-            </div>
-
-            <!-- ==== STEP 2 – Profile ==== -->
-            <div id="step2" style="display:none;">
-                <h2 style="text-align:center;margin-bottom:20px;">Complete Your Profile</h2>
-                <p style="text-align:center;margin-bottom:25px;color:#666;">
-                    Fill in your details to customize your experience
-                </p>
-
-                <form id="step2Form">
+                <form id="registerForm">
                     <div class="form-group">
                         <label for="current_weight">Current Weight (kg)</label>
-                        <input type="number" id="current_weight" step="0.1" required>
+                        <input type="number" id="current_weight" name="current_weight" step="0.1" required>
                     </div>
 
                     <div class="form-group">
                         <label for="height">Height (cm)</label>
-                        <input type="number" id="height" step="0.1" required>
+                        <input type="number" id="height" name="height" step="0.1" required>
                     </div>
 
                     <div class="form-group">
                         <label for="gender">Gender</label>
-                        <select id="gender" required>
+                        <select id="gender" name="gender" required>
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -146,7 +169,7 @@
 
                     <div class="form-group">
                         <label for="goal_type">Goal</label>
-                        <select id="goal_type" required>
+                        <select id="goal_type" name="goal_type" required>
                             <option value="">Select Goal</option>
                             <option value="lose">Lose Weight</option>
                             <option value="gain">Gain Weight</option>
@@ -156,13 +179,82 @@
 
                     <div class="form-group">
                         <label for="weight_goal">Target Weight (kg)</label>
-                        <input type="number" id="weight_goal" step="0.1" required>
+                        <input type="number" id="weight_goal" name="weight_goal" step="0.1" required>
                     </div>
 
                     <button type="submit" class="btn">Complete Registration</button>
                 </form>
             </div>
 
+            <!-- Registration Step 1: Account Information -->
+            <div id="step1" style="display: block;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
+                <p style="text-align: center; margin-bottom: 25px; color: #666;">Enter your account details to get started</p>
+
+                <form id="step1Form">
+                    <div class="form-group">
+                        <label for="reg_email">Email Address</label>
+                        <input type="email" id="reg_email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_password">Password</label>
+                        <input type="password" id="reg_password" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_confirm_password">Confirm Password</label>
+                        <input type="password" id="reg_confirm_password" name="confirm_password" required>
+                    </div>
+
+                    <button type="submit" class="btn">Continue to Profile</button>
+                </form>
+            </div>
+
+            <!-- Registration Step 2: Profile Information -->
+            <div id="step2" style="display: none;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Complete Your Profile</h2>
+                <p style="text-align: center; margin-bottom: 25px; color: #666;">Please fill in your details to customize your experience</p>
+
+                <form id="step2Form">
+                    <div class="form-group">
+                        <label for="current_weight">Current Weight (kg)</label>
+                        <input type="number" id="current_weight" name="current_weight" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="height">Height (cm)</label>
+                        <input type="number" id="height" name="height" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goal_type">Goal</label>
+                        <select id="goal_type" name="goal_type" required>
+                            <option value="">Select Goal</option>
+                            <option value="lose">Lose Weight</option>
+                            <option value="gain">Gain Weight</option>
+                            <option value="maintain">Maintain Weight</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight_goal">Target Weight (kg)</label>
+                        <input type="number" id="weight_goal" name="weight_goal" step="0.1" required>
+                    </div>
+
+                    <button type="submit" class="btn">Complete Registration</button>
+                </form>
+            </div>
         </div>
 
         <div class="login-link">
@@ -171,59 +263,316 @@
     </div>
 
     <script>
-        // ---- Step 1 → Step 2 (email/password) ----
-        document.getElementById('step1Form').addEventListener('submit', e => {
+        // Get Clerk frontend API key from backend
+        async function loadClerk() {
+            // Wait for Clerk to be loaded with a timeout
+            const waitForClerk = () => {
+                return new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 20; // 10 seconds at 500ms intervals
+
+                    const checkClerk = () => {
+                        if (typeof window.Clerk !== 'undefined') {
+                            resolve(window.Clerk);
+                        } else if (attempts >= maxAttempts) {
+                            reject(new Error('Clerk library failed to load after 10 seconds'));
+                        } else {
+                            attempts++;
+                            setTimeout(checkClerk, 500);
+                        }
+                    };
+
+                    checkClerk();
+                });
+            };
+
+            try {
+                // Wait for Clerk library to load
+                await waitForClerk();
+
+                const response = await fetch('/api/clerk-key');
+                const data = await response.json();
+
+                if (data.clerkFrontendApi) {
+                    // Initialize Clerk with error handling
+                    try {
+                        await window.Clerk.load({
+                            frontendApi: data.clerkFrontendApi,
+                        });
+
+                        // Mount the sign-up component after Clerk is loaded with Google OAuth button configuration
+                        await window.Clerk.mountSignUp('#clerk-sign-up', {
+                            appearance: {
+                                elements: {
+                                    socialButtons: {
+                                        marginTop: '16px'
+                                    },
+                                    socialButtonsBlockButton: "flex",
+                                    socialButtonsBlockButtonText: "Sign up with",
+                                    socialButtonsBlockButtonGoogle: {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }
+                                }
+                            },
+                            signInUrl: '/login',
+                            signUpUrl: '/register',
+                            // Ensure social providers are enabled
+                            socialButtons: {
+                                providers: ['google']
+                            }
+                        });
+                    } catch (initError) {
+                        console.error('Error initializing Clerk:', initError);
+                        document.getElementById('clerk-container').innerHTML = '<p style="color: red;">Error initializing Clerk. Please refresh the page.</p>';
+                    }
+                } else {
+                    console.error('Clerk frontend API key not configured');
+                    document.getElementById('clerk-container').innerHTML = '<p style="color: red;">Clerk authentication is not configured. Please contact the administrator.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading Clerk:', error);
+                document.getElementById('clerk-container').innerHTML = '<p style="color: red;">' + error.message + '</p>';
+            }
+        }
+
+        // Google OAuth callback function for registration
+        function handleCredentialResponse(response) {
+            // Send the Google ID token to the backend to create a new user
+            console.log("Google ID Token: " + response.credential);
+
+            // Send to backend to create user
+            fetch('/api/google-register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    credential: response.credential
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user || data.message.includes("already exists")) {
+                    if (data.user) {
+                        // User created successfully
+                        alert('Google registration successful! Redirecting to dashboard...');
+                        window.location.href = '/dashboard';
+                    } else {
+                        // User already exists, try to log them in
+                        alert('Account already exists. Please log in with your email instead.');
+                    }
+                } else {
+                    alert('Google registration failed: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error with Google registration:', error);
+                alert('An error occurred during Google registration. Please try again.');
+            });
+        }
+
+        // Initialize Google Sign-Up after page loads
+        function initializeGoogleSignIn() {
+            // Fetch Google client ID from backend
+            fetch('/api/google-config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.googleClientId) {
+                        // Update the Google Sign-In button with actual client ID
+                        const googleDiv = document.getElementById('g_id_onload');
+                        if (googleDiv) {
+                            googleDiv.setAttribute('data-client_id', data.googleClientId);
+
+                            // Re-render the button if library is already loaded
+                            if (window.google && window.google.accounts) {
+                                window.google.accounts.id.initialize({
+                                    client_id: data.googleClientId,
+                                    callback: handleCredentialResponse,
+                                    auto_select: false
+                                });
+
+                                window.google.accounts.id.renderButton(
+                                    document.getElementById("g_id_onload"),
+                                    {
+                                        theme: "outline",
+                                        size: "large",
+                                        type: "standard",
+                                        shape: "rectangular",
+                                        text: "signup_with",
+                                        logo_alignment: "left"
+                                    }
+                                );
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading Google config:', error);
+                    document.getElementById('custom-google-signin').innerHTML = '<p style="color: red;">Error loading Google authentication.</p>';
+                });
+        }
+
+        // Step 1: Account Information Form
+        document.getElementById('step1Form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('reg_email').value.trim();
-            const pwd   = document.getElementById('reg_password').value;
-            const cpwd  = document.getElementById('reg_confirm_password').value;
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm_password');
 
-            if (pwd !== cpwd) {
+            if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 return;
             }
 
-            // Store credentials for the final POST
-            window.tempReg = { email, password: pwd };
+            // Store the credentials temporarily
+            window.tempCredentials = {
+                email: email,
+                password: password
+            };
 
+            // Move to step 2
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
         });
 
-        // ---- Final registration (profile + credentials) ----
-        document.getElementById('step2Form').addEventListener('submit', async e => {
+        // Step 2: Profile Information Form
+        document.getElementById('step2Form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const profile = {
-                current_weight: parseFloat(document.getElementById('current_weight').value),
-                height:         parseFloat(document.getElementById('height').value),
-                gender:         document.getElementById('gender').value,
-                goal_type:      document.getElementById('goal_type').value,
-                weight_goal:    parseFloat(document.getElementById('weight_goal').value)
+            const formData = new FormData(this);
+            const profileData = {
+                current_weight: parseFloat(formData.get('current_weight')),
+                height: parseFloat(formData.get('height')),
+                gender: formData.get('gender'),
+                goal_type: formData.get('goal_type'),
+                weight_goal: parseFloat(formData.get('weight_goal'))
             };
 
-            const payload = { ...window.tempReg, ...profile };
+            // Combine credentials with profile data
+            const registerData = {
+                email: window.tempCredentials.email,
+                password: window.tempCredentials.password,
+                current_weight: profileData.current_weight,
+                height: profileData.height,
+                gender: profileData.gender,
+                goal_type: profileData.goal_type,
+                weight_goal: profileData.weight_goal
+            };
 
             try {
-                const res = await fetch('/api/register', {
+                const response = await fetch('/api/register', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
                 });
 
-                const data = await res.json();
+                const result = await response.json();
 
-                if (res.ok) {
-                    alert('Registration successful! Redirecting…');
+                if (response.ok) {
+                    alert('Registration completed successfully! Redirecting to dashboard...');
                     window.location.href = '/dashboard';
                 } else {
-                    alert('Registration failed: ' + (data.error || 'Unknown error'));
+                    alert('Registration failed: ' + (result.error || 'Unknown error'));
                 }
-            } catch (err) {
-                console.error(err);
-                alert('Network error – please try again.');
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('An error occurred during registration. Please try again.');
             }
+        });
+
+        // Handle form submission for traditional registration (existing form)
+        document.getElementById('traditionalRegisterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm_password');
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const registerData = {
+                email: email,
+                password: password
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Registration successful! Please complete your profile.');
+                    // Show profile form after successful traditional registration
+                    document.getElementById('traditional-register').style.display = 'none';
+                    document.getElementById('profileFormSection').style.display = 'block';
+                } else {
+                    alert('Registration failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('An error occurred during registration. Please try again.');
+            }
+        });
+
+        // Handle profile form submission (existing form)
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const profileData = {
+                current_weight: parseFloat(formData.get('current_weight')),
+                height: parseFloat(formData.get('height')),
+                gender: formData.get('gender'),
+                goal_type: formData.get('goal_type'),
+                weight_goal: parseFloat(formData.get('weight_goal'))
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Profile completed successfully! Redirecting to dashboard...');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Profile completion failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Profile completion error:', error);
+                alert('An error occurred during profile completion. Please try again.');
+            }
+        });
+
+        // Initialize Google Sign-In when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show step 1 by default
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('traditional-register').style.display = 'none';
+            initializeGoogleSignIn();
         });
     </script>
 </body>
