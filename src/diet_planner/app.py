@@ -104,48 +104,49 @@ class User(db.Model):
             'subscription_status': 'active'  # Always return active since all features are free
         }
 
-# Configure Gemini API
-api_key = os.environ.get("GEMINI_API_KEY")
-if not api_key:
-    print("Warning: GEMINI_API_KEY environment variable not found!")
-    model = None
-else:
+# Store API key for later use
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+model = None  # Initialize as None, will be configured when first needed
+
+def get_configured_model():
+    """Lazily configure and return the Gemini model"""
+    global model
+    if model is not None:
+        return model
+
+    if not GEMINI_API_KEY:
+        print("Warning: GEMINI_API_KEY environment variable not found!")
+        return None
+
     try:
         print("Gemini API key found, attempting to configure...")
-        genai.configure(api_key=api_key)
+        import google.generativeai as genai  # Import here to avoid issues during startup
+        genai.configure(api_key=GEMINI_API_KEY)
 
-        available_models = []
-        try:
-            for m in genai.list_models():
-                if 'generateContent' in m.supported_generation_methods:
-                    available_models.append(m.name)
-            print(f"Available models: {available_models}")
-        except Exception as e:
-            print(f"Error listing models: {e}")
-
-        try:
-            model = genai.GenerativeModel('gemini-2.5-flash')
-            test_response = model.generate_content("Hello")
-            print("Gemini model (gemini-2.5-flash) configured successfully")
-        except Exception as model_error:
-            print(f"Error with gemini-2.5-flash: {model_error}")
+        # Try different models in order of preference
+        models_to_try = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest']
+        for model_name in models_to_try:
             try:
-                model = genai.GenerativeModel('gemini-2.5-pro')
+                model = genai.GenerativeModel(model_name)
+                # Test the model
                 test_response = model.generate_content("Hello")
-                print("Gemini model (gemini-2.5-pro) configured successfully")
-            except Exception as pro_error:
-                print(f"Error with gemini-2.5-pro: {pro_error}")
-                try:
-                    model = genai.GenerativeModel('gemini-flash-latest')
-                    test_response = model.generate_content("Hello")
-                    print("Gemini model (gemini-flash-latest) configured successfully")
-                except Exception as latest_error:
-                    print(f"Error with all models: {model_error}, {pro_error}, {latest_error}")
-                    model = None
-                    print("Setting model to None - AI features will not be available")
+                print(f"Gemini model ({model_name}) configured successfully")
+                return model
+            except Exception as e:
+                print(f"Error with {model_name}: {e}")
+                continue
+
+        print("Could not configure any Gemini model - AI features will not be available")
+        model = None
+        return None
+    except ImportError:
+        print("Google Generative AI library not available")
+        model = None
+        return None
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
         model = None
+        return None
 
 
 
@@ -202,21 +203,26 @@ def google_login():
 
 
 
-# Create database tables
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully")
-    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-    # NutritionEntry model is defined after this, so we can't access it here
-    try:
-        test_user = User.query.first()
-        print("Database connection successful. Found existing users:", test_user is not None)
-    except Exception as e:
-        print(f"Database connection test failed: {e}")
-        print("Recreating database due to schema mismatch...")
-        db.drop_all()
+# Initialize database function - do not run at import time for serverless environments
+def init_db():
+    with app.app_context():
         db.create_all()
-        print("Database recreated successfully")
+        print("Database tables created successfully")
+        print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+        # NutritionEntry model is defined after this, so we can't access it here
+        try:
+            test_user = User.query.first()
+            print("Database connection successful. Found existing users:", test_user is not None)
+        except Exception as e:
+            print(f"Database connection test failed: {e}")
+            print("Recreating database due to schema mismatch...")
+            db.drop_all()
+            db.create_all()
+            print("Database recreated successfully")
+
+# Only initialize the database in development or if explicitly needed
+if __name__ == "__main__":
+    init_db()
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
@@ -408,11 +414,12 @@ def chatbot():
             return jsonify({'error': 'User message is required'}), 400
         if 'Mujhe expert se baat karni hai' in user_message:
             return jsonify({'response': 'Aap ke sawal ka jawab dena zaroori hai. Kripya apna contact number ya email provide karein taake hum aap se expert ke through rabta kar sakein.', 'needs_expert': True}), 200
-        if model is None:
+        current_model = get_configured_model()
+        if current_model is None:
             return jsonify({'response': 'Sorry, the AI model is not available. Please contact the administrator.', 'needs_expert': False}), 500
         system_instruction = "Aap Pakistani diet aur health matters par baat karne wale nutritionist hain. Jawab Roman Urdu mein dena. Sirf Pakistani diet, traditional foods, aur health concerns par bat karna. Koi bhi non-Pakistani diet ya western foods ke baare mein bat karne se mana karna. jawab chota hoga, seedha aur asan alfaaz mein jawab dein."
         try:
-            response = model.generate_content(f"{system_instruction} User ka sawal: {user_message}")
+            response = current_model.generate_content(f"{system_instruction} User ka sawal: {user_message}")
             bot_response = response.text if response and hasattr(response, 'text') else "Maaf kijiye, aapka sawal samajh nahi aaya. Kripya din mein Pakistani khana ya sehat ke bare mein pochhein."
         except Exception as gen_error:
             print(f"Error generating content: {gen_error}")
@@ -605,8 +612,8 @@ def current_user():
         db.session.rollback()
 # Recipe generation using AI
 def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
-    global model
-    if model is None:
+    current_model = get_configured_model()
+    if current_model is None:
         # Return mock data if model is not available
         return [
             {
@@ -626,7 +633,7 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
                 'instructions': '1. Sample step 1\n2. Sample step 2'
             }
         ]
-    
+
     # Create prompt for recipe generation
     prompt = f"Generate a Pakistani cuisine recipe"
     if query:
@@ -635,11 +642,11 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
         prompt += f" suitable for {meal_type}"
     if diet_type:
         prompt += f" that is {diet_type}"
-    
+
     prompt += ". Provide the response in JSON format with these fields: name, description, prepTime (in minutes), calories, protein (in grams), carbs (in grams), fat (in grams), mealType (breakfast, lunch, dinner, snack), dietType (vegetarian, non-vegetarian, vegan, etc.), cuisine, ingredients (array), instructions (string with steps)."
-    
+
     try:
-        response = model.generate_content(prompt)
+        response = current_model.generate_content(prompt)
         # Try to parse the response as JSON
         import re
         json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
@@ -822,29 +829,30 @@ def get_pakistani_recipes():
         meal_type = request.args.get('mealType', '').lower()
         diet_type = request.args.get('dietType', '').lower()
         
-        # If AI model is available, try to generate recipes
-        if model is not None:
+        # Get model and check if it's available
+        current_model = get_configured_model()
+        if current_model is not None:
             try:
                 # Build prompt based on search criteria
                 prompt_parts = ["Generate Pakistani recipes in JSON format:"]
-                
+
                 if search_query:
                     prompt_parts.append(f"Recipes containing '{search_query}'")
-                
+
                 if meal_type:
                     prompt_parts.append(f"Meal type: {meal_type}")
-                
+
                 if diet_type:
                     prompt_parts.append(f"Diet type: {diet_type}")
-                
+
                 prompt_parts.extend([
                     "Include fields: id, name, description, prepTime, calories, protein, carbs, fat, mealType, dietType, cuisine, ingredients, instructions",
                     "Return at least 6 recipes in a JSON array"
                 ])
-                
+
                 prompt = " ".join(prompt_parts)
-                
-                response = model.generate_content(prompt)
+
+                response = current_model.generate_content(prompt)
                 
                 # Try to extract JSON from response
                 response_text = response.text.strip()
@@ -1362,7 +1370,8 @@ def generate_weekly_meal_plan():
         allergies = data.get('allergies', [])
         medical_conditions = data.get('medical_conditions', [])
 
-        if model is None:
+        current_model = get_configured_model()
+        if current_model is None:
             import random
             # Return 7-day plan structure in correct sequence that matches frontend expectations
             days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -1423,7 +1432,10 @@ def generate_weekly_meal_plan():
         
         # Use a timeout for the AI generation
         def generate_ai_content():
-            return model.generate_content(prompt)
+            current_model = get_configured_model()
+            if current_model is None:
+                raise Exception("AI model not available")
+            return current_model.generate_content(prompt)
         
         try:
             # Run AI call with timeout of 30 seconds
@@ -1712,8 +1724,8 @@ def analyze_food_plate():
         }), 200
 
 
-# Run the app
+# Only run the app directly if this file is executed, not imported
+# In serverless environments like Vercel, we don't run the app directly
 if __name__ == "__main__":
+    init_db()  # Initialize database when running locally
     app.run(debug=True, host='127.0.0.1', port=5000)
-else:
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
