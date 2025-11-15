@@ -54,8 +54,9 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 100px;
             margin-right: 10px;
+            width: 150px;
         }
 
         nav ul {
@@ -90,7 +91,12 @@
             border-radius: 4px;
             cursor: pointer;
             margin-left: 10px;
+
             transition: background-color 0.3s;
+        }
+        .user-actions ul {
+            display: flex;
+            list-style: none;
         }
 
         .user-actions button:hover {
@@ -620,7 +626,6 @@
                     <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="/diet-plan"><i class="fas fa-calendar-alt"></i> Meal Plans</a></li>
                     <li><a href="/recipes"><i class="fas fa-utensils"></i> Recipes</a></li>
-                    <li><a href="/dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
                     <li><a href="/shopping-list"><i class="fas fa-shopping-cart"></i> Shopping List</a></li>
                     <li><a href="/exercise-planner"><i class="fas fa-dumbbell"></i> Exercise Planner</a></li>
                     <li><a href="/chatbot"><i class="fas fa-comment-dots"></i> Nutritionist</a></li>
@@ -628,8 +633,15 @@
                 </ul>
             </nav>
             <div class="user-actions">
-                <button id="profile-btn"><i class="fas fa-user"></i> Profile</button>
-                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <ul class="user-actions-ul">
+                    <li>
+                        <button id="profile-btn"><i class="fas fa-user"></i> Profile</button>
+                    </li>
+                    <li>
+                        <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </li>
+                </ul>
+                
             </div>
         </div>
     </header>
@@ -867,7 +879,7 @@
                         if(user.daily_calories) {
                             const calorieValue = Math.round(user.daily_calories);
                             // Format as "consumed / goal" instead of "value / value"
-                            document.getElementById('today-calories').textContent = `0 / ${calorieValue.toLocaleString()}`;
+                            document.getElementById('today-calories').textContent = ` ${calorieValue.toLocaleString()}`;
 
                             const nutrientCards = document.querySelectorAll('.nutrient-card');
 
