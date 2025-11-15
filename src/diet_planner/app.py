@@ -29,11 +29,8 @@ database_url = os.environ.get('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # Use a temporary directory for the SQLite database in a serverless environment
-    temp_dir = '/tmp'
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(temp_dir, 'database.db')}"
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -107,34 +104,47 @@ class User(db.Model):
         }
 
 # Configure Gemini API
-model = None
-def get_gemini_model():
-    global model
-    if model is None:
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            print("Warning: GEMINI_API_KEY environment variable not found!")
-            return None
-        try:
-            print("Gemini API key found, attempting to configure...")
-            genai.configure(api_key=api_key)
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    print("Warning: GEMINI_API_KEY environment variable not found!")
+    model = None
+else:
+    try:
+        print("Gemini API key found, attempting to configure...")
+        genai.configure(api_key=api_key)
 
+        available_models = []
+        try:
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    available_models.append(m.name)
+            print(f"Available models: {available_models}")
+        except Exception as e:
+            print(f"Error listing models: {e}")
+
+        try:
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            test_response = model.generate_content("Hello")
+            print("Gemini model (gemini-2.5-flash) configured successfully")
+        except Exception as model_error:
+            print(f"Error with gemini-2.5-flash: {model_error}")
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                print("Gemini model (gemini-1.5-flash) configured successfully")
-            except Exception as model_error:
-                print(f"Error with gemini-1.5-flash: {model_error}")
+                model = genai.GenerativeModel('gemini-2.5-pro')
+                test_response = model.generate_content("Hello")
+                print("Gemini model (gemini-2.5-pro) configured successfully")
+            except Exception as pro_error:
+                print(f"Error with gemini-2.5-pro: {pro_error}")
                 try:
-                    model = genai.GenerativeModel('gemini-1.5-pro')
-                    print("Gemini model (gemini-1.5-pro) configured successfully")
-                except Exception as pro_error:
-                    print(f"Error with gemini-1.5-pro: {pro_error}")
+                    model = genai.GenerativeModel('gemini-flash-latest')
+                    test_response = model.generate_content("Hello")
+                    print("Gemini model (gemini-flash-latest) configured successfully")
+                except Exception as latest_error:
+                    print(f"Error with all models: {model_error}, {pro_error}, {latest_error}")
                     model = None
                     print("Setting model to None - AI features will not be available")
-        except Exception as e:
-            print(f"Error configuring Gemini API: {e}")
-            model = None
-    return model
+    except Exception as e:
+        print(f"Error configuring Gemini API: {e}")
+        model = None
 
 
 
@@ -391,7 +401,6 @@ def food_search():
 @app.route('/api/chatbot', methods=['POST'])
 def chatbot():
     try:
-        model = get_gemini_model()
         data = request.get_json()
         user_message = data.get('user_message', '').strip()
         if not user_message:
@@ -595,7 +604,7 @@ def current_user():
         db.session.rollback()
 # Recipe generation using AI
 def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
-    model = get_gemini_model()
+    global model
     if model is None:
         # Return mock data if model is not available
         return [
@@ -808,7 +817,6 @@ def cancel_subscription():
 @app.route('/api/pakistani-recipes', methods=['GET'])
 def get_pakistani_recipes():
     try:
-        model = get_gemini_model()
         search_query = request.args.get('search', '').lower()
         meal_type = request.args.get('mealType', '').lower()
         diet_type = request.args.get('dietType', '').lower()
@@ -1343,7 +1351,6 @@ def nutrition_tracking():
 @app.route('/api/diet-plan', methods=['POST'])
 def generate_weekly_meal_plan():
     try:
-        model = get_gemini_model()
         user_id = session.get('user_id')
         user = User.query.get(user_id)
         data = request.get_json()
@@ -1707,4 +1714,5 @@ def analyze_food_plate():
 # Run the app
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
-
+else:
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
