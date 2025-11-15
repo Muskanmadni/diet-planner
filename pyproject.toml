@@ -11,4 +11,5 @@ dependencies = [
     "flask-cors>=4.0.0",
     "python-dotenv>=1.0.0",
     "authlib>=1.6.5",
+    
 ]
