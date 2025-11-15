@@ -7,6 +7,9 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
+import jwt
+from google.auth.transport import requests
+from google.oauth2 import id_token
 
 from functools import wraps
 from flask import redirect, url_for
@@ -145,13 +148,6 @@ else:
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
         model = None
-
-
-
-# Google OAuth routes
-import jwt
-from google.auth.transport import requests
-from google.oauth2 import id_token
 
 
 
