@@ -2,22 +2,31 @@
   "version": 2,
   "builds": [
     {
-      "src": "wsgi.py",
+      "src": "api.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api.py"
+    },
+    {
       "src": "/static/(.*)",
-      "dest": "/wsgi.py"
+      "dest": "/api.py"
     },
     {
       "src": "/images/(.*)",
-      "dest": "/wsgi.py"
+      "dest": "/api.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/wsgi.py"
+      "dest": "/api.py"
     }
-  ]
+  ],
+  "functions": {
+    "api.py": {
+      "maxDuration": 30
+    }
+  }
 }
