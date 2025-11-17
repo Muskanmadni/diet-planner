@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import json
 from google.auth.transport import requests
 from google.oauth2 import id_token
+import shutil
 
 from functools import wraps
 from flask import redirect, url_for
@@ -24,14 +25,6 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
-
-# Configure session settings for serverless deployment
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # Use secure cookies in production
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-)
-
 CORS(app, supports_credentials=True)
 
 # Database configuration
@@ -39,40 +32,18 @@ database_url = os.environ.get('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # For Vercel and other serverless deployments, use a more appropriate database solution
-    # In production, you should use a proper database like PostgreSQL
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+    # Use /tmp for Vercel writable storage
+    tmp_db_path = "/tmp/database.db"
+    # Copy initial DB if it exists in repo
+    if not os.path.exists(tmp_db_path):
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        initial_db = os.path.join(basedir, '..', '..', 'database.db')  # your repo DB
+        if os.path.exists(initial_db):
+            shutil.copy(initial_db, tmp_db_path)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{tmp_db_path}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    "pool_pre_ping": True,
-    "pool_recycle": 300,
-}
-
-# Initialize database
 db = SQLAlchemy(app)
-
-# Ensure database tables exist
-def init_db():
-    with app.app_context():
-        db.create_all()
-        print("Database tables created successfully")
-        print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-        try:
-            test_user = User.query.first()
-            print("Database connection successful. Found existing users:", test_user is not None)
-        except Exception as e:
-            print(f"Database connection test failed: {e}")
-            print("Attempting to recreate database...")
-            try:
-                db.create_all()
-                print("Database recreated successfully")
-            except Exception as e2:
-                print(f"Database recreation failed: {e2}")
-
-# Initialize database when the module is loaded
-init_db()
 
 # Login required decorator
 def login_required(f):
@@ -233,6 +204,21 @@ def google_login():
 
 
 
+# Create database tables
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
+    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+    # NutritionEntry model is defined after this, so we can't access it here
+    try:
+        test_user = User.query.first()
+        print("Database connection successful. Found existing users:", test_user is not None)
+    except Exception as e:
+        print(f"Database connection test failed: {e}")
+        print("Recreating database due to schema mismatch...")
+        db.drop_all()
+        db.create_all()
+        print("Database recreated successfully")
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
@@ -528,10 +514,6 @@ def serve_static_html(filename):
 @app.route('/images/<path:filename>')
 def serve_image(filename):
     return send_from_directory(os.path.join(app.root_path, 'static', 'images'), filename)
-
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    return send_from_directory(os.path.join(app.root_path, 'static'), filename)
 
 # Auth Routes
 @app.route('/api/login', methods=['POST'])
