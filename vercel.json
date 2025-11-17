@@ -13,7 +13,7 @@
     },
     {
       "src": "/static/(.*)",
-      "dest": "src/diet_planner/static/$1"
+      "dest": "src/diet_planner/static/images/$1"
     },
     {
       "src": "/(.*)",
