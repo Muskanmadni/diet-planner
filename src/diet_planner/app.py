@@ -505,7 +505,11 @@ def serve_static_html(filename):
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'static', 'images'), filename)
+    return send_from_directory(os.path.join(app.root_path, 'static', 'images'), filename)
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(os.path.join(app.root_path, 'static'), filename)
 
 # Auth Routes
 @app.route('/api/login', methods=['POST'])
