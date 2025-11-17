@@ -1,32 +1,13 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api.py",
-      "use": "@vercel/python"
-    }
-  ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api.py"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "/api.py"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/api.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api.py"
-    }
-  ],
-  "functions": {
-    "api.py": {
-      "maxDuration": 30
-    }
-  }
+  { "src": "/api/(.*)", "dest": "/api/$1.py" 
+  },
+  { "src": "/static/(.*)", "dest": "/static/$1" 
+  },
+  { "src": "/images/(.*)", "dest": "/static/images/$1" 
+  },
+  { "src": "/(.*)", "dest": "/static/index.html" 
+  }    
+  ]
 }
