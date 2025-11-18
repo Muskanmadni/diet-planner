@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import json
 from google.auth.transport import requests
 from google.oauth2 import id_token
-import shutil 
+
 from functools import wraps
 from flask import redirect, url_for
 import http
@@ -27,20 +27,14 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 # Database configuration
-database_url = os.environ.get("DATABASE_URL")
+database_url = os.environ.get('DATABASE_URL')
 if database_url:
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # Use /tmp for writable SQLite in Vercel
-    tmp_db_path = "/tmp/database.db"
-    if not os.path.exists(tmp_db_path):
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        initial_db = os.path.join(basedir, '..', '..', 'database.db')
-        if os.path.exists(initial_db):
-            shutil.copy(initial_db, tmp_db_path)
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{tmp_db_path}"
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Login required decorator
