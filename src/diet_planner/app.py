@@ -28,21 +28,11 @@ CORS(app, supports_credentials=True)
 
 # Database configuration
 database_url = os.environ.get('DATABASE_URL')
-
-if database_url and database_url.startswith("postgres://"):
-    # Railway/Render kuch platforms "postgres://" dete hain, Flask-SQLAlchemy ko "postgresql://" chahiye
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
-
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # Local development ke liye sirf SQLite allow karo, production mein nahi
-    if os.getenv('FLASK_ENV') == 'development' or os.getenv('DEBUG') == '1':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_dev.db'
-        print("Local development mode: Using SQLite")
-    else:
-        raise RuntimeError("DATABASE_URL not set! Please set PostgreSQL URL in environment variables.")
-    
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
