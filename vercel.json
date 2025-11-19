@@ -1,8 +1,27 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api.py", "use": "@vercel/python" },
-    { "src": "static/**", "use": "@vercel/static" },
-    { "src": "images/**", "use": "@vercel/static" }
+    {
+      "src": "api.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/api.py"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/api.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api.py"
+    }
   ]
 }
