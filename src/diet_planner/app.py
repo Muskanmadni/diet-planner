@@ -25,19 +25,25 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
-
+db = SQLAlchemy()
 # Database configuration
-postgres_url = os.environ.get('SQLALCHEMY_DATABASE_URI') 
+postgres_url = os.environ.get('POSTGRES_URL') 
 
 if postgres_url:
-    # Production: PostgreSQL se connect karo
+    # AGAR VERCEL PAR HAIN: Postgres se connect karo.
+    # Postgres URL 'postgresql://...' se shuru hota hai.
     app.config['SQLALCHEMY_DATABASE_URI'] = postgres_url
+    print("Connecting to PostgreSQL...") # Ye check karne ke liye
 else:
-    # Local Development: Ab bhi SQLite use kar sakte hain
+    # AGAR LOCAL MACHINE PAR HAIN: Local SQLite use karte raho.
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
-    
+    print("Connecting to local SQLite...")
+
+# Optional: Agar aapko tracking band karni hai
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+
+# Database ko app se initialize karo
+db.init_app(app)
 
 # Login required decorator
 def login_required(f):
