@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 import json
 from google.auth.transport import requests
 from google.oauth2 import id_token
-
 from functools import wraps
 from flask import redirect, url_for
 import http
@@ -65,11 +64,10 @@ def login_required(f):
 
 
 # User model
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
     current_weight = db.Column(db.Float, nullable=True)
     height = db.Column(db.Float, nullable=True)
     gender = db.Column(db.String(20), nullable=True)
@@ -77,11 +75,34 @@ class User(db.Model):
     weight_goal = db.Column(db.Float, nullable=True)
     bmi = db.Column(db.Float, nullable=True)
     daily_calories = db.Column(db.Float, nullable=True)
+    # All features are free - these fields are maintained for compatibility but all users have access
+    subscription_tier = db.Column(db.String(20), nullable=True, default='free')
+    subscription_start_date = db.Column(db.DateTime, nullable=True)
+    subscription_end_date = db.Column(db.DateTime, nullable=True)
+    subscription_status = db.Column(db.String(20), nullable=True, default='active')  # All users have active status
 
-    subscription_tier = db.Column(db.String(20), default='free', server_default='free')
-    subscription_start_date = db.Column(db.DateTime, default=datetime.utcnow)
-    subscription_end_date = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=36500))
-    subscription_status = db.Column(db.String(20), default='active', server_default='active')
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'current_weight': self.current_weight,
+            'height': self.height,
+            'gender': self.gender,
+            'goal_type': self.goal_type,
+            'weight_goal': self.weight_goal,
+            'bmi': self.bmi,
+            'daily_calories': self.daily_calories,
+            'subscription_tier': 'free',  # Always return free tier since all features are free
+            'subscription_start_date': datetime.utcnow().isoformat(),  # Always return current time
+            'subscription_end_date': (datetime.utcnow() + timedelta(days=36500)).isoformat(),  # Always return long duration
+            'subscription_status': 'active'  # Always return active since all features are free
+        }
 
 # Configure Gemini API
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -125,6 +146,9 @@ else:
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
         model = None
+
+
+
 
 
 
@@ -483,7 +507,7 @@ def serve_static_html(filename):
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    return send_from_directory(os.path.join(app.root_path, 'static', 'images'), filename)
+    return send_from_directory(os.path.join(app.root_path, '..', 'static', 'images'), filename)
 
 # Auth Routes
 @app.route('/api/login', methods=['POST'])
@@ -1687,3 +1711,5 @@ def analyze_food_plate():
 # Run the app
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
+else:
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
