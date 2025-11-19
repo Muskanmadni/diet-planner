@@ -12,9 +12,10 @@ wheels/
 __pycache__/
 
 # Package manager lock files
-uv.lock
+
 poetry.lock
 Pipfile.lock
-*.lock
+
+
 
 .vercel
