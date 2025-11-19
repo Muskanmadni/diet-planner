@@ -44,15 +44,10 @@ Before deploying, you'll need to set the following environment variables in your
 
 ## Database Configuration
 
-### For Development (using SQLite):
-The application will automatically create and use a local SQLite database if no `DATABASE_URL` is provided.
+### For Development and Vercel Deployment (using SQLite):
+The application now automatically uses SQLite for Vercel deployments to avoid psycopg2 build issues. The app will detect the deployment environment and force SQLite usage regardless of the DATABASE_URL setting.
 
-### For Production (recommended):
-1. Set up a hosted database (e.g. PostgreSQL, MySQL)
-2. Set the `DATABASE_URL` environment variable to your database connection string
-3. Example PostgreSQL connection string: `postgresql://username:password@host:port/database_name`
-
-**Note**: Using SQLite in serverless environments like Vercel can be problematic due to the stateless nature of serverless functions. For production use, a hosted database is strongly recommended.
+**Note**: For Vercel deployment, the application is configured to use SQLite to avoid build issues with PostgreSQL dependencies. No hosted database setup is required for basic functionality, though if you choose to use PostgreSQL with a hosted database, you can set the DATABASE_URL environment variable.
 
 ## Notes
 
