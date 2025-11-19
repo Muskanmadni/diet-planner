@@ -1,10 +1,13 @@
 #!/bin/bash
-# Build script for Vercel deployment
+# Custom build script for Vercel to handle dependencies correctly
 
-# Create a static directory in the root if it doesn't exist
-mkdir -p static
+# Set environment variable to force SQLite usage
+export FORCE_SQLITE=true
 
-# Copy static files from src/diet_planner/static to root static directory
-cp -r src/diet_planner/static/* static/ 2>/dev/null || echo "No static files to copy, continuing..."
+# Install dependencies without psycopg2 to avoid compilation issues
+pip install --no-cache-dir --target="$HOME/site-packages" -r requirements-vercel.txt
 
-echo "Build script completed successfully"
+# Install SQLite-specific dependencies if needed
+pip install --no-cache-dir --target="$HOME/site-packages" pysqlite3-binary
+
+echo "Build completed successfully"

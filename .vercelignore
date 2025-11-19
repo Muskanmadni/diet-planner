@@ -1,0 +1,6 @@
+# Ignore files that might cause psycopg2 installation issues
+uv.lock
+*.lock
+.venv/
+__pycache__/
+*.pyc
