@@ -3,13 +3,25 @@ name = "diet-planner"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "umm e habiba madni", email = "88267142+Muskanmadni@users.noreply.github.com" }
+]
 requires-python = ">=3.9"
+license = {text = "MIT"}
 dependencies = [
-    "requests>=2.31.0",
     "flask>=2.3.2",
     "flask-sqlalchemy>=3.0.5",
     "flask-cors>=4.0.0",
+    "google-generativeai>=0.3.1",
+    "openai-agents>=0.4.2",
     "python-dotenv>=1.0.0",
-    "google-generativeai>=0.6.0",
     "authlib>=1.6.5",
+    "gunicorn>=20.1.0",
+    "requests>=2.31.0",
+    "psycopg2-binary>=2.9.9",
+    "asyncpg>=0.30.0",
 ]
+
+[project.scripts]
+diet-planner = "diet_planner:main"
+app = "diet_planner.app:start"
