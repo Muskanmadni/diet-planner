@@ -13,8 +13,3 @@ dependencies = [
     "google-generativeai>=0.6.0",
     "authlib>=1.6.5",
 ]
-
-[project.optional-dependencies]
-sqlite = [
-    # Only include SQLite-related dependencies
-]
