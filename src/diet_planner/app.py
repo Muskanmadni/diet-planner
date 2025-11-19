@@ -27,14 +27,14 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 # Database configuration
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+postgres_url = os.environ.get('POSTGRES_URL') 
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if postgres_url:
+    # Production: PostgreSQL se connect karo
+    app.config['SQLALCHEMY_DATABASE_URI'] = postgres_url
+else:
+    # Local Development: Ab bhi SQLite use kar sakte hain
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
 db = SQLAlchemy(app)
 
 # Login required decorator
