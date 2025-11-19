@@ -200,7 +200,6 @@ def google_login():
 
 # Create database tables
 with app.app_context():
-    db.create_all()
     print("Database tables created successfully")
     print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
     # NutritionEntry model is defined after this, so we can't access it here
