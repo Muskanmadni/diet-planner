@@ -25,6 +25,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
+
 # Database configuration
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
