@@ -12,7 +12,7 @@ from google.oauth2 import id_token
 from functools import wraps
 from flask import redirect, url_for
 import http
-
+from libsql_client import create_client
 import requests
 
 
@@ -27,23 +27,28 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-turso_url = os.environ.get('TURSO_DATABASE_URL')
-turso_token = os.environ.get('TURSO_AUTH_TOKEN')
+turso_url = os.environ.get('TURSO_DATABASE_URL')  # e.g., libsql://your-db.turso.io
+turso_token = os.environ.get('TURSO_AUTH_TOKEN')  # Your auth token
 
 if turso_url and turso_token:
-    # Turso/libSQL connection (works on Vercel)
-    db_url = f"libsql://{turso_url}?authToken={turso_token}&secure=true"
-    # For embedded/sync mode (optional, if you want local caching – but remote is fine for serverless)
-    # connect_args = {'auth_token': turso_token, 'sync_url': turso_url}
-    connect_args = {'check_same_thread': False}  # Required for threading in Flask
+    # Use Turso's HTTP client as a raw connection pool for SQLAlchemy
+    # This works around dialect issues – treats it as a generic SQLite remote DB
+    client = create_client(
+        url=turso_url,
+        auth_token=turso_token,
+    )
+    # SQLAlchemy URI for remote libSQL (no special dialect needed)
+    db_url = f"sqlite://?mode=libsql&url={turso_url}&auth_token={turso_token}&secure=true"
+    connect_args = {'client': client}  # Pass the client to SQLAlchemy
 else:
-    # Local fallback (dev only)
+    # Local fallback
     basedir = os.path.abspath(os.path.dirname(__file__))
     db_url = f"sqlite:///{os.path.join(basedir, 'instance', 'app.db')}"
+    connect_args = {'check_same_thread': False}
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': connect_args} if 'connect_args' in locals() else {}
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': connect_args}
 
 db = SQLAlchemy(app)
 
