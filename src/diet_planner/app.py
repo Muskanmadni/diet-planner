@@ -27,14 +27,24 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+turso_url = os.environ.get('TURSO_DATABASE_URL')
+turso_token = os.environ.get('TURSO_AUTH_TOKEN')
 
+if turso_url and turso_token:
+    # Turso/libSQL connection (works on Vercel)
+    db_url = f"libsql://{turso_url}?authToken={turso_token}&secure=true"
+    # For embedded/sync mode (optional, if you want local caching – but remote is fine for serverless)
+    # connect_args = {'auth_token': turso_token, 'sync_url': turso_url}
+    connect_args = {'check_same_thread': False}  # Required for threading in Flask
+else:
+    # Local fallback (dev only)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_url = f"sqlite:///{os.path.join(basedir, 'instance', 'app.db')}"
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': connect_args} if 'connect_args' in locals() else {}
+
 db = SQLAlchemy(app)
 
 # Login required decorator
