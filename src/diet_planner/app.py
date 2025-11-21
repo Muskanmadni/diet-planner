@@ -33,7 +33,7 @@ if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"libsql://nutriguide-db-vercel-icfg-0tgfqjlubaajt0gjmiegglvw.aws-us-east-1.turso.io"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
