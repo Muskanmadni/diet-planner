@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, render_template_string, send_from_directory, send_file, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,7 +13,7 @@ from google.oauth2 import id_token
 from functools import wraps
 from flask import redirect, url_for
 import http
-from libsql_client import create_client
+
 import requests
 
 
@@ -27,12 +28,15 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-Turso_url = os.environ.get('TURSO_DATABASE_URL')
-Turso_token = os.environ.get('TURSO_AUTH_TOKEN')
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
-if Turso_url and Turso_token:
-    db = create_client(Turso_url, Turso_token)
-    
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 # Login required decorator
 def login_required(f):
@@ -57,6 +61,8 @@ def login_required(f):
         
         return redirect(url_for('login_page'))
     return decorated_function
+
+
 
 
 
@@ -197,7 +203,7 @@ def google_login():
 
 
 # Create database tables
-with app.app_context():
+
     db.create_all()
     print("Database tables created successfully")
     print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
