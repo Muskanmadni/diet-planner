@@ -10,5 +10,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==3.0.1
 pycparser==2.21
-libsql-client==0.3.1
 sqlalchemy-libsql==0.1.0
+libsql-client==0.14.0 
+SQLAlchemy==2.0.35
+
