@@ -220,21 +220,45 @@ def google_login():
 
 
 
-# Create database tables
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully")
-    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-    # NutritionEntry model is defined after this, so we can't access it here
+# Database initialization will be handled via a before_first_request or similar mechanism later
+# This avoids issues during import time in serverless environments like Vercel
+
+# Flag to track if tables have been created
+_tables_created = False
+
+def ensure_tables_exist():
+    global _tables_created
+    if not _tables_created:
+        with app.app_context():
+            try:
+                db.create_all()
+                print("Database tables created successfully")
+                print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+                # NutritionEntry model is defined after this, so we can't access it here
+                try:
+                    test_user = User.query.first()
+                    print("Database connection successful. Found existing users:", test_user is not None)
+                except Exception as e:
+                    print(f"Database connection test failed: {e}")
+                    print("Recreating database due to schema mismatch...")
+                    db.drop_all()
+                    db.create_all()
+                    print("Database recreated successfully")
+                _tables_created = True
+            except Exception as table_error:
+                print(f"Error creating tables: {table_error}")
+
+# Initialize tables only once when needed, to handle serverless environments
+import atexit
+def cleanup_db():
     try:
-        test_user = User.query.first()
-        print("Database connection successful. Found existing users:", test_user is not None)
-    except Exception as e:
-        print(f"Database connection test failed: {e}")
-        print("Recreating database due to schema mismatch...")
-        db.drop_all()
-        db.create_all()
-        print("Database recreated successfully")
+        with app.app_context():
+            if hasattr(db, 'engine') and db.engine:
+                db.engine.dispose()
+    except:
+        pass  # Ignore errors during cleanup
+
+atexit.register(cleanup_db)
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
@@ -265,6 +289,9 @@ def calculate_daily_calories(weight, height, gender, goal_type, age=30):
 @app.route('/api/register', methods=['POST'])
 def register():
     try:
+        # Ensure tables exist before attempting database operations
+        ensure_tables_exist()
+
         data = request.get_json()
         if not data:
             return jsonify({'error': 'No data provided'}), 400
@@ -535,6 +562,9 @@ def serve_image(filename):
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
+        # Ensure tables exist before attempting database operations
+        ensure_tables_exist()
+
         data = request.get_json()
         if not data or not data.get('email') or not data.get('password'):
             return jsonify({'error': 'Email and password are required'}), 400
