@@ -1,6 +1,3 @@
-
-
-
 from flask import Flask, request, jsonify, render_template_string, send_from_directory, send_file, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,22 +27,12 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-TURSO_DATABASE_URL = os.environ.get("TURSO_DATABASE_URL")  # e.g., libsql://xyz.turso.io
-TURSO_AUTH_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
-
-if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
-    # Use embedded replica mode: syncs with remote Turso DB
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite+libsql:///embedded.db"
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        "connect_args": {
-            "auth_token": TURSO_AUTH_TOKEN,
-            "sync_url": TURSO_DATABASE_URL,
-        }
-    }
-    print("Connected to Turso (serverless SQLite)")
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
-    print("Using local SQLite (dev only)")
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -73,8 +60,6 @@ def login_required(f):
         
         return redirect(url_for('login_page'))
     return decorated_function
-
-
 
 
 
@@ -215,7 +200,7 @@ def google_login():
 
 
 # Create database tables
-
+with app.app_context():
     db.create_all()
     print("Database tables created successfully")
     print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
