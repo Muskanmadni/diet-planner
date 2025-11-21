@@ -32,8 +32,7 @@ Turso_token = os.environ.get('TURSO_AUTH_TOKEN')
 
 if Turso_url and Turso_token:
     db = create_client(Turso_url, Turso_token)
-else:
-    db = SQLAlchemy(app)
+    
 
 # Login required decorator
 def login_required(f):
