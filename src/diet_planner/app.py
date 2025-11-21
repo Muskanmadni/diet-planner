@@ -27,31 +27,33 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-# Force local SQLite for development/testing
-if os.environ.get("FLASK_ENV") == "development" or not os.environ.get("TURSO_FORCE_PRODUCTION"):
-    # Always use local SQLite for development/testing
+# Check if we're in a serverless environment like Vercel
+is_serverless_env = bool(os.environ.get("VERCEL") or os.environ.get("SERVERLESS"))
+
+if os.environ.get("FLASK_ENV") == "development" or not is_serverless_env:
+    # Use local SQLite for development or when not in serverless
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
     print("Using local SQLite (dev mode)")
 else:
+    # In Vercel/serverless environment, try to use Turso
     TURSO_DATABASE_URL = os.environ.get("TURSO_DATABASE_URL")  # e.g., libsql://xyz.turso.io
     TURSO_AUTH_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
 
     if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
-        # Use embedded replica mode: syncs with remote Turso DB
+        # Use Turso database for serverless production
         try:
-            # For libsql client, set up connection using environment variables or specific configuration
-            # Set the auth token in the environment for the libsql client to pick up
-            import os
+            # Set auth token in environment for libsql client to pick up
             os.environ['LIBSQL_AUTH_TOKEN'] = TURSO_AUTH_TOKEN
+            # Use the TURSO URL directly but with the correct SQLAlchemy driver prefix
             app.config['SQLALCHEMY_DATABASE_URI'] = TURSO_DATABASE_URL.replace("libsql://", "sqlite+libsql://")
             print("Connected to Turso (serverless SQLite)")
         except Exception as e:
-            print(f"Turso connection failed: {e}, falling back to local SQLite")
-            app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
-            print("Using local SQLite (dev only)")
+            print(f"Turso connection failed: {e}")
+            # In serverless, we MUST use a proper database - this will cause an error if Turso fails
+            raise Exception(f"Database setup failed in serverless environment: {e}")
     else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
-        print("Using local SQLite (dev only)")
+        # In serverless environments, we must have Turso credentials
+        raise Exception("TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables are required in serverless environments")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
