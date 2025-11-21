@@ -31,31 +31,29 @@ CORS(app, supports_credentials=True)
 is_serverless_env = bool(os.environ.get("VERCEL") or os.environ.get("SERVERLESS"))
 
 if os.environ.get("FLASK_ENV") == "development" or not is_serverless_env:
-    # Use local SQLite for development or when not in serverless
+    # Local development: use regular SQLite file
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
-    print("Using local SQLite (dev mode)")
+    print("Using local SQLite (development mode)")
+    
 else:
-    # In Vercel/serverless environment, try to use Turso
-    TURSO_DATABASE_URL = os.environ.get("TURSO_DATABASE_URL")  # e.g., libsql://xyz.turso.io
+    # Production / Vercel: Use Turso (libsql)
+    TURSO_DATABASE_URL = os.environ.get("TURSO_DATABASE_URL")      # e.g. libsql://my-db-xxxx.turso.io
     TURSO_AUTH_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
 
-    if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
-        # Use Turso database for serverless production
-        try:
-            # Set auth token in environment for libsql client to pick up
-            os.environ['LIBSQL_AUTH_TOKEN'] = TURSO_AUTH_TOKEN
-            # Use the TURSO URL directly but with the correct SQLAlchemy driver prefix
-            app.config['SQLALCHEMY_DATABASE_URI'] = TURSO_DATABASE_URL.replace("libsql://", "sqlite+libsql://")
-            print("Connected to Turso (serverless SQLite)")
-        except Exception as e:
-            print(f"Turso connection failed: {e}")
-            # In serverless, we MUST use a proper database - this will cause an error if Turso fails
-            raise Exception(f"Database setup failed in serverless environment: {e}")
-    else:
-        # In serverless environments, we must have Turso credentials
-        raise Exception("TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables are required in serverless environments")
+    if not TURSO_DATABASE_URL or not TURSO_AUTH_TOKEN:
+        raise Exception("In serverless environment: TURSO_DATABASE_URL and TURSO_AUTH_TOKEN are required!")
+
+    # Correct modern way: Use libsql:// directly (NO sqlite+libsql:// !)
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f"{TURSO_DATABASE_URL}?authToken={TURSO_AUTH_TOKEN}"
+    )
+    print("Connected to Turso via sqlalchemy-libsql (production)")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "connect_args": {"check_same_thread": False}  # Only needed for local SQLite
+}
+
 db = SQLAlchemy(app)
 
 # Login required decorator
