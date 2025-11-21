@@ -27,12 +27,31 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+# Force local SQLite for development/testing
+if os.environ.get("FLASK_ENV") == "development" or not os.environ.get("TURSO_FORCE_PRODUCTION"):
+    # Always use local SQLite for development/testing
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+    print("Using local SQLite (dev mode)")
 else:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+    TURSO_DATABASE_URL = os.environ.get("TURSO_DATABASE_URL")  # e.g., libsql://xyz.turso.io
+    TURSO_AUTH_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
+
+    if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
+        # Use embedded replica mode: syncs with remote Turso DB
+        try:
+            # For libsql client, set up connection using environment variables or specific configuration
+            # Set the auth token in the environment for the libsql client to pick up
+            import os
+            os.environ['LIBSQL_AUTH_TOKEN'] = TURSO_AUTH_TOKEN
+            app.config['SQLALCHEMY_DATABASE_URI'] = TURSO_DATABASE_URL.replace("libsql://", "sqlite+libsql://")
+            print("Connected to Turso (serverless SQLite)")
+        except Exception as e:
+            print(f"Turso connection failed: {e}, falling back to local SQLite")
+            app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+            print("Using local SQLite (dev only)")
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+        print("Using local SQLite (dev only)")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -60,6 +79,8 @@ def login_required(f):
         
         return redirect(url_for('login_page'))
     return decorated_function
+
+
 
 
 
@@ -527,10 +548,11 @@ def login():
             user.subscription_start_date = datetime.utcnow()
             user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
             db.session.commit()
-        
+
         session['user_id'] = user.id
         return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
     except Exception as e:
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/logout', methods=['POST'])
