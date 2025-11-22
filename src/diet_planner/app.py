@@ -36,8 +36,8 @@ if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     # If no DATABASE_URL is set, check for Turso credentials
-    turso_url = os.environ.get('TURSO_DATABASE_URL')
-    auth_token = os.environ.get('TURSO_AUTH_TOKEN')
+    turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
+    auth_token = os.environ.get('DIET_PLANNER_TURSO_AUTH_TOKEN')
 
     if turso_url and auth_token:
         # Note: SQLAlchemy does not natively support libsql:// URLs
