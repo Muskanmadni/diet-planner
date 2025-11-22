@@ -7,7 +7,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
-
+from google.auth.transport import requests
+from google.oauth2 import id_token
 from functools import wraps
 from flask import redirect, url_for
 import http
@@ -148,10 +149,7 @@ else:
 
 
 
-# Google OAuth routes
-import jwt
-from google.auth.transport import requests
-from google.oauth2 import id_token
+
 
 
 
