@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, render_template_string, send_from_directory, send_file, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,8 +7,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
-from google.auth.transport import requests
-from google.oauth2 import id_token
+
 from functools import wraps
 from flask import redirect, url_for
 import http
@@ -26,35 +24,13 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
-
 # Database configuration
-# Check if database URL is already set (e.g., by a deployment platform)
 database_url = os.environ.get('DATABASE_URL')
-
 if database_url:
-    # Use the DATABASE_URL if it's already set (e.g. by Vercel or other platform)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # If no DATABASE_URL is set, check for Turso credentials
-    turso_url = os.environ.get('TURSO_DATABASE_URL')
-    auth_token = os.environ.get('TURSO_AUTH_TOKEN')
-
-    if turso_url and auth_token:
-        # Note: SQLAlchemy does not natively support libsql:// URLs
-        # For local development, we continue using SQLite
-        # For deployment, your hosting platform (e.g. Vercel) should set DATABASE_URL
-        # to the proper Turso connection string that is compatible with deployment environments
-        print("Turso credentials found in environment.")
-        print("For local development, using SQLite database.")
-        print("For deployment: Set DATABASE_URL environment variable to your Turso database URL on your hosting platform.")
-
-        # For local development, continue using SQLite
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
-    else:
-        # Fallback to local SQLite if no credentials are available
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -82,8 +58,6 @@ def login_required(f):
         
         return redirect(url_for('login_page'))
     return decorated_function
-
-
 
 
 
@@ -174,6 +148,10 @@ else:
 
 
 
+# Google OAuth routes
+import jwt
+from google.auth.transport import requests
+from google.oauth2 import id_token
 
 
 
@@ -225,26 +203,19 @@ def google_login():
 
 # Create database tables
 with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
+    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+    # NutritionEntry model is defined after this, so we can't access it here
     try:
-        # Try to create tables
-        db.create_all()
-        print("Database tables created successfully")
-        print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-        # NutritionEntry model is defined after this, so we can't access it here
-        try:
-            test_user = User.query.first()
-            print("Database connection successful. Found existing users:", test_user is not None)
-        except Exception as e:
-            print(f"Database connection test failed: {e}")
-            print("Recreating database due to schema mismatch...")
-            db.drop_all()
-            db.create_all()
-            print("Database recreated successfully")
+        test_user = User.query.first()
+        print("Database connection successful. Found existing users:", test_user is not None)
     except Exception as e:
-        print(f"Error during database setup: {e}")
-        # Fallback to ensure tables exist
+        print(f"Database connection test failed: {e}")
+        print("Recreating database due to schema mismatch...")
+        db.drop_all()
         db.create_all()
-        print("Database tables created successfully after error handling")
+        print("Database recreated successfully")
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
