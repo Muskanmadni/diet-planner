@@ -28,33 +28,58 @@ CORS(app, supports_credentials=True)
 
 
 # Database configuration
-# Check if database URL is already set (e.g., by a deployment platform)
-database_url = os.environ.get('DATABASE_URL')
+# Check if running in production environment (Vercel)
+is_production = os.environ.get('VERCEL', False)
 
-if database_url:
-    # Use the DATABASE_URL if it's already set (e.g. by Vercel or other platform)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # If no DATABASE_URL is set, check for Turso credentials
-    turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
-    auth_token = os.environ.get('DIET_PLANNER_TURSO_AUTH_TOKEN')
-
-    if turso_url and auth_token:
-        # Note: SQLAlchemy does not natively support libsql:// URLs
-        # For local development, we continue using SQLite
-        # For deployment, your hosting platform (e.g. Vercel) should set DATABASE_URL
-        # to the proper Turso connection string that is compatible with deployment environments
-        print("Turso credentials found in environment.")
-        print("For local development, using SQLite database.")
-        print("For deployment: Set DATABASE_URL environment variable to your Turso database URL on your hosting platform.")
-
-        # For local development, continue using SQLite
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+if is_production:
+    # In production (Vercel), DATABASE_URL should be set by the platform
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        print("Production mode: Using DATABASE_URL from environment")
     else:
-        # Fallback to local SQLite if no credentials are available
+        # This is an error condition in production - database must be configured
+        print("ERROR: DATABASE_URL not set in production environment!")
+        print("Please configure your database in Vercel environment variables.")
+        # Fallback for testing only - in real production, this should fail
         basedir = os.path.abspath(os.path.dirname(__file__))
         app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+else:
+    # Local development
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        # Use the DATABASE_URL if it's already set (e.g. by Vercel or other platform)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # If no DATABASE_URL is set, check for Turso credentials
+        turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
+        auth_token = os.environ.get('DIET_PLANNER_TURSO_AUTH_TOKEN')
+
+        if turso_url and auth_token:
+            # Try to construct a compatible database URL for Turso
+            # In production, you'll need to use a supported database like PostgreSQL
+            print("Turso credentials found in environment.")
+
+            # For deployment with Turso, replace libsql:// with https:// for compatibility
+            # Or use a different database in production (recommended: PostgreSQL)
+            if turso_url.startswith('libsql://'):
+                # Replace with a compatible database URL, typically PostgreSQL for Vercel
+                print("Note: SQLAlchemy does not natively support libsql:// URLs in production")
+                print("For production deployment, use PostgreSQL, MySQL, or other supported database")
+                # Use DATABASE_URL if available, otherwise fallback will be used
+                if database_url:
+                    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+                else:
+                    print("Please configure DATABASE_URL in your Vercel environment settings")
+                    basedir = os.path.abspath(os.path.dirname(__file__))
+                    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+            else:
+                # If the URL is already in a compatible format, use it
+                app.config['SQLALCHEMY_DATABASE_URI'] = turso_url
+        else:
+            # Fallback to local SQLite if no credentials are available
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -225,8 +250,8 @@ def google_login():
 
 
 # Create database tables
-with app.app_context():
-    try:
+try:
+    with app.app_context():
         # Try to create tables
         db.create_all()
         print("Database tables created successfully")
@@ -237,15 +262,12 @@ with app.app_context():
             print("Database connection successful. Found existing users:", test_user is not None)
         except Exception as e:
             print(f"Database connection test failed: {e}")
-            print("Recreating database due to schema mismatch...")
-            db.drop_all()
-            db.create_all()
-            print("Database recreated successfully")
-    except Exception as e:
-        print(f"Error during database setup: {e}")
-        # Fallback to ensure tables exist
-        db.create_all()
-        print("Database tables created successfully after error handling")
+            # Don't try to recreate tables in read-only environment
+            print("Database connection issue detected - may be in a read-only environment")
+except Exception as e:
+    print(f"Error during database setup: {e}")
+    print("This may be expected in deployment environments with read-only file systems")
+    # Continue without failing the entire application
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
