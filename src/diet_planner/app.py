@@ -27,67 +27,39 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 
-# Database configuration
-# Check if running in production environment (Vercel)
-is_production = os.environ.get('VERCEL', False)
-
-# In all environments, prioritize DATABASE_URL if available
-database_url = os.environ.get('DATABASE_URL')
+# Database configuration for Neon PostgreSQL
+# In all environments, prioritize DATABASE_URL if available (this will be your Neon connection)
+database_url = os.environ.get('POSTGRES_URL')
 
 if database_url:
-    # Use the DATABASE_URL if it's available (for Vercel deployment with any database)
+    # Use the DATABASE_URL if it's available (should be your Neon PostgreSQL connection)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Check for production environment
+    is_production = os.environ.get('VERCEL', False)
     if is_production:
-        print("Production mode: Using DATABASE_URL from environment")
+        print("Production mode: Using Neon PostgreSQL database from DATABASE_URL")
     else:
-        print("Development mode: Using DATABASE_URL from environment")
-elif is_production:
-    # This is an error condition in production - database must be configured
-    print("ERROR: DATABASE_URL not set in production environment!")
-    print("Please configure your database in Vercel environment variables.")
-    # For Turso with Vercel, you need to set DATABASE_URL to your Turso database
-    import sys
-    print("CRITICAL: Database not configured for production. Application will not function properly.")
-    print("Please set DATABASE_URL in your Vercel environment variables.")
-    # As fallback, try to construct from Turso environment if available
-    turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
-    if turso_url:
-        print(f"Found TURSO database URL, attempting to configure: {turso_url}")
-        # If Turso URL is available, we'll try to use it as DATABASE_URL
-        # For Turso to work with SQLAlchemy, you need to use the PostgreSQL-compatible URL format
-        if turso_url.startswith('libsql://'):
-            # Replace libsql:// with postgresql:// if Turso is in pg mode
-            # Or construct a proper PostgreSQL connection string
-            # This is the format expected by SQLAlchemy
-            app.config['SQLALCHEMY_DATABASE_URI'] = database_url or turso_url.replace('libsql://', 'postgresql://', 1)
-        else:
-            app.config['SQLALCHEMY_DATABASE_URI'] = turso_url
-    else:
-        # Last resort - this will fail in production with read-only file system
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+        print("Development mode: Using database from DATABASE_URL")
 else:
-    # Local development - check for Turso credentials or use SQLite
-    turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
-    auth_token = os.environ.get('DIET_PLANNER_TURSO_AUTH_TOKEN')
-
-    if turso_url and auth_token:
-        # Try to construct a compatible database URL for Turso
-        # In production, you'll need to use a supported database like PostgreSQL
-        print("Turso credentials found in environment.")
-
-        # For deployment with Turso, replace libsql:// with postgresql:// for SQLAlchemy compatibility
-        if turso_url.startswith('libsql://'):
-            # Construct PostgreSQL compatible URL
-            # Format: postgresql://username:password@host:port/database
-            app.config['SQLALCHEMY_DATABASE_URI'] = turso_url.replace('libsql://', 'postgresql://', 1)
-        else:
-            # If the URL is already in a compatible format, use it
-            app.config['SQLALCHEMY_DATABASE_URI'] = turso_url
+    # For local development without DATABASE_URL set
+    is_production = os.environ.get('VERCEL', False)
+    if is_production:
+        # Critical error in production if no database is configured
+        print("CRITICAL ERROR: No database configured in production!")
+        print("Please set DATABASE_URL environment variable in Vercel to your Neon PostgreSQL connection string.")
+        # This will show an error since the database won't be properly configured
+        print("Application will not function properly without a database.")
     else:
-        # Fallback to local SQLite if no credentials are available
+        # Local development fallback to SQLite
+        print("Local development mode: Using local SQLite database")
         basedir = os.path.abspath(os.path.dirname(__file__))
         app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
+
+# Additional SQLAlchemy configuration for PostgreSQL/Neon
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,  # Verify connections before use
+    'pool_recycle': 300,    # Recycle connections every 5 minutes
+}
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
