@@ -29,37 +29,34 @@ CORS(app, supports_credentials=True)
 
 # Database configuration for Neon PostgreSQL
 # In all environments, prioritize DATABASE_URL if available (this will be your Neon connection)
-database_url = os.environ.get('POSTGRES_URL')
+# Database configuration
+# Check if database URL is already set (e.g., by a deployment platform)
+database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # Use the DATABASE_URL if it's available (should be your Neon PostgreSQL connection)
+    # Use the DATABASE_URL if it's already set (e.g. by Vercel or other platform)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    # Check for production environment
-    is_production = os.environ.get('VERCEL', False)
-    if is_production:
-        print("Production mode: Using Neon PostgreSQL database from DATABASE_URL")
-    else:
-        print("Development mode: Using database from DATABASE_URL")
 else:
-    # For local development without DATABASE_URL set
-    is_production = os.environ.get('VERCEL', False)
-    if is_production:
-        # Critical error in production if no database is configured
-        print("CRITICAL ERROR: No database configured in production!")
-        print("Please set DATABASE_URL environment variable in Vercel to your Neon PostgreSQL connection string.")
-        # This will show an error since the database won't be properly configured
-        print("Application will not function properly without a database.")
-    else:
-        # Local development fallback to SQLite
-        print("Local development mode: Using local SQLite database")
+    # If no DATABASE_URL is set, check for Turso credentials
+    turso_url = os.environ.get('DIET_PLANNER_TURSO_DATABASE_URL')
+    auth_token = os.environ.get('DIET_PLANNER_TURSO_AUTH_TOKEN')
+
+    if turso_url and auth_token:
+        # Note: SQLAlchemy does not natively support libsql:// URLs
+        # For local development, we continue using SQLite
+        # For deployment, your hosting platform (e.g. Vercel) should set DATABASE_URL
+        # to the proper Turso connection string that is compatible with deployment environments
+        print("Turso credentials found in environment.")
+        print("For local development, using SQLite database.")
+        print("For deployment: Set DATABASE_URL environment variable to your Turso database URL on your hosting platform.")
+
+        # For local development, continue using SQLite
         basedir = os.path.abspath(os.path.dirname(__file__))
         app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
-
-# Additional SQLAlchemy configuration for PostgreSQL/Neon
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'pool_pre_ping': True,  # Verify connections before use
-    'pool_recycle': 300,    # Recycle connections every 5 minutes
-}
+    else:
+        # Fallback to local SQLite if no credentials are available
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
