@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, render_template_string, send_from_directory, send_file, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,8 +26,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 
-# Database configuration for Neon PostgreSQL
-# In all environments, prioritize DATABASE_URL if available (this will be your Neon connection)
+# Database configuration
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -66,11 +64,8 @@ def login_required(f):
 
 
 
-
-
 # User model
 class User(db.Model):
-    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
@@ -205,24 +200,20 @@ def google_login():
 
 
 # Create database tables
-try:
-    with app.app_context():
-        # Try to create tables
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
+    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+    # NutritionEntry model is defined after this, so we can't access it here
+    try:
+        test_user = User.query.first()
+        print("Database connection successful. Found existing users:", test_user is not None)
+    except Exception as e:
+        print(f"Database connection test failed: {e}")
+        print("Recreating database due to schema mismatch...")
+        db.drop_all()
         db.create_all()
-        print("Database tables created successfully")
-        print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-        # NutritionEntry model is defined after this, so we can't access it here
-        try:
-            test_user = User.query.first()
-            print("Database connection successful. Found existing users:", test_user is not None)
-        except Exception as e:
-            print(f"Database connection test failed: {e}")
-            # Don't try to recreate tables in read-only environment
-            print("Database connection issue detected - may be in a read-only environment")
-except Exception as e:
-    print(f"Error during database setup: {e}")
-    print("This may be expected in deployment environments with read-only file systems")
-    # Continue without failing the entire application
+        print("Database recreated successfully")
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
@@ -609,8 +600,6 @@ def current_user():
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
 # Recipe generation using AI
 def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
     global model
@@ -1005,6 +994,106 @@ def get_pakistani_recipes():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+        
+        # Fallback to static recipes if AI is not available or fails
+        comprehensive_pakistani_recipes = [
+            {
+                'id': 1,
+                'name': 'Chicken Karahi',
+                'description': 'Delicious Pakistani-style chicken curry cooked in a karahi with tomatoes, green chilies, and aromatic spices.',
+                'prepTime': 30,
+                'calories': 320,
+                'protein': 30,
+                'carbs': 8,
+                'fat': 20,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chicken', 'Tomatoes', 'Onions', 'Green chilies', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Salt', 'Turmeric', 'Red chili powder', 'Coriander powder', 'Garam masala'],
+                'instructions': '1. Heat 2 tablespoons of oil in a karahi or heavy-bottomed pan. 2. Add sliced onions and sauté until golden brown. 3. Add ginger-garlic paste and green chilies, cook for 1 minute. 4. Add chicken pieces and cook until they change color. 5. Add all the spices (cumin, coriander, turmeric, red chili powder) and mix well. 6. Add chopped tomatoes and cook until oil starts separating from the masala. 7. Add 1 cup water, cover and cook for 15-20 minutes until chicken is tender. 8. Garnish with fresh coriander and serve hot with naan or rice.'
+            },
+            {
+                'id': 2,
+                'name': 'Daal Chawal',
+                'description': 'Classic Pakistani lentils served with steamed basmati rice, seasoned with cumin and garlic.',
+                'prepTime': 45,
+                'calories': 280,
+                'protein': 12,
+                'carbs': 45,
+                'fat': 6,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Yellow lentils (moong dal)', 'Basmati rice', 'Onions', 'Garlic', 'Ginger', 'Turmeric', 'Red chili powder', 'Cumin', 'Salt', 'Ghee or oil', 'Bay leaf', 'Cinnamon'],
+                'instructions': '1. Wash 1 cup yellow lentils and pressure cook with 3 cups water and turmeric for 4-5 whistles until soft. 2. In a separate pot, rinse 1 cup basmati rice until water runs clear. Add rice to 2 cups boiling water with salt and a few drops of oil. Cook covered for 12-15 minutes. 3. For tempering: heat ghee/oil in a pan, add cumin seeds and let them splutter. 4. Add sliced onions and cook until golden. Add ginger-garlic paste and spices. 5. Mix this tempering with cooked daal. 6. Serve daal and rice together, garnished with coriander and a dollop of ghee.'
+            },
+            {
+                'id': 3,
+                'name': 'Seekh Kebab',
+                'description': 'Minced meat kebabs with Pakistani spices, grilled to perfection and served with mint chutney.',
+                'prepTime': 40,
+                'calories': 250,
+                'protein': 20,
+                'carbs': 5,
+                'fat': 18,
+                'mealType': 'snack',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Minced beef or mutton', 'Onions', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Garam masala', 'Coriander leaves', 'Mint leaves', 'Egg', 'Salt', 'Red chili powder', 'Oil for grilling'],
+                'instructions': '1. Mix minced meat with all spices, ginger-garlic paste, chopped onions, coriander, mint, and egg. 2. Refrigerate for 1 hour to allow flavors to blend. 3. Soak metal skewers in water for 10 minutes. 4. Take a portion of the mixture and shape around the skewer in log form. 5. Heat a griddle or tava with little oil. 6. Grill the kebabs, turning occasionally, until golden brown and cooked through (about 10-12 minutes). 7. Serve hot with mint chutney and naan.'
+            },
+            {
+                'id': 4,
+                'name': 'Aloo Gosht',
+                'description': 'Hearty Pakistani curry with mutton and potatoes in a rich tomato-based gravy.',
+                'prepTime': 60,
+                'calories': 350,
+                'protein': 25,
+                'carbs': 18,
+                'fat': 22,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Mutton or beef', 'Potatoes', 'Onions', 'Tomatoes', 'Yogurt', 'Ginger garlic', 'Coriander', 'Cumin', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Salt', 'Oil'],
+                'instructions': '1. Cut meat into cubes and marinate with yogurt, ginger-garlic paste, and spices for 30 minutes. 2. Heat oil in a heavy-bottomed pot, add whole spices (cinnamon, cardamom, cloves) and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add marinated meat and cook until color changes. 5. Add chopped tomatoes and cook until oil separates. 6. Add 1 cup water, cover and simmer for 45 minutes until meat is tender. 7. Add peeled and quartered potatoes in the last 20 minutes of cooking. 8. Adjust seasoning and serve with naan or rice.'
+            },
+            {
+                'id': 5,
+                'name': 'Biryani',
+                'description': 'Fragrant Pakistani rice dish layered with marinated meat, saffron, and aromatic spices.',
+                'prepTime': 90,
+                'calories': 420,
+                'protein': 25,
+                'carbs': 55,
+                'fat': 15,
+                'mealType': 'lunch',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Basmati rice', 'Chicken or mutton', 'Yogurt', 'Onions', 'Tomatoes', 'Saffron', 'Mint leaves', 'Coriander leaves', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Bay leaves', 'Salt', 'Ghee'],
+                'instructions': '1. Soak 2 cups basmati rice in water for 30 minutes. 2. Marinate chicken/meat with yogurt, spices, and ginger-garlic paste for 1 hour. 3. In a large pot, layer the marinated meat at the bottom. 4. Heat oil separately, fry sliced onions until golden (for biryani masala). 5. Layer half the drained rice over the meat. 6. Add fried onions, mint, coriander, saffron milk, and ghee. 7. Layer remaining rice on top. 8. Seal the pot with dough or tight lid, cook on low flame for 20 minutes. 9. Let it rest for 10 minutes before serving.'
+            },
+            {
+                'id': 6,
+                'name': 'Chana Masala',
+                'description': 'Spicy Pakistani chickpea curry with tomatoes and aromatic spices.',
+                'prepTime': 40,
+                'calories': 200,
+                'protein': 9,
+                'carbs': 30,
+                'fat': 5,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chickpeas (kala chana)', 'Onions', 'Tomatoes', 'Ginger garlic', 'Coriander', 'Cumin', 'Amchur (dry mango powder)', 'Red chili powder', 'Turmeric', 'Garam masala', 'Coriander powder', 'Salt', 'Oil', 'Fresh coriander'],
+                'instructions': '1. Soak chickpeas overnight, then boil until tender (or use canned chickpeas). 2. Heat oil in a heavy-bottomed pan, add cumin seeds and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add ginger-garlic paste and cook for 1 minute. 5. Add all ground spices (coriander, cumin, turmeric, red chili powder), mix well. 6. Add chopped tomatoes and cook until soft and oil separates. 7. Add the boiled chickpeas and 1 cup water, simmer for 15 minutes. 8. Add amchur powder and garam masala in the end. 9. Garnish with fresh coriander and serve with naan.'
+            }
+        ]
+
+        return jsonify({
+            'recipes': comprehensive_pakistani_recipes,
+            'count': len(comprehensive_pakistani_recipes),
+            'generated_by': 'database'
+        }), 200
 
 
 # Nutrition Tracking Models
