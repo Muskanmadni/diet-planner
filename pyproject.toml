@@ -16,12 +16,10 @@ dependencies = [
     "google-generativeai==0.8.3",
     "gunicorn==23.0.0",
     "pycparser>=2.23",
+    "psycopg>=3.1",   
 ]
 
-[project.optional-dependencies]
-postgres = [
-    "psycopg2-binary>=2.9.0",
-]
+
 
 
 [project.scripts]
