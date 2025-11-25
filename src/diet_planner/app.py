@@ -24,21 +24,20 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
-# Database configuration 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Database configuration
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgres://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
+)
 
-if DATABASE_URL:
-    # Production environment - PostgreSQL
-    # Force convert to postgresql:// (SQLAlchemy requires this)
-    if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+# Force convert to postgresql:// (SQLAlchemy requires this)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize SQLAlchemy without engine options initially to avoid hstore detection
 db = SQLAlchemy(app)
-
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
 @event.listens_for(Engine, "connect")
 def set_nile_tenant(dbapi_connection, connection_record):
@@ -1772,4 +1771,12 @@ if __name__ == "__main__":
             print(f"Error during table creation: {e}")
             db.session.rollback()  # Rollback any failed transactions
     app.run(debug=True, host='127.0.0.1', port=5000)
+
+
+
+
+
+
+
+
 
