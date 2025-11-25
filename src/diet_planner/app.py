@@ -34,7 +34,6 @@ if is_vercel:
 else:
     # For local development or other environments, use DATABASE_URL from environment variables only
     # (not from .env file which is loaded earlier) to allow easy override
-    import sys
     # Check the os.environ directly, which may have been modified after load_dotenv()
     env_database_url = os.environ.get("DATABASE_URL")
     if env_database_url:
