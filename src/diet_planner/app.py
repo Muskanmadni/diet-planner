@@ -51,7 +51,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Create SQLAlchemy instance
-db = SQLAlchemy(app)
+db = SQLAlchemy
 
 
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
