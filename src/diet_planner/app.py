@@ -7,13 +7,14 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import json
-from google.auth.transport import requests as google_requests
+from google.auth.transport import requests
 from google.oauth2 import id_token
 from functools import wraps
 from flask import redirect, url_for
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
 import http
+
+import requests
+
 
 
 # Load environment variables from .env file
@@ -25,57 +26,39 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 # Database configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgres://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
-)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
-# Force convert to postgresql:// (SQLAlchemy requires this)
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Initialize SQLAlchemy without engine options initially to avoid hstore detection
 db = SQLAlchemy(app)
-# AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
-@event.listens_for(Engine, "connect")
-def set_nile_tenant(dbapi_connection, connection_record):
-    # Only set tenant if there's an active request context
-    # and avoid setting during initial connection setup/extension loading
-    from flask import has_request_context
-    try:
-        # Check if we're in a request context first
-        if has_request_context():
-            user_id = session.get('user_id')
-            if user_id:
-                # Create a new cursor to set the tenant variable
-                cursor = dbapi_connection.cursor()
-                cursor.execute(f"SET nile.tenant_id = '{user_id}'")
-                cursor.close()
-    except:
-        # If session access fails during initialization, ignore
-        pass
 
-@event.listens_for(Engine, "connect", once=True)
-def enable_extensions(dbapi_connection, connection_record):
-    try:
-        cursor = dbapi_connection.cursor()
-        cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
-        cursor.close()
-        dbapi_connection.commit()
-    except:
-        pass
-# =========================================================================
-
+# Login required decorator
 def login_required(f):
     @wraps(f)
-    def decorated(*args, **kwargs):
-        if not session.get('user_id'):
-            return redirect(url_for('login_page'))
-        return f(*args, **kwargs)
-    return decorated
+    def decorated_function(*args, **kwargs):
+        # Check Flask session first (for existing users)
+        if 'user_id' in session and session['user_id'] is not None:
+            return f(*args, **kwargs)
+        
+        # Check Clerk authentication
+        auth_header = request.headers.get('Authorization')
+        session_token = None
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            session_token = auth_header[7:]
 
+
+            try:
+                return f(*args, **kwargs)
+            except:
+                pass  
+        
+        return redirect(url_for('login_page'))
+    return decorated_function
 
 
 
@@ -83,8 +66,8 @@ def login_required(f):
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)  # Increased size for scrypt hashes
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
     current_weight = db.Column(db.Float, nullable=True)
     height = db.Column(db.Float, nullable=True)
     gender = db.Column(db.String(20), nullable=True)
@@ -176,28 +159,28 @@ def google_login():
     try:
         data = request.get_json()
         token = data.get('credential')
-
+        
         if not token:
             return jsonify({'error': 'Google ID token is required'}), 400
-
+            
         # Verify the Google ID token
         try:
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
+            idinfo = id_token.verify_oauth2_token(token, requests.Request())
             email = idinfo['email']
             name = idinfo.get('name', '')
             user_id = idinfo['sub']  # Google's unique user ID
         except ValueError as e:
             print(f"Invalid Google token: {e}")
             return jsonify({'error': 'Invalid Google token'}), 400
-
+            
         # Find or create user in our database
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({'error': 'Account with this email does not exist. Please register first.'}), 400
-
+            
         # Store user in session
         session['user_id'] = user.id
-
+        
         # Ensure user has access to all features
         if user.subscription_status != 'active':
             user.subscription_status = 'active'
@@ -205,7 +188,7 @@ def google_login():
             user.subscription_start_date = datetime.utcnow()
             user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
             db.session.commit()
-
+            
         return jsonify({'message': 'Google login successful', 'user': user.to_dict()}), 200
     except Exception as e:
         print(f"Error in google_login: {e}")
@@ -217,55 +200,20 @@ def google_login():
 
 
 # Create database tables
-# Moved this to after app initialization to avoid connection issues during startup
-def init_db():
-    with app.app_context():
-        try:
-            # Check if tables exist and have the correct schema by attempting to create them
-            # This will fail if there's a schema mismatch
-            db.create_all()
-            print("Database tables created successfully")
-            print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
-            # NutritionEntry model is defined after this, so we can't access it here
-            try:
-                test_user = User.query.first()
-                print("Database connection successful. Found existing users:", test_user is not None)
-            except Exception as e:
-                print(f"Database connection test failed: {e}")
-                print("Recreating database due to schema mismatch...")
-                db.session.rollback()  # Rollback any failed transactions
-                db.drop_all()
-                db.create_all()
-                print("Database recreated successfully")
-        except Exception as e:
-            # If initialization fails due to schema mismatch or other issues, recreate database
-            print(f"Database initialization failed: {e}")
-            print("Recreating database due to schema mismatch...")
-            try:
-                db.session.rollback()  # Rollback any failed transactions
-                # For database recreation, use a more targeted approach to avoid system table issues
-                # Use quoted table name for "user" since it might be a reserved word
-                from sqlalchemy import text
-                db.session.execute(text('DROP TABLE IF EXISTS nutrition_entry;'))
-                db.session.execute(text('DROP TABLE IF EXISTS "user";'))  # user is a reserved word in PostgreSQL
-                db.session.commit()  # Commit the drops
-                db.create_all()
-                print("Database recreated successfully with new schema")
-            except Exception as recreate_error:
-                print(f"Error recreating database: {recreate_error}")
-                # Fallback approach - let SQLAlchemy handle it
-                try:
-                    db.session.rollback()
-                    db.create_all()  # Sometimes this works after a rollback
-                    print("Database recreated with simple approach")
-                except Exception as simple_error:
-                    print(f"Simple approach also failed: {simple_error}")
-                    # As a final fallback, just continue with existing schema
-                    pass
-                db.session.rollback()
-
-# Initialize the database after the app is fully set up
-init_db()
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
+    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+    # NutritionEntry model is defined after this, so we can't access it here
+    try:
+        test_user = User.query.first()
+        print("Database connection successful. Found existing users:", test_user is not None)
+    except Exception as e:
+        print(f"Database connection test failed: {e}")
+        print("Recreating database due to schema mismatch...")
+        db.drop_all()
+        db.create_all()
+        print("Database recreated successfully")
 
 def calculate_bmi(weight, height):
     if not weight or not height or height <= 0:
@@ -579,7 +527,7 @@ def login():
             user.subscription_start_date = datetime.utcnow()
             user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
             db.session.commit()
-
+        
         session['user_id'] = user.id
         return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
     except Exception as e:
@@ -606,10 +554,10 @@ def current_user():
 
         if request.method == 'GET':
             return jsonify({'message': 'User info retrieved successfully', 'user': user.to_dict()}), 200
-
+        
         elif request.method == 'PUT':
             data = request.get_json()
-
+            
             # Update user fields if provided in the request
             if 'email' in data:
                 # Check if email is already taken by another user
@@ -617,36 +565,36 @@ def current_user():
                 if existing_user and existing_user.id != user.id:
                     return jsonify({'error': 'Email already taken'}), 409
                 user.email = data['email']
-
+            
             if 'current_weight' in data:
                 user.current_weight = data['current_weight']
                 user.bmi = calculate_bmi(user.current_weight, user.height)
-
+                
                 # Recalculate daily calories if needed
                 if user.height and user.gender and user.goal_type:
                     user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
-
+            
             if 'height' in data:
                 user.height = data['height']
                 user.bmi = calculate_bmi(user.current_weight, user.height)
-
+                
                 # Recalculate daily calories if needed
                 if user.current_weight and user.gender and user.goal_type:
                     user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
-
+            
             if 'gender' in data:
                 user.gender = data['gender']
                 if user.current_weight and user.height and user.goal_type:
                     user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
-
+            
             if 'goal_type' in data:
                 user.goal_type = data['goal_type']
                 if user.current_weight and user.height and user.gender:
                     user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
-
+            
             if 'weight_goal' in data:
                 user.weight_goal = data['weight_goal']
-
+            
             db.session.commit()
             return jsonify({'message': 'User profile updated successfully', 'user': user.to_dict()}), 200
 
@@ -675,7 +623,7 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
                 'instructions': '1. Sample step 1\n2. Sample step 2'
             }
         ]
-
+    
     # Create prompt for recipe generation
     prompt = f"Generate a Pakistani cuisine recipe"
     if query:
@@ -684,9 +632,9 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
         prompt += f" suitable for {meal_type}"
     if diet_type:
         prompt += f" that is {diet_type}"
-
+    
     prompt += ". Provide the response in JSON format with these fields: name, description, prepTime (in minutes), calories, protein (in grams), carbs (in grams), fat (in grams), mealType (breakfast, lunch, dinner, snack), dietType (vegetarian, non-vegetarian, vegan, etc.), cuisine, ingredients (array), instructions (string with steps)."
-
+    
     try:
         response = model.generate_content(prompt)
         # Try to parse the response as JSON
@@ -708,7 +656,7 @@ def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
                 pass
     except Exception as e:
         print(f"Error generating recipe with AI: {e}")
-
+    
     # Return mock data if AI fails
     return [
         {
@@ -736,7 +684,7 @@ def get_recipes():
         # Get query parameters
         meal_type = request.args.get('meal_type', '')
         diet_type = request.args.get('diet_type', '')
-
+        
         # Generate recipes using AI
         recipes = generate_recipe_with_ai(meal_type=meal_type, diet_type=diet_type)
         return jsonify({'recipes': recipes, 'count': len(recipes)}), 200
@@ -751,7 +699,7 @@ def search_recipes():
         query = data.get('query', '')
         meal_type = data.get('meal_type', '')
         diet_type = data.get('diet_type', '')
-
+        
         # Generate recipes using AI based on search parameters
         recipes = generate_recipe_with_ai(query=query, meal_type=meal_type, diet_type=diet_type)
         return jsonify({'recipes': recipes, 'count': len(recipes)}), 200
@@ -765,13 +713,13 @@ def change_password():
         user_id = session.get('user_id')
         if not user_id:
             return jsonify({'error': 'User not authenticated'}), 401
-
+        
         user = User.query.get(user_id)
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
         data = request.get_json()
-
+        
         if not data or not data.get('current_password') or not data.get('new_password'):
             return jsonify({'error': 'Current password and new password are required'}), 400
 
@@ -828,7 +776,7 @@ def get_subscription_status():
         if not user_id: return jsonify({'error': 'User not authenticated'}), 401
         user = User.query.get(user_id)
         if not user: return jsonify({'error': 'User not found'}), 404
-
+        
         # All users now have access to all features, so ensure status is always active
         if user.subscription_status != 'active':
             user.subscription_status = 'active'
@@ -836,7 +784,7 @@ def get_subscription_status():
             user.subscription_start_date = datetime.utcnow()
             user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
             db.session.commit()
-
+        
         return jsonify({
             'subscription_tier': 'free',
             'subscription_start_date': datetime.utcnow().isoformat(),
@@ -870,34 +818,34 @@ def get_pakistani_recipes():
         search_query = request.args.get('search', '').lower()
         meal_type = request.args.get('mealType', '').lower()
         diet_type = request.args.get('dietType', '').lower()
-
+        
         # If AI model is available, try to generate recipes
         if model is not None:
             try:
                 # Build prompt based on search criteria
                 prompt_parts = ["Generate Pakistani recipes in JSON format:"]
-
+                
                 if search_query:
                     prompt_parts.append(f"Recipes containing '{search_query}'")
-
+                
                 if meal_type:
                     prompt_parts.append(f"Meal type: {meal_type}")
-
+                
                 if diet_type:
                     prompt_parts.append(f"Diet type: {diet_type}")
-
+                
                 prompt_parts.extend([
                     "Include fields: id, name, description, prepTime, calories, protein, carbs, fat, mealType, dietType, cuisine, ingredients, instructions",
                     "Return at least 6 recipes in a JSON array"
                 ])
-
+                
                 prompt = " ".join(prompt_parts)
-
+                
                 response = model.generate_content(prompt)
-
+                
                 # Try to extract JSON from response
                 response_text = response.text.strip()
-
+                
                 # Look for JSON inside code blocks or try to parse directly
                 import re
                 json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response_text)
@@ -905,7 +853,7 @@ def get_pakistani_recipes():
                     json_str = json_match.group(1)
                 else:
                     json_str = response_text
-
+                
                 # Clean up the response to get just the JSON part
                 if json_str.startswith("```json"):
                     json_str = json_str[7:]  # Remove ```json
@@ -913,13 +861,13 @@ def get_pakistani_recipes():
                     json_str = json_str[3:]   # Remove ```
                 if json_str.endswith("```"):
                     json_str = json_str[:-3]  # Remove ```
-
+                
                 recipes = json.loads(json_str)
-
+                
                 # Ensure recipes is a list
                 if not isinstance(recipes, list):
                     recipes = [recipes]
-
+                
                 # Add default values for any missing fields
                 for recipe in recipes:
                     recipe.setdefault('id', len(recipes))
@@ -933,18 +881,18 @@ def get_pakistani_recipes():
                     recipe.setdefault('cuisine', 'Pakistani')
                     recipe.setdefault('ingredients', ['Ingredients not specified'])
                     recipe.setdefault('instructions', 'Instructions not specified')
-
+                
                 return jsonify({
                     'recipes': recipes,
                     'count': len(recipes),
                     'generated_by': 'ai'
                 }), 200
-
+                
             except Exception as ai_error:
                 print(f"AI generation failed: {ai_error}")
                 # Fallback to static recipes if AI fails
                 pass
-
+        
         # Fallback to static recipes if AI is not available or fails
         comprehensive_pakistani_recipes = [
             {
@@ -1046,7 +994,7 @@ def get_pakistani_recipes():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+        
         # Fallback to static recipes if AI is not available or fails
         comprehensive_pakistani_recipes = [
             {
@@ -1186,7 +1134,7 @@ def get_nutrition_entries():
     try:
         user_id = session.get('user_id')
         date_str = request.args.get('date')  # Format: YYYY-MM-DD
-
+        
         if date_str:
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
             entries = NutritionEntry.query.filter_by(user_id=user_id, date=date).all()
@@ -1194,12 +1142,12 @@ def get_nutrition_entries():
             # Get today's entries by default
             today = datetime.utcnow().date()
             entries = NutritionEntry.query.filter_by(user_id=user_id, date=today).all()
-
+        
         total_calories = sum(entry.calories for entry in entries)
         total_protein = sum(entry.protein for entry in entries)
         total_carbs = sum(entry.carbs for entry in entries)
         total_fat = sum(entry.fat for entry in entries)
-
+        
         return jsonify({
             'entries': [entry.to_dict() for entry in entries],
             'summary': {
@@ -1218,18 +1166,18 @@ def add_nutrition_entry():
     try:
         user_id = session.get('user_id')
         data = request.get_json()
-
+        
         required_fields = ['food_name', 'quantity', 'unit', 'meal_type', 'calories', 'protein', 'carbs', 'fat']
         for field in required_fields:
             if field not in data:
                 return jsonify({'error': f'{field} is required'}), 400
-
+        
         date_str = data.get('date')  # Format: YYYY-MM-DD
         if date_str:
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
         else:
             date = datetime.utcnow().date()
-
+        
         entry = NutritionEntry(
             user_id=user_id,
             food_name=data['food_name'],
@@ -1242,10 +1190,10 @@ def add_nutrition_entry():
             fat=data['fat'],
             date=date
         )
-
+        
         db.session.add(entry)
         db.session.commit()
-
+        
         return jsonify({
             'message': 'Nutrition entry added successfully',
             'entry': entry.to_dict()
@@ -1260,12 +1208,12 @@ def update_nutrition_entry(entry_id):
     try:
         user_id = session.get('user_id')
         entry = NutritionEntry.query.filter_by(id=entry_id, user_id=user_id).first()
-
+        
         if not entry:
             return jsonify({'error': 'Nutrition entry not found'}), 404
-
+        
         data = request.get_json()
-
+        
         # Update fields if provided
         if 'food_name' in data:
             entry.food_name = data['food_name']
@@ -1285,9 +1233,9 @@ def update_nutrition_entry(entry_id):
             entry.fat = data['fat']
         if 'date' in data:
             entry.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
-
+        
         db.session.commit()
-
+        
         return jsonify({
             'message': 'Nutrition entry updated successfully',
             'entry': entry.to_dict()
@@ -1302,13 +1250,13 @@ def delete_nutrition_entry(entry_id):
     try:
         user_id = session.get('user_id')
         entry = NutritionEntry.query.filter_by(id=entry_id, user_id=user_id).first()
-
+        
         if not entry:
             return jsonify({'error': 'Nutrition entry not found'}), 404
-
+        
         db.session.delete(entry)
         db.session.commit()
-
+        
         return jsonify({'message': 'Nutrition entry deleted successfully'}), 200
     except Exception as e:
         db.session.rollback()
@@ -1320,19 +1268,19 @@ def get_daily_nutrition_summary():
     try:
         user_id = session.get('user_id')
         date_str = request.args.get('date')  # Format: YYYY-MM-DD
-
+        
         if date_str:
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
         else:
             date = datetime.utcnow().date()
-
+        
         entries = NutritionEntry.query.filter_by(user_id=user_id, date=date).all()
-
+        
         total_calories = sum(entry.calories for entry in entries)
         total_protein = sum(entry.protein for entry in entries)
         total_carbs = sum(entry.carbs for entry in entries)
         total_fat = sum(entry.fat for entry in entries)
-
+        
         # Group by meal type
         meals = {}
         for meal_type in ['breakfast', 'lunch', 'dinner', 'snack']:
@@ -1344,7 +1292,7 @@ def get_daily_nutrition_summary():
                 'total_carbs': sum(entry.carbs for entry in meal_entries),
                 'total_fat': sum(entry.fat for entry in meal_entries)
             }
-
+        
         return jsonify({
             'date': date.isoformat(),
             'summary': {
@@ -1364,7 +1312,7 @@ def get_nutrition_history():
     try:
         user_id = session.get('user_id')
         limit = int(request.args.get('limit', 7))  # Default to 7 days
-
+        
         # Get the last N days of nutrition data
         entries = db.session.query(
             NutritionEntry.date,
@@ -1377,7 +1325,7 @@ def get_nutrition_history():
         ).order_by(
             NutritionEntry.date.desc()
         ).limit(limit).all()
-
+        
         history = []
         for entry in entries:
             history.append({
@@ -1385,7 +1333,7 @@ def get_nutrition_history():
                 'total_calories': entry.total_calories,
                 'food_count': entry.food_count
             })
-
+        
         return jsonify({'history': history}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -1469,11 +1417,11 @@ def generate_weekly_meal_plan():
         # Add timeout handling for the AI call
         import concurrent.futures
         import time
-
+        
         # Use a timeout for the AI generation
         def generate_ai_content():
             return model.generate_content(prompt)
-
+        
         try:
             # Run AI call with timeout of 30 seconds
             with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -1503,17 +1451,17 @@ def generate_weekly_meal_plan():
                 "plan_type": "structured_timeout",
                 "generated_by": "timeout"
             }), 200
-
+        
         raw = response.text.strip() if response and hasattr(response, 'text') else ""
-
+        
         # Extract JSON from response if it's wrapped in code blocks
         import re
         json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', raw, re.DOTALL)
         if json_match:
             raw = json_match.group(1).strip()
-
+            
         meal_plan = json.loads(raw)
-
+        
         return jsonify({
             "diet_plan": meal_plan,
             "original_response": response.text.strip() if response and hasattr(response, 'text') else raw,
@@ -1550,7 +1498,7 @@ def generate_weekly_meal_plan():
                 {"name": "Tea with Biscuits", "calories": 200, "details": "One cup tea with digestive biscuits"}
             ]
         }
-
+        
         return jsonify({
             "diet_plan": fallback_plan,
             "original_response": raw if 'raw' in locals() else "AI response could not be parsed",
@@ -1564,7 +1512,7 @@ def generate_weekly_meal_plan():
             "generated_by": "gemini_raw",
             "warning": "AI response was not valid JSON – using structured fallback."
         }), 200
-
+        
     except Exception as e:
         # Always return JSON, even in error cases
         return jsonify({
@@ -1671,29 +1619,29 @@ def analyze_food_plate():
         data = request.get_json()
         # Default to a sample image if no image URL is provided
         image_url = data.get('image_url', 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Breakfast_foods.jpg')
-
+        
         # Call the external API
         conn = http.client.HTTPSConnection("ai-workout-planner-exercise-fitness-nutrition-guide.p.rapidapi.com")
-
+        
         payload = ""
-
+        
         headers = {
             'x-rapidapi-host': "ai-workout-planner-exercise-fitness-nutrition-guide.p.rapidapi.com",
             'x-rapidapi-key': rapidapi_key,
             'Content-Type': "application/x-www-form-urlencoded"
         }
-
+        
         # Create the request URL with the image URL parameter
         import urllib.parse
         encoded_image_url = urllib.parse.quote(image_url, safe='')
         request_path = f"/analyzeFoodPlate?imageUrl={encoded_image_url}&lang=en&noqueue=1"
-
+        
         conn.request("POST", request_path, payload, headers)
-
+        
         res = conn.getresponse()
         api_data = res.read()
         conn.close()
-
+        
         # Parse the API response
         try:
             api_response = json.loads(api_data.decode("utf-8"))
@@ -1724,7 +1672,7 @@ def analyze_food_plate():
                 'analysis': mock_response,
                 'message': 'Using mock data because real API response could not be parsed. Please check your RAPIDAPI_KEY.'
             }), 200
-
+        
         # Return the API response
         return jsonify({
             'analysis': api_response,
@@ -1763,20 +1711,5 @@ def analyze_food_plate():
 
 # Run the app
 if __name__ == "__main__":
-    with app.app_context():
-        try:
-            db.create_all()
-            print("Tables created! Nile multi-tenancy ACTIVE")
-        except Exception as e:
-            print(f"Error during table creation: {e}")
-            db.session.rollback()  # Rollback any failed transactions
     app.run(debug=True, host='127.0.0.1', port=5000)
-
-
-
-
-
-
-
-
 
