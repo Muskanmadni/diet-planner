@@ -25,23 +25,17 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 # Database configuration
-if os.getenv("VERCEL"):  
-    # Vercel pe hamesha DATABASE_URL use karo (Supabase/Neon ka)
-    DATABASE_URL = os.getenv("DATABASE_URL")
-    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+database_url = os.getenv("DATABASE_URL")
 
-else:
-    # Local development ke liye
-    db_url = os.getenv("DATABASE_URL")  # agar .env mein daala ho
-    if db_url:
-        if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///diet_planner.db"
+# Agar Nile ya Supabase se link hai to postgres:// ko postgresql:// kar do
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
+# Agar DATABASE_URL nahi mila to local ke liye SQLite
+if not database_url:
+    database_url = "sqlite:///diet_planner.db"
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
