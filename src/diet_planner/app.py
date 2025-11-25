@@ -13,7 +13,7 @@ from functools import wraps
 from flask import redirect, url_for
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-
+import http
 
 
 # Load environment variables from .env file
@@ -32,12 +32,15 @@ DATABASE_URL = os.getenv(
 
 # Force convert to postgresql:// (SQLAlchemy requires this)
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize SQLAlchemy without engine options initially to avoid hstore detection
 db = SQLAlchemy(app)
+
+
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
 @event.listens_for(Engine, "connect")
 def set_nile_tenant(dbapi_connection, connection_record):
@@ -1763,5 +1766,12 @@ def analyze_food_plate():
 
 # Run the app
 if __name__ == "__main__":
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Tables created! Nile multi-tenancy ACTIVE")
+        except Exception as e:
+            print(f"Error during table creation: {e}")
+            db.session.rollback()  # Rollback any failed transactions
     app.run(debug=True, host='127.0.0.1', port=5000)
 
