@@ -25,34 +25,19 @@ app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change
 CORS(app, supports_credentials=True)
 
 # Database configuration
-database_url = os.getenv("DATABASE_URL")
-if database_url:
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgres://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
+)
 
-    # Fix old Heroku URLs: postgres:// → postgresql://
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
+# Force convert to postgresql:// (SQLAlchemy requires this)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-    # Force psycopg driver instead of psycopg2
-    # Required for Vercel because psycopg2 is not supported
-    if database_url.startswith("postgresql://") and "+psycopg" not in database_url:
-        database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
-
-    # Ensure SSL mode for Neon/Supabase
-    if "sslmode" not in database_url:
-        connector = "&" if "?" in database_url else "?"
-        database_url = f"{database_url}{connector}sslmode=require"
-
-# If no DATABASE_URL found → use SQLite locally
-else:
-    database_url = "sqlite:///diet_planner.db"
-
-# Apply DB config to Flask
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Create SQLAlchemy instance
+# Initialize SQLAlchemy without engine options initially to avoid hstore detection
 db = SQLAlchemy(app)
-
 
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
 @event.listens_for(Engine, "connect")
