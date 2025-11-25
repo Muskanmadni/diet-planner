@@ -150,9 +150,6 @@ else:
 
 
 
-
-
-
 @app.route('/api/google-login', methods=['POST'])
 def google_login():
     """Handle Google login using ID token"""
@@ -1712,4 +1709,3 @@ def analyze_food_plate():
 # Run the app
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
-
