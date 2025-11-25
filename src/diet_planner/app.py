@@ -25,6 +25,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
+
 # Database configuration
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
@@ -146,6 +147,8 @@ else:
     except Exception as e:
         print(f"Error configuring Gemini API: {e}")
         model = None
+
+
 
 
 
@@ -1709,3 +1712,4 @@ def analyze_food_plate():
 # Run the app
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
+
