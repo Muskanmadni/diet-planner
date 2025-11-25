@@ -24,32 +24,19 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
-# Database configuration - Check for Vercel environment first, otherwise use environment variable
-# On Vercel, VERCEL environment variable is set
-is_vercel = os.getenv("VERCEL") is not None
+# Database configuration
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgres://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
+)
 
-if is_vercel:
-    # On Vercel, always use SQLite since it's more compatible and doesn't require additional drivers
-    db_uri = "sqlite:///diet_planner.db"
-else:
-    # For local development or other environments, use DATABASE_URL from environment variables only
-    # (not from .env file which is loaded earlier) to allow easy override
-    import sys
-    # Check the os.environ directly, which may have been modified after load_dotenv()
-    env_database_url = os.environ.get("DATABASE_URL")
-    if env_database_url:
-        # Force convert to postgresql:// (SQLAlchemy requires this)
-        if env_database_url.startswith("postgres://"):
-            env_database_url = env_database_url.replace("postgres://", "postgresql://", 1)
-        db_uri = env_database_url
-    else:
-        # For local development without DATABASE_URL, use SQLite
-        db_uri = "sqlite:///diet_planner.db"
+# Force convert to postgresql:// (SQLAlchemy requires this)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize SQLAlchemy
+# Initialize SQLAlchemy without engine options initially to avoid hstore detection
 db = SQLAlchemy(app)
 
 
