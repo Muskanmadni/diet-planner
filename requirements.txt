@@ -13,5 +13,5 @@ pycparser==2.21
 libsql-client==0.3.1
 sqlalchemy-libsql==0.1.0
 psycopg==3.2.2
-psycopg2-binary
+psycopg[binary]>=3.1
 
