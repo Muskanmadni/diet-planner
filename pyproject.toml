@@ -18,6 +18,12 @@ dependencies = [
     "pycparser>=2.23",
 ]
 
+[project.optional-dependencies]
+postgres = [
+    "psycopg2-binary>=2.9.0",
+]
+
+
 [project.scripts]
 diet-planner = "diet_planner:main"
 app = "diet_planner.app:start"
