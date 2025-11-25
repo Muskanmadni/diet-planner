@@ -26,17 +26,31 @@ CORS(app, supports_credentials=True)
 
 # Database configuration
 database_url = os.getenv("DATABASE_URL")
+if database_url:
 
-# Agar Nile ya Supabase se link hai to postgres:// ko postgresql:// kar do
-if database_url and database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+    # Fix old Heroku URLs: postgres:// → postgresql://
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Agar DATABASE_URL nahi mila to local ke liye SQLite
-if not database_url:
+    # Force psycopg driver instead of psycopg2
+    # Required for Vercel because psycopg2 is not supported
+    if database_url.startswith("postgresql://") and "+psycopg" not in database_url:
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+    # Ensure SSL mode for Neon/Supabase
+    if "sslmode" not in database_url:
+        connector = "&" if "?" in database_url else "?"
+        database_url = f"{database_url}{connector}sslmode=require"
+
+# If no DATABASE_URL found → use SQLite locally
+else:
     database_url = "sqlite:///diet_planner.db"
 
+# Apply DB config to Flask
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Create SQLAlchemy instance
 db = SQLAlchemy(app)
 
 
