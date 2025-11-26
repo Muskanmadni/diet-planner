@@ -1,5 +1,5 @@
 
-from flask import Flask, request, jsonify, send_file, session, redirect, url_for, send_from_directory
+from flask import Flask, has_request_context, request, jsonify, send_file, session, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import json
 import re
 import random
+
 import concurrent.futures
 import http.client
 import urllib.parse
@@ -52,11 +53,18 @@ db = SQLAlchemy(app)
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
 @event.listens_for(Engine, "connect")
 def set_nile_tenant(dbapi_connection, connection_record):
+    # Skip during boot / preload / create_all()
+    if not has_request_context():
+        return
+
     user_id = session.get('user_id')
-    if user_id:
-        cursor = dbapi_connection.cursor()
-        cursor.execute(f"SET nile.tenant_id = '{user_id}'")
-        cursor.close()
+    if not user_id:
+        return
+
+    cursor = dbapi_connection.cursor()
+    cursor.execute(f"SET nile.tenant_id = '{user_id}'")
+    cursor.close()
+
 
 @event.listens_for(Engine, "connect", once=True)
 def enable_extensions(dbapi_connection, connection_record):
@@ -65,7 +73,7 @@ def enable_extensions(dbapi_connection, connection_record):
         cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
         cursor.close()
         dbapi_connection.commit()
-    except:
+    except Exception:
         pass
 # =========================================================================
 
@@ -798,4 +806,6 @@ def analyze_food_plate():
         }), 200
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host="127.0.0.1", port=5000)
