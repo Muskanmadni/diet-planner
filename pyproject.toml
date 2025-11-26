@@ -16,7 +16,7 @@ dependencies = [
     "google-generativeai==0.8.3",
     "gunicorn==23.0.0",
     "pycparser>=2.23",
-    "psycopg>3.2.2",
+    "pg8000>=1.29.3",
     
 ]
 
