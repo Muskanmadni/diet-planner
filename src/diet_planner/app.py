@@ -29,12 +29,16 @@ CORS(app, supports_credentials=True)
 # Database configuration with Nile multi-tenancy
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg3://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
+    "postgresql+pg8000://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
 )
 
-# Force convert to postgresql:// (SQLAlchemy requires this)
+# Force convert postgres:// → postgresql+pg8000://
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg3://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
+
+# Also convert psycopg3 URLs → pg8000
+if DATABASE_URL.startswith("postgresql+psycopg3://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql+psycopg3://", "postgresql+pg8000://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -42,7 +46,9 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300
 }
+
 db = SQLAlchemy(app)
+
 # AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
 @event.listens_for(Engine, "connect")
 def set_nile_tenant(dbapi_connection, connection_record):
