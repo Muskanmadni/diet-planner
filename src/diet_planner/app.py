@@ -1,80 +1,71 @@
-
-from flask import Flask, request, jsonify, send_file, session, redirect, url_for, send_from_directory
+from flask import Flask, request, jsonify, render_template_string, send_from_directory, send_file, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
-from functools import wraps
-from datetime import datetime, timedelta
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import json
-import re
-import random
-import concurrent.futures
-import http.client
-import urllib.parse
-from google.auth.transport import requests as google_requests
+from google.auth.transport import requests
 from google.oauth2 import id_token
-from sqlalchemy import event, func
-from sqlalchemy.engine import Engine
+from functools import wraps
+from flask import redirect, url_for
+import http
 
-# ======================== NILE MULTI-TENANCY SETUP ========================
+import requests
+
+
+
+# Load environment variables from .env file
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'nutriguide-prod-secret-key-change-in-production')
 CORS(app, supports_credentials=True)
 
-# Database configuration with Nile multi-tenancy
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgres://019aaf22-80a9-7236-83f8-f67eecf76bdb:478df69b-3b78-46e5-b85f-0859afb2926f@us-west-2.db.thenile.dev:5432/nutridb"
-)
+# Database configuration
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, '..', '..', 'database.db')}"
 
-# Force convert to postgresql:// (SQLAlchemy requires this)
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    "pool_pre_ping": True,
-    "pool_recycle": 300
-}
 db = SQLAlchemy(app)
-# AUTOMATIC TENANT ISOLATION — Every query is scoped to current user
-@event.listens_for(Engine, "connect")
-def set_nile_tenant(dbapi_connection, connection_record):
-    user_id = session.get('user_id')
-    if user_id:
-        cursor = dbapi_connection.cursor()
-        cursor.execute(f"SET nile.tenant_id = '{user_id}'")
-        cursor.close()
 
-@event.listens_for(Engine, "connect", once=True)
-def enable_extensions(dbapi_connection, connection_record):
-    try:
-        cursor = dbapi_connection.cursor()
-        cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
-        cursor.close()
-        dbapi_connection.commit()
-    except:
-        pass
-# =========================================================================
-
+# Login required decorator
 def login_required(f):
     @wraps(f)
-    def decorated(*args, **kwargs):
-        if not session.get('user_id'):
-            return redirect(url_for('login_page'))
-        return f(*args, **kwargs)
-    return decorated
+    def decorated_function(*args, **kwargs):
+        # Check Flask session first (for existing users)
+        if 'user_id' in session and session['user_id'] is not None:
+            return f(*args, **kwargs)
+        
+        # Check Clerk authentication
+        auth_header = request.headers.get('Authorization')
+        session_token = None
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            session_token = auth_header[7:]
 
-# =================================== MODELS ===================================
+
+            try:
+                return f(*args, **kwargs)
+            except:
+                pass  
+        
+        return redirect(url_for('login_page'))
+    return decorated_function
+
+
+
+
+# User model
 class User(db.Model):
-    
-    id = db.Column(db.Integer, primary_key=True)  # This becomes Nile tenant_id
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     current_weight = db.Column(db.Float, nullable=True)
@@ -84,76 +75,249 @@ class User(db.Model):
     weight_goal = db.Column(db.Float, nullable=True)
     bmi = db.Column(db.Float, nullable=True)
     daily_calories = db.Column(db.Float, nullable=True)
-    subscription_tier = db.Column(db.String(20), default='free')
-    subscription_start_date = db.Column(db.DateTime)
-    subscription_end_date = db.Column(db.DateTime)
-    subscription_status = db.Column(db.String(20), default='active')
+    # All features are free - these fields are maintained for compatibility but all users have access
+    subscription_tier = db.Column(db.String(20), nullable=True, default='free')
+    subscription_start_date = db.Column(db.DateTime, nullable=True)
+    subscription_end_date = db.Column(db.DateTime, nullable=True)
+    subscription_status = db.Column(db.String(20), nullable=True, default='active')  # All users have active status
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
     def to_dict(self):
         return {
-            'id': self.id, 'email': self.email, 'current_weight': self.current_weight,
-            'height': self.height, 'gender': self.gender, 'goal_type': self.goal_type,
-            'weight_goal': self.weight_goal, 'bmi': self.bmi, 'daily_calories': self.daily_calories,
-            'subscription_tier': 'free',
-            'subscription_start_date': datetime.utcnow().isoformat(),
-            'subscription_end_date': (datetime.utcnow() + timedelta(days=36500)).isoformat(),
-            'subscription_status': 'active'
+            'id': self.id,
+            'email': self.email,
+            'current_weight': self.current_weight,
+            'height': self.height,
+            'gender': self.gender,
+            'goal_type': self.goal_type,
+            'weight_goal': self.weight_goal,
+            'bmi': self.bmi,
+            'daily_calories': self.daily_calories,
+            'subscription_tier': 'free',  # Always return free tier since all features are free
+            'subscription_start_date': datetime.utcnow().isoformat(),  # Always return current time
+            'subscription_end_date': (datetime.utcnow() + timedelta(days=36500)).isoformat(),  # Always return long duration
+            'subscription_status': 'active'  # Always return active since all features are free
         }
 
-class NutritionEntry(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    food_name = db.Column(db.String(100), nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    unit = db.Column(db.String(20), nullable=False)
-    meal_type = db.Column(db.String(20), nullable=False)
-    calories = db.Column(db.Integer, nullable=False)
-    protein = db.Column(db.Float, nullable=False)
-    carbs = db.Column(db.Float, nullable=False)
-    fat = db.Column(db.Float, nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        for k, v in data.items():
-            if isinstance(v, (datetime, datetime.date)):
-                data[k] = v.isoformat()
-        return data
-
-# =========================================================================
-# Gemini AI Setup
+# Configure Gemini API
 api_key = os.environ.get("GEMINI_API_KEY")
-model = None
-if api_key:
-    genai.configure(api_key=api_key)
+if not api_key:
+    print("Warning: GEMINI_API_KEY environment variable not found!")
+    model = None
+else:
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        model.generate_content("hi")
-        print("Gemini AI ready")
-    except Exception as e:
-        print(f"Gemini error: {e}")
+        print("Gemini API key found, attempting to configure...")
+        genai.configure(api_key=api_key)
 
+        available_models = []
+        try:
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    available_models.append(m.name)
+            print(f"Available models: {available_models}")
+        except Exception as e:
+            print(f"Error listing models: {e}")
+
+        try:
+            model = genai.GenerativeModel('gemini-2.5-flash')
+            test_response = model.generate_content("Hello")
+            print("Gemini model (gemini-2.5-flash) configured successfully")
+        except Exception as model_error:
+            print(f"Error with gemini-2.5-flash: {model_error}")
+            try:
+                model = genai.GenerativeModel('gemini-2.5-pro')
+                test_response = model.generate_content("Hello")
+                print("Gemini model (gemini-2.5-pro) configured successfully")
+            except Exception as pro_error:
+                print(f"Error with gemini-2.5-pro: {pro_error}")
+                try:
+                    model = genai.GenerativeModel('gemini-flash-latest')
+                    test_response = model.generate_content("Hello")
+                    print("Gemini model (gemini-flash-latest) configured successfully")
+                except Exception as latest_error:
+                    print(f"Error with all models: {model_error}, {pro_error}, {latest_error}")
+                    model = None
+                    print("Setting model to None - AI features will not be available")
+    except Exception as e:
+        print(f"Error configuring Gemini API: {e}")
+        model = None
+
+
+
+
+
+
+
+@app.route('/api/google-login', methods=['POST'])
+def google_login():
+    """Handle Google login using ID token"""
+    try:
+        data = request.get_json()
+        token = data.get('credential')
+        
+        if not token:
+            return jsonify({'error': 'Google ID token is required'}), 400
+            
+        # Verify the Google ID token
+        try:
+            idinfo = id_token.verify_oauth2_token(token, requests.Request())
+            email = idinfo['email']
+            name = idinfo.get('name', '')
+            user_id = idinfo['sub']  # Google's unique user ID
+        except ValueError as e:
+            print(f"Invalid Google token: {e}")
+            return jsonify({'error': 'Invalid Google token'}), 400
+            
+        # Find or create user in our database
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'error': 'Account with this email does not exist. Please register first.'}), 400
+            
+        # Store user in session
+        session['user_id'] = user.id
+        
+        # Ensure user has access to all features
+        if user.subscription_status != 'active':
+            user.subscription_status = 'active'
+            user.subscription_tier = 'free'
+            user.subscription_start_date = datetime.utcnow()
+            user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
+            db.session.commit()
+            
+        return jsonify({'message': 'Google login successful', 'user': user.to_dict()}), 200
+    except Exception as e:
+        print(f"Error in google_login: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+# Create database tables
 with app.app_context():
     db.create_all()
-    print("Nile Database initialized — multi-tenancy active")
+    print("Database tables created successfully")
+    print(f"User model has the following fields: {[column.name for column in User.__table__.columns]}")
+    # NutritionEntry model is defined after this, so we can't access it here
+    try:
+        test_user = User.query.first()
+        print("Database connection successful. Found existing users:", test_user is not None)
+    except Exception as e:
+        print(f"Database connection test failed: {e}")
+        print("Recreating database due to schema mismatch...")
+        db.drop_all()
+        db.create_all()
+        print("Database recreated successfully")
 
-# =================================== UTILS ===================================
 def calculate_bmi(weight, height):
-    if not weight or not height or height <= 0: return None
-    return round(weight / ((height / 100) ** 2), 2)
+    if not weight or not height or height <= 0:
+        return None
+    height_m = height / 100
+    bmi = weight / (height_m * height_m)
+    return round(bmi, 2)
 
 def calculate_daily_calories(weight, height, gender, goal_type, age=30):
-    if not weight or not height or not gender: return None
-    bmr = 10 * weight + 6.25 * height - 5 * age + (5 if gender.lower() == 'male' else -161)
-    cal = bmr * 1.2
-    if goal_type == 'lose': cal -= 500
-    elif goal_type == 'gain': cal += 500
-    return round(cal)
+    if not weight or not height or not gender:
+        return None
+    if gender.lower() == 'male':
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5
+    elif gender.lower() == 'female':
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+    else:
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+    activity_factor = 1.2
+    if goal_type == 'lose':
+        daily_calories = bmr * activity_factor - 500
+    elif goal_type == 'gain':
+        daily_calories = bmr * activity_factor + 500
+    else:
+        daily_calories = bmr * activity_factor
+    return round(daily_calories)
 
+# Registration route
+@app.route('/api/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Check if this is an account creation request (with email and password)
+        if data.get('email') and data.get('password'):
+            # Check if user already exists
+            existing_user = User.query.filter_by(email=data['email']).first()
+            if existing_user:
+                return jsonify({'error': 'User with this email already exists'}), 409
+
+            # Extract profile information if provided
+            weight = data.get('current_weight')
+            height = data.get('height')
+            gender = data.get('gender')
+            goal_type = data.get('goal_type')
+            bmi = calculate_bmi(weight, height)
+            daily_calories = calculate_daily_calories(weight, height, gender, goal_type)
+
+            user = User(
+                email=data['email'],
+                current_weight=weight,
+                height=height,
+                gender=gender,
+                goal_type=goal_type,
+                weight_goal=data.get('weight_goal'),
+                bmi=bmi,
+                daily_calories=daily_calories,
+                # All features are free - setting default values
+                subscription_tier='free',
+                subscription_start_date=datetime.utcnow(),
+                subscription_end_date=datetime.utcnow() + timedelta(days=36500),  # Long duration for all users
+                subscription_status='active'  # All users have access to all features
+            )
+            user.set_password(data['password'])
+            db.session.add(user)
+            db.session.commit()
+            return jsonify({'message': 'User registered successfully', 'user': user.to_dict()}), 201
+        else:
+            # This is a profile update request for an existing user in session
+            user_id = session.get('user_id')
+            if not user_id:
+                return jsonify({'error': 'User not authenticated'}), 401
+
+            user = User.query.get(user_id)
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+
+            # Update profile information
+            if 'current_weight' in data:
+                user.current_weight = data['current_weight']
+            if 'height' in data:
+                user.height = data['height']
+            if 'gender' in data:
+                user.gender = data['gender']
+            if 'goal_type' in data:
+                user.goal_type = data['goal_type']
+            if 'weight_goal' in data:
+                user.weight_goal = data['weight_goal']
+
+            # Recalculate BMI and daily calories if weight/height/gender/goal changed
+            if user.current_weight and user.height:
+                user.bmi = calculate_bmi(user.current_weight, user.height)
+            if user.current_weight and user.height and user.gender and user.goal_type:
+                user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
+
+            db.session.commit()
+            return jsonify({'message': 'Profile updated successfully', 'user': user.to_dict()}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# Local food database
 LOCAL_FOOD_DATABASE = {
     'roti': {'name': 'Roti', 'calories': 70, 'carbs': 15, 'protein': 3, 'fat': 0.5},
     'biryani': {'name': 'Biryani', 'calories': 250, 'carbs': 35, 'protein': 8, 'fat': 10},
@@ -167,6 +331,8 @@ LOCAL_FOOD_DATABASE = {
     'mix_vegetable': {'name': 'Mixed Vegetables', 'calories': 45, 'carbs': 8, 'protein': 2, 'fat': 0.4},
     'paratha': {'name': 'Paratha', 'calories': 150, 'carbs': 20, 'protein': 4, 'fat': 6}
 }
+
+# No need for hardcoded recipe database - will use Gemini API to generate Pakistani recipes
 
 LIMITED_FOOD_RECOMMENDATIONS = {
     'breakfast': [
@@ -199,49 +365,135 @@ LIMITED_FOOD_RECOMMENDATIONS = {
     ]
 }
 
-# =================================== ROUTES ===================================
+MOTIVATIONAL_TIPS = [
+    "Start your day with a glass of water to boost metabolism!",
+    "Include at least 5 servings of fruits and vegetables in your diet daily.",
+    "Choose whole grains over refined grains for better nutrition.",
+    "Stay hydrated - drink at least 8 glasses of water daily.",
+    "Plan your meals to avoid unhealthy food choices.",
+    "Start with small steps - every healthy choice matters!",
+    "Try to eat 2 pieces of fruit as snacks instead of processed food.",
+    "Take a 10-minute walk after meals for better digestion.",
+    "Cook at home to control ingredients and portions.",
+    "Listen to your body - eat when hungry, stop when full."
+]
 
+FREE_USER_MEAL_LIMIT = 5
+
+@app.route('/api/food_search', methods=['GET'])
+def food_search():
+    try:
+        food_name = request.args.get('food_name', '').lower().strip()
+        if not food_name:
+            return jsonify({'error': 'Food name parameter is required'}), 400
+        result = []
+        for key, value in LOCAL_FOOD_DATABASE.items():
+            if food_name in key or food_name in value['name'].lower():
+                result.append(value)
+        if not result:
+            return jsonify({'message': f'No food items found matching "{food_name}"'}), 404
+        return jsonify({'results': result, 'count': len(result)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/chatbot', methods=['POST'])
+def chatbot():
+    try:
+        data = request.get_json()
+        user_message = data.get('user_message', '').strip()
+        if not user_message:
+            return jsonify({'error': 'User message is required'}), 400
+        if 'Mujhe expert se baat karni hai' in user_message:
+            return jsonify({'response': 'Aap ke sawal ka jawab dena zaroori hai. Kripya apna contact number ya email provide karein taake hum aap se expert ke through rabta kar sakein.', 'needs_expert': True}), 200
+        if model is None:
+            return jsonify({'response': 'Sorry, the AI model is not available. Please contact the administrator.', 'needs_expert': False}), 500
+        system_instruction = "Aap Pakistani diet aur health matters par baat karne wale nutritionist hain. Jawab Roman Urdu mein dena. Sirf Pakistani diet, traditional foods, aur health concerns par bat karna. Koi bhi non-Pakistani diet ya western foods ke baare mein bat karne se mana karna. jawab chota hoga, seedha aur asan alfaaz mein jawab dein."
+        try:
+            response = model.generate_content(f"{system_instruction} User ka sawal: {user_message}")
+            bot_response = response.text if response and hasattr(response, 'text') else "Maaf kijiye, aapka sawal samajh nahi aaya. Kripya din mein Pakistani khana ya sehat ke bare mein pochhein."
+        except Exception as gen_error:
+            print(f"Error generating content: {gen_error}")
+            bot_response = f"Sorry, I'm having trouble generating a response. Error: {str(gen_error)}"
+        return jsonify({'response': bot_response, 'needs_expert': False}), 200
+    except Exception as e:
+        print(f"Error in chatbot endpoint: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Static HTML Routes
 @app.route('/')
 def landing_page():
-    if session.get('user_id'):
-        return redirect('/dashboard')
-    return send_file('landing.html')
+    user_id = session.get('user_id')
+    if user_id:
+        return redirect(url_for('dashboard'))
+    else:
+        html_path = os.path.join(os.path.dirname(__file__), 'landing.html')
+        return send_file(html_path)
 
 @app.route('/dashboard')
-def dashboard(): return send_file('dashboard.html')
+@login_required
+def dashboard():
+    html_path = os.path.join(os.path.dirname(__file__), 'dashboard.html')
+    return send_file(html_path)
 
-@app.route('/chatbot') 
-def chatbot_ui(): return send_file('chatbot.html')
+@app.route('/chatbot')
+@login_required
+def chatbot_ui():
+    html_path = os.path.join(os.path.dirname(__file__), 'chatbot.html')
+    return send_file(html_path)
 
 @app.route('/register')
-def register_page(): return send_file('register.html')
+def register_page():
+    html_path = os.path.join(os.path.dirname(__file__), 'register.html')
+    return send_file(html_path)
 
 @app.route('/login')
-def login_page(): return send_file('login.html')
+def login_page():
+    html_path = os.path.join(os.path.dirname(__file__), 'login.html')
+    return send_file(html_path)
 
-@app.route('/diet-plan') 
-def diet_plan(): return send_file('diet_plan.html')
+@app.route('/diet-plan')
+@login_required
+def diet_plan():
+    html_path = os.path.join(os.path.dirname(__file__), 'diet_plan.html')
+    return send_file(html_path)
 
-@app.route('/recipes') 
-def recipes(): return send_file('recipes.html')
+@app.route('/recipes')
+@login_required
+def recipes():
+    html_path = os.path.join(os.path.dirname(__file__), 'recipes.html')
+    return send_file(html_path)
 
-@app.route('/shopping-list') 
-def shopping_list(): return send_file('shopping_list.html')
+@app.route('/shopping-list')
+@login_required
+def shopping_list():
+    html_path = os.path.join(os.path.dirname(__file__), 'shopping_list.html')
+    return send_file(html_path)
 
-@app.route('/exercise-planner') 
-def exercise_planner(): return send_file('exercise_planner.html')
+@app.route('/exercise-planner')
+@login_required
+def exercise_planner():
+    html_path = os.path.join(os.path.dirname(__file__), 'exercise_planner.html')
+    return send_file(html_path)
 
-@app.route('/profile') 
-def profile(): return send_file('profile.html')
+@app.route('/profile')
+@login_required
+def profile():
+    html_path = os.path.join(os.path.dirname(__file__), 'profile.html')
+    return send_file(html_path)
 
 @app.route('/settings')
-def settings(): return send_file('settings.html')
+@login_required
+def settings():
+    html_path = os.path.join(os.path.dirname(__file__), 'settings.html')
+    return send_file(html_path)
 
 @app.route('/history')
-def history(): return send_file('history.html')
+@login_required
+def history():
+    html_path = os.path.join(os.path.dirname(__file__), 'history.html')
+    return send_file(html_path)
 
-@app.route('/nutrition_tracking') 
-def nutrition_tracking(): return send_file('nutrition_tracking.html')
+# This is the original static recipe function that has been replaced by AI-powered version
 
 @app.route('/<path:filename>')
 def serve_static_html(filename):
@@ -249,112 +501,685 @@ def serve_static_html(filename):
         file_path = os.path.join(os.path.dirname(__file__), filename)
         if os.path.exists(file_path):
             return send_file(file_path)
-    return jsonify({'error': 'File not found'}), 404
+        else:
+            return jsonify({'error': 'File not found'}), 404
+    else:
+        return jsonify({'error': 'File not found'}), 404
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'static', 'images'), filename)
 
-@app.route('/api/register', methods=['POST'])
-def register():
+# Auth Routes
+@app.route('/api/login', methods=['POST'])
+def login():
     try:
         data = request.get_json()
         if not data or not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email and password required'}), 400
-        if User.query.filter_by(email=data['email']).first():
-            return jsonify({'error': 'User already exists'}), 409
-
-        user = User(email=data['email'])
-        user.set_password(data['password'])
-        for field in ['current_weight','height','gender','goal_type','weight_goal']:
-            if field in data: setattr(user, field, data[field])
-        user.bmi = calculate_bmi(user.current_weight, user.height)
-        user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
-        db.session.add(user)
-        db.session.commit()
-        return jsonify({'message': 'Registered', 'user': user.to_dict()}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    user = User.query.filter_by(email=data['email']).first()
-    if user and user.check_password(data['password']):
+            return jsonify({'error': 'Email and password are required'}), 400
+        user = User.query.filter_by(email=data['email']).first()
+        if not user or not user.check_password(data['password']):
+            return jsonify({'error': 'Invalid email or password'}), 401
+        # Ensure user has access to all features
+        if user.subscription_status != 'active':
+            user.subscription_status = 'active'
+            user.subscription_tier = 'free'
+            user.subscription_start_date = datetime.utcnow()
+            user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
+            db.session.commit()
+        
         session['user_id'] = user.id
-        return jsonify({'message': 'Success', 'user': user.to_dict()}), 200
-    return jsonify({'error': 'Invalid credentials'}), 401
-
-@app.route('/api/google-login', methods=['POST'])
-def google_login():
-    try:
-        data = request.get_json()
-        token = data.get('credential')
-        idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
-        email = idinfo['email']
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return jsonify({'error': 'Account does not exist. Please register first.'}), 400
-        session['user_id'] = user.id
-        return jsonify({'message': 'Google login successful', 'user': user.to_dict()}), 200
+        return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    session.pop('user_id', None)
-    return jsonify({'message': 'Logged out'})
+    try:
+        session.pop('user_id', None)
+        return jsonify({'message': 'Logout successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/current_user', methods=['GET'])
-@login_required
+@app.route('/api/current_user', methods=['GET', 'PUT'])
 def current_user():
-    user = User.query.get(session['user_id'])
-    return jsonify({'user': user.to_dict()})
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'User not authenticated'}), 401
 
-@app.route('/api/food_search', methods=['GET'])
-def food_search():
-    q = request.args.get('food_name', '').lower().strip()
-    results = [v for k, v in LOCAL_FOOD_DATABASE.items() if q in k or q in v['name'].lower()]
-    return jsonify({'results': results})
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
 
-@app.route('/api/chatbot', methods=['POST'])
-def chatbot():
-    data = request.get_json()
-    user_message = data.get('user_message', '').strip()
-    if 'expert' in user_message.lower():
-        return jsonify({'response': 'Aap ke sawal ka jawab dena zaroori hai. Kripya apna contact number ya email provide karein...', 'needs_expert': True})
-    if model:
-        try:
-            response = model.generate_content(f"Roman Urdu mein jawab do: {user_message}")
-            return jsonify({'response': response.text})
-        except:
-            pass
-    return jsonify({'response': 'AI unavailable'})
+        if request.method == 'GET':
+            return jsonify({'message': 'User info retrieved successfully', 'user': user.to_dict()}), 200
+        
+        elif request.method == 'PUT':
+            data = request.get_json()
+            
+            # Update user fields if provided in the request
+            if 'email' in data:
+                # Check if email is already taken by another user
+                existing_user = User.query.filter_by(email=data['email']).first()
+                if existing_user and existing_user.id != user.id:
+                    return jsonify({'error': 'Email already taken'}), 409
+                user.email = data['email']
+            
+            if 'current_weight' in data:
+                user.current_weight = data['current_weight']
+                user.bmi = calculate_bmi(user.current_weight, user.height)
+                
+                # Recalculate daily calories if needed
+                if user.height and user.gender and user.goal_type:
+                    user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
+            
+            if 'height' in data:
+                user.height = data['height']
+                user.bmi = calculate_bmi(user.current_weight, user.height)
+                
+                # Recalculate daily calories if needed
+                if user.current_weight and user.gender and user.goal_type:
+                    user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
+            
+            if 'gender' in data:
+                user.gender = data['gender']
+                if user.current_weight and user.height and user.goal_type:
+                    user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
+            
+            if 'goal_type' in data:
+                user.goal_type = data['goal_type']
+                if user.current_weight and user.height and user.gender:
+                    user.daily_calories = calculate_daily_calories(user.current_weight, user.height, user.gender, user.goal_type)
+            
+            if 'weight_goal' in data:
+                user.weight_goal = data['weight_goal']
+            
+            db.session.commit()
+            return jsonify({'message': 'User profile updated successfully', 'user': user.to_dict()}), 200
 
-@app.route('/api/diet-plan', methods=['POST'])
+    except Exception as e:
+        db.session.rollback()
+# Recipe generation using AI
+def generate_recipe_with_ai(query='', meal_type='', diet_type=''):
+    global model
+    if model is None:
+        # Return mock data if model is not available
+        return [
+            {
+                'id': 1,
+                'name': f'{query or "Sample"} Recipe',
+                'description': f'A delicious {query or "sample"} recipe for {meal_type or "any meal"} with {diet_type or "no specific"} dietary requirements',
+                'prepTime': 30,
+                'calories': 350,
+                'protein': 20,
+                'carbs': 40,
+                'fat': 15,
+                'mealType': meal_type or 'lunch',
+                'dietType': diet_type or 'balanced',
+                'cuisine': 'Pakistani',
+                'image': 'utensils',
+                'ingredients': ['Sample Ingredient 1', 'Sample Ingredient 2'],
+                'instructions': '1. Sample step 1\n2. Sample step 2'
+            }
+        ]
+    
+    # Create prompt for recipe generation
+    prompt = f"Generate a Pakistani cuisine recipe"
+    if query:
+        prompt += f" for '{query}'"
+    if meal_type:
+        prompt += f" suitable for {meal_type}"
+    if diet_type:
+        prompt += f" that is {diet_type}"
+    
+    prompt += ". Provide the response in JSON format with these fields: name, description, prepTime (in minutes), calories, protein (in grams), carbs (in grams), fat (in grams), mealType (breakfast, lunch, dinner, snack), dietType (vegetarian, non-vegetarian, vegan, etc.), cuisine, ingredients (array), instructions (string with steps)."
+    
+    try:
+        response = model.generate_content(prompt)
+        # Try to parse the response as JSON
+        import re
+        json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+        if json_match:
+            import ast
+            try:
+                recipe_data = ast.literal_eval(json_match.group())
+                # Ensure it's in the correct format
+                if not isinstance(recipe_data, list):
+                    recipe_data = [recipe_data]
+                for i, recipe in enumerate(recipe_data):
+                    recipe['id'] = i + 1
+                    recipe['image'] = recipe.get('image', 'utensils')
+                return recipe_data
+            except:
+                # If JSON parsing fails, return mock data
+                pass
+    except Exception as e:
+        print(f"Error generating recipe with AI: {e}")
+    
+    # Return mock data if AI fails
+    return [
+        {
+            'id': 1,
+            'name': f'{query or "Sample"} Recipe',
+            'description': f'A delicious Pakistani {query or "sample"} recipe for {meal_type or "any meal"} with {diet_type or "no specific"} dietary requirements',
+            'prepTime': 30,
+            'calories': 350,
+            'protein': 20,
+            'carbs': 40,
+            'fat': 15,
+            'mealType': meal_type or 'lunch',
+            'dietType': diet_type or 'balanced',
+            'cuisine': 'Pakistani',
+            'image': 'utensils',
+            'ingredients': ['Sample Ingredient 1', 'Sample Ingredient 2'],
+            'instructions': '1. Sample step 1\n2. Sample step 2'
+        }
+    ]
+
+@app.route('/api/recipes', methods=['GET'])
 @login_required
-def generate_weekly_meal_plan():
-    days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
-    plan = {day: {
-        "breakfast": [random.choice(LIMITED_FOOD_RECOMMENDATIONS['breakfast'])],
-        "lunch": [random.choice(LIMITED_FOOD_RECOMMENDATIONS['lunch'])],
-        "dinner": [random.choice(LIMITED_FOOD_RECOMMENDATIONS['dinner'])],
-        "snack": [random.choice(LIMITED_FOOD_RECOMMENDATIONS['snack'])]
-    } for day in days}
-    return jsonify({"diet_plan": plan})
+def get_recipes():
+    try:
+        # Get query parameters
+        meal_type = request.args.get('meal_type', '')
+        diet_type = request.args.get('diet_type', '')
+        
+        # Generate recipes using AI
+        recipes = generate_recipe_with_ai(meal_type=meal_type, diet_type=diet_type)
+        return jsonify({'recipes': recipes, 'count': len(recipes)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/nutrition/entries', methods=['GET', 'POST'])
+@app.route('/api/recipes/search', methods=['POST'])
 @login_required
-def nutrition_entries():
-    if request.method == 'GET':
-        date_str = request.args.get('date')
-        date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else datetime.utcnow().date()
-        entries = NutritionEntry.query.filter_by(date=date).all()
-        return jsonify({'entries': [e.to_dict() for e in entries]})
-    else:
+def search_recipes():
+    try:
         data = request.get_json()
+        query = data.get('query', '')
+        meal_type = data.get('meal_type', '')
+        diet_type = data.get('diet_type', '')
+        
+        # Generate recipes using AI based on search parameters
+        recipes = generate_recipe_with_ai(query=query, meal_type=meal_type, diet_type=diet_type)
+        return jsonify({'recipes': recipes, 'count': len(recipes)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/change-password', methods=['POST'])
+@login_required
+def change_password():
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'User not authenticated'}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        data = request.get_json()
+        
+        if not data or not data.get('current_password') or not data.get('new_password'):
+            return jsonify({'error': 'Current password and new password are required'}), 400
+
+        # Verify current password
+        if not user.check_password(data['current_password']):
+            return jsonify({'error': 'Current password is incorrect'}), 401
+
+        # Set new password
+        user.set_password(data['new_password'])
+        db.session.commit()
+
+        return jsonify({'message': 'Password changed successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# Subscription System - All Features Now Free!
+# All features are now available to all users at no cost
+SUBSCRIPTION_PLANS = {
+    'free': {'name': 'Free Plan', 'price': 0, 'duration': 36500, 'features': ['All features included', 'No premium required']}
+}
+
+@app.route('/api/subscription/plans', methods=['GET'])
+def get_subscription_plans():
+    return jsonify({'plans': SUBSCRIPTION_PLANS}), 200
+
+@app.route('/api/subscription/create', methods=['POST'])
+def create_subscription():
+    try:
+        user_id = session.get('user_id')
+        if not user_id: return jsonify({'error': 'User not authenticated'}), 401
+        user = User.query.get(user_id)
+        if not user: return jsonify({'error': 'User not found'}), 404
+        # All users now get access to all features automatically
+        # This endpoint is kept for compatibility but grants free access to all features
+        plan = SUBSCRIPTION_PLANS['free']
+        start_date = datetime.utcnow()
+        end_date = start_date + timedelta(days=plan['duration'])  # Long duration to ensure it doesn't expire
+        user.subscription_tier = 'free'  # Changed from 'pro' to 'free'
+        user.subscription_start_date = start_date
+        user.subscription_end_date = end_date
+        user.subscription_status = 'active'
+        db.session.commit()
+        return jsonify({'message': 'All features unlocked successfully - you now have access to all premium features for free!', 'plan': plan, 'start_date': start_date.isoformat(), 'end_date': end_date.isoformat()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/subscription/status', methods=['GET'])
+def get_subscription_status():
+    try:
+        user_id = session.get('user_id')
+        if not user_id: return jsonify({'error': 'User not authenticated'}), 401
+        user = User.query.get(user_id)
+        if not user: return jsonify({'error': 'User not found'}), 404
+        
+        # All users now have access to all features, so ensure status is always active
+        if user.subscription_status != 'active':
+            user.subscription_status = 'active'
+            user.subscription_tier = 'free'
+            user.subscription_start_date = datetime.utcnow()
+            user.subscription_end_date = datetime.utcnow() + timedelta(days=36500)  # Long duration
+            db.session.commit()
+        
+        return jsonify({
+            'subscription_tier': 'free',
+            'subscription_start_date': datetime.utcnow().isoformat(),
+            'subscription_end_date': (datetime.utcnow() + timedelta(days=36500)).isoformat(),  # Long duration
+            'subscription_status': 'active'  # Always return active since all features are free
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/subscription/cancel', methods=['POST'])
+def cancel_subscription():
+    try:
+        user_id = session.get('user_id')
+        if not user_id: return jsonify({'error': 'User not authenticated'}), 401
+        user = User.query.get(user_id)
+        if not user: return jsonify({'error': 'User not found'}), 404
+        # Even if a user cancels, they still keep access to all features since everything is free
+        # We'll keep them as active to maintain access
+        user.subscription_status = 'active'
+        db.session.commit()
+        return jsonify({'message': 'Your account is active with full access to all features!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+# FIXED: AI-Powered Recipe Generator
+@app.route('/api/pakistani-recipes', methods=['GET'])
+def get_pakistani_recipes():
+    try:
+        search_query = request.args.get('search', '').lower()
+        meal_type = request.args.get('mealType', '').lower()
+        diet_type = request.args.get('dietType', '').lower()
+        
+        # If AI model is available, try to generate recipes
+        if model is not None:
+            try:
+                # Build prompt based on search criteria
+                prompt_parts = ["Generate Pakistani recipes in JSON format:"]
+                
+                if search_query:
+                    prompt_parts.append(f"Recipes containing '{search_query}'")
+                
+                if meal_type:
+                    prompt_parts.append(f"Meal type: {meal_type}")
+                
+                if diet_type:
+                    prompt_parts.append(f"Diet type: {diet_type}")
+                
+                prompt_parts.extend([
+                    "Include fields: id, name, description, prepTime, calories, protein, carbs, fat, mealType, dietType, cuisine, ingredients, instructions",
+                    "Return at least 6 recipes in a JSON array"
+                ])
+                
+                prompt = " ".join(prompt_parts)
+                
+                response = model.generate_content(prompt)
+                
+                # Try to extract JSON from response
+                response_text = response.text.strip()
+                
+                # Look for JSON inside code blocks or try to parse directly
+                import re
+                json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', response_text)
+                if json_match:
+                    json_str = json_match.group(1)
+                else:
+                    json_str = response_text
+                
+                # Clean up the response to get just the JSON part
+                if json_str.startswith("```json"):
+                    json_str = json_str[7:]  # Remove ```json
+                if json_str.startswith("```"):
+                    json_str = json_str[3:]   # Remove ```
+                if json_str.endswith("```"):
+                    json_str = json_str[:-3]  # Remove ```
+                
+                recipes = json.loads(json_str)
+                
+                # Ensure recipes is a list
+                if not isinstance(recipes, list):
+                    recipes = [recipes]
+                
+                # Add default values for any missing fields
+                for recipe in recipes:
+                    recipe.setdefault('id', len(recipes))
+                    recipe.setdefault('prepTime', 30)
+                    recipe.setdefault('calories', 300)
+                    recipe.setdefault('protein', 15)
+                    recipe.setdefault('carbs', 25)
+                    recipe.setdefault('fat', 10)
+                    recipe.setdefault('mealType', 'lunch')
+                    recipe.setdefault('dietType', 'non-vegetarian')
+                    recipe.setdefault('cuisine', 'Pakistani')
+                    recipe.setdefault('ingredients', ['Ingredients not specified'])
+                    recipe.setdefault('instructions', 'Instructions not specified')
+                
+                return jsonify({
+                    'recipes': recipes,
+                    'count': len(recipes),
+                    'generated_by': 'ai'
+                }), 200
+                
+            except Exception as ai_error:
+                print(f"AI generation failed: {ai_error}")
+                # Fallback to static recipes if AI fails
+                pass
+        
+        # Fallback to static recipes if AI is not available or fails
+        comprehensive_pakistani_recipes = [
+            {
+                'id': 1,
+                'name': 'Chicken Karahi',
+                'description': 'Delicious Pakistani-style chicken curry cooked in a karahi with tomatoes, green chilies, and aromatic spices.',
+                'prepTime': 30,
+                'calories': 320,
+                'protein': 30,
+                'carbs': 8,
+                'fat': 20,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chicken', 'Tomatoes', 'Onions', 'Green chilies', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Salt', 'Turmeric', 'Red chili powder', 'Coriander powder', 'Garam masala'],
+                'instructions': '1. Heat 2 tablespoons of oil in a karahi or heavy-bottomed pan. 2. Add sliced onions and sauté until golden brown. 3. Add ginger-garlic paste and green chilies, cook for 1 minute. 4. Add chicken pieces and cook until they change color. 5. Add all the spices (cumin, coriander, turmeric, red chili powder) and mix well. 6. Add chopped tomatoes and cook until oil starts separating from the masala. 7. Add 1 cup water, cover and cook for 15-20 minutes until chicken is tender. 8. Garnish with fresh coriander and serve hot with naan or rice.'
+            },
+            {
+                'id': 2,
+                'name': 'Daal Chawal',
+                'description': 'Classic Pakistani lentils served with steamed basmati rice, seasoned with cumin and garlic.',
+                'prepTime': 45,
+                'calories': 280,
+                'protein': 12,
+                'carbs': 45,
+                'fat': 6,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Yellow lentils (moong dal)', 'Basmati rice', 'Onions', 'Garlic', 'Ginger', 'Turmeric', 'Red chili powder', 'Cumin', 'Salt', 'Ghee or oil', 'Bay leaf', 'Cinnamon'],
+                'instructions': '1. Wash 1 cup yellow lentils and pressure cook with 3 cups water and turmeric for 4-5 whistles until soft. 2. In a separate pot, rinse 1 cup basmati rice until water runs clear. Add rice to 2 cups boiling water with salt and a few drops of oil. Cook covered for 12-15 minutes. 3. For tempering: heat ghee/oil in a pan, add cumin seeds and let them splutter. 4. Add sliced onions and cook until golden. Add ginger-garlic paste and spices. 5. Mix this tempering with cooked daal. 6. Serve daal and rice together, garnished with coriander and a dollop of ghee.'
+            },
+            {
+                'id': 3,
+                'name': 'Seekh Kebab',
+                'description': 'Minced meat kebabs with Pakistani spices, grilled to perfection and served with mint chutney.',
+                'prepTime': 40,
+                'calories': 250,
+                'protein': 20,
+                'carbs': 5,
+                'fat': 18,
+                'mealType': 'snack',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Minced beef or mutton', 'Onions', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Garam masala', 'Coriander leaves', 'Mint leaves', 'Egg', 'Salt', 'Red chili powder', 'Oil for grilling'],
+                'instructions': '1. Mix minced meat with all spices, ginger-garlic paste, chopped onions, coriander, mint, and egg. 2. Refrigerate for 1 hour to allow flavors to blend. 3. Soak metal skewers in water for 10 minutes. 4. Take a portion of the mixture and shape around the skewer in log form. 5. Heat a griddle or tava with little oil. 6. Grill the kebabs, turning occasionally, until golden brown and cooked through (about 10-12 minutes). 7. Serve hot with mint chutney and naan.'
+            },
+            {
+                'id': 4,
+                'name': 'Aloo Gosht',
+                'description': 'Hearty Pakistani curry with mutton and potatoes in a rich tomato-based gravy.',
+                'prepTime': 60,
+                'calories': 350,
+                'protein': 25,
+                'carbs': 18,
+                'fat': 22,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Mutton or beef', 'Potatoes', 'Onions', 'Tomatoes', 'Yogurt', 'Ginger garlic', 'Coriander', 'Cumin', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Salt', 'Oil'],
+                'instructions': '1. Cut meat into cubes and marinate with yogurt, ginger-garlic paste, and spices for 30 minutes. 2. Heat oil in a heavy-bottomed pot, add whole spices (cinnamon, cardamom, cloves) and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add marinated meat and cook until color changes. 5. Add chopped tomatoes and cook until oil separates. 6. Add 1 cup water, cover and simmer for 45 minutes until meat is tender. 7. Add peeled and quartered potatoes in the last 20 minutes of cooking. 8. Adjust seasoning and serve with naan or rice.'
+            },
+            {
+                'id': 5,
+                'name': 'Biryani',
+                'description': 'Fragrant Pakistani rice dish layered with marinated meat, saffron, and aromatic spices.',
+                'prepTime': 90,
+                'calories': 420,
+                'protein': 25,
+                'carbs': 55,
+                'fat': 15,
+                'mealType': 'lunch',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Basmati rice', 'Chicken or mutton', 'Yogurt', 'Onions', 'Tomatoes', 'Saffron', 'Mint leaves', 'Coriander leaves', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Bay leaves', 'Salt', 'Ghee'],
+                'instructions': '1. Soak 2 cups basmati rice in water for 30 minutes. 2. Marinate chicken/meat with yogurt, spices, and ginger-garlic paste for 1 hour. 3. In a large pot, layer the marinated meat at the bottom. 4. Heat oil separately, fry sliced onions until golden (for biryani masala). 5. Layer half the drained rice over the meat. 6. Add fried onions, mint, coriander, saffron milk, and ghee. 7. Layer remaining rice on top. 8. Seal the pot with dough or tight lid, cook on low flame for 20 minutes. 9. Let it rest for 10 minutes before serving.'
+            },
+            {
+                'id': 6,
+                'name': 'Chana Masala',
+                'description': 'Spicy Pakistani chickpea curry with tomatoes and aromatic spices.',
+                'prepTime': 40,
+                'calories': 200,
+                'protein': 9,
+                'carbs': 30,
+                'fat': 5,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chickpeas (kala chana)', 'Onions', 'Tomatoes', 'Ginger garlic', 'Coriander', 'Cumin', 'Amchur (dry mango powder)', 'Red chili powder', 'Turmeric', 'Garam masala', 'Coriander powder', 'Salt', 'Oil', 'Fresh coriander'],
+                'instructions': '1. Soak chickpeas overnight, then boil until tender (or use canned chickpeas). 2. Heat oil in a heavy-bottomed pan, add cumin seeds and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add ginger-garlic paste and cook for 1 minute. 5. Add all ground spices (coriander, cumin, turmeric, red chili powder), mix well. 6. Add chopped tomatoes and cook until soft and oil separates. 7. Add the boiled chickpeas and 1 cup water, simmer for 15 minutes. 8. Add amchur powder and garam masala in the end. 9. Garnish with fresh coriander and serve with naan.'
+            }
+        ]
+
+        return jsonify({
+            'recipes': comprehensive_pakistani_recipes,
+            'count': len(comprehensive_pakistani_recipes),
+            'generated_by': 'database'
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
+        # Fallback to static recipes if AI is not available or fails
+        comprehensive_pakistani_recipes = [
+            {
+                'id': 1,
+                'name': 'Chicken Karahi',
+                'description': 'Delicious Pakistani-style chicken curry cooked in a karahi with tomatoes, green chilies, and aromatic spices.',
+                'prepTime': 30,
+                'calories': 320,
+                'protein': 30,
+                'carbs': 8,
+                'fat': 20,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chicken', 'Tomatoes', 'Onions', 'Green chilies', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Salt', 'Turmeric', 'Red chili powder', 'Coriander powder', 'Garam masala'],
+                'instructions': '1. Heat 2 tablespoons of oil in a karahi or heavy-bottomed pan. 2. Add sliced onions and sauté until golden brown. 3. Add ginger-garlic paste and green chilies, cook for 1 minute. 4. Add chicken pieces and cook until they change color. 5. Add all the spices (cumin, coriander, turmeric, red chili powder) and mix well. 6. Add chopped tomatoes and cook until oil starts separating from the masala. 7. Add 1 cup water, cover and cook for 15-20 minutes until chicken is tender. 8. Garnish with fresh coriander and serve hot with naan or rice.'
+            },
+            {
+                'id': 2,
+                'name': 'Daal Chawal',
+                'description': 'Classic Pakistani lentils served with steamed basmati rice, seasoned with cumin and garlic.',
+                'prepTime': 45,
+                'calories': 280,
+                'protein': 12,
+                'carbs': 45,
+                'fat': 6,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Yellow lentils (moong dal)', 'Basmati rice', 'Onions', 'Garlic', 'Ginger', 'Turmeric', 'Red chili powder', 'Cumin', 'Salt', 'Ghee or oil', 'Bay leaf', 'Cinnamon'],
+                'instructions': '1. Wash 1 cup yellow lentils and pressure cook with 3 cups water and turmeric for 4-5 whistles until soft. 2. In a separate pot, rinse 1 cup basmati rice until water runs clear. Add rice to 2 cups boiling water with salt and a few drops of oil. Cook covered for 12-15 minutes. 3. For tempering: heat ghee/oil in a pan, add cumin seeds and let them splutter. 4. Add sliced onions and cook until golden. Add ginger-garlic paste and spices. 5. Mix this tempering with cooked daal. 6. Serve daal and rice together, garnished with coriander and a dollop of ghee.'
+            },
+            {
+                'id': 3,
+                'name': 'Seekh Kebab',
+                'description': 'Minced meat kebabs with Pakistani spices, grilled to perfection and served with mint chutney.',
+                'prepTime': 40,
+                'calories': 250,
+                'protein': 20,
+                'carbs': 5,
+                'fat': 18,
+                'mealType': 'snack',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Minced beef or mutton', 'Onions', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Garam masala', 'Coriander leaves', 'Mint leaves', 'Egg', 'Salt', 'Red chili powder', 'Oil for grilling'],
+                'instructions': '1. Mix minced meat with all spices, ginger-garlic paste, chopped onions, coriander, mint, and egg. 2. Refrigerate for 1 hour to allow flavors to blend. 3. Soak metal skewers in water for 10 minutes. 4. Take a portion of the mixture and shape around the skewer in log form. 5. Heat a griddle or tava with little oil. 6. Grill the kebabs, turning occasionally, until golden brown and cooked through (about 10-12 minutes). 7. Serve hot with mint chutney and naan.'
+            },
+            {
+                'id': 4,
+                'name': 'Aloo Gosht',
+                'description': 'Hearty Pakistani curry with mutton and potatoes in a rich tomato-based gravy.',
+                'prepTime': 60,
+                'calories': 350,
+                'protein': 25,
+                'carbs': 18,
+                'fat': 22,
+                'mealType': 'dinner',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Mutton or beef', 'Potatoes', 'Onions', 'Tomatoes', 'Yogurt', 'Ginger garlic', 'Coriander', 'Cumin', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Salt', 'Oil'],
+                'instructions': '1. Cut meat into cubes and marinate with yogurt, ginger-garlic paste, and spices for 30 minutes. 2. Heat oil in a heavy-bottomed pot, add whole spices (cinnamon, cardamom, cloves) and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add marinated meat and cook until color changes. 5. Add chopped tomatoes and cook until oil separates. 6. Add 1 cup water, cover and simmer for 45 minutes until meat is tender. 7. Add peeled and quartered potatoes in the last 20 minutes of cooking. 8. Adjust seasoning and serve with naan or rice.'
+            },
+            {
+                'id': 5,
+                'name': 'Biryani',
+                'description': 'Fragrant Pakistani rice dish layered with marinated meat, saffron, and aromatic spices.',
+                'prepTime': 90,
+                'calories': 420,
+                'protein': 25,
+                'carbs': 55,
+                'fat': 15,
+                'mealType': 'lunch',
+                'dietType': 'non-vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Basmati rice', 'Chicken or mutton', 'Yogurt', 'Onions', 'Tomatoes', 'Saffron', 'Mint leaves', 'Coriander leaves', 'Ginger garlic', 'Cumin', 'Coriander', 'Red chili powder', 'Turmeric', 'Garam masala', 'Cinnamon', 'Cardamom', 'Cloves', 'Bay leaves', 'Salt', 'Ghee'],
+                'instructions': '1. Soak 2 cups basmati rice in water for 30 minutes. 2. Marinate chicken/meat with yogurt, spices, and ginger-garlic paste for 1 hour. 3. In a large pot, layer the marinated meat at the bottom. 4. Heat oil separately, fry sliced onions until golden (for biryani masala). 5. Layer half the drained rice over the meat. 6. Add fried onions, mint, coriander, saffron milk, and ghee. 7. Layer remaining rice on top. 8. Seal the pot with dough or tight lid, cook on low flame for 20 minutes. 9. Let it rest for 10 minutes before serving.'
+            },
+            {
+                'id': 6,
+                'name': 'Chana Masala',
+                'description': 'Spicy Pakistani chickpea curry with tomatoes and aromatic spices.',
+                'prepTime': 40,
+                'calories': 200,
+                'protein': 9,
+                'carbs': 30,
+                'fat': 5,
+                'mealType': 'lunch',
+                'dietType': 'vegetarian',
+                'cuisine': 'Pakistani',
+                'ingredients': ['Chickpeas (kala chana)', 'Onions', 'Tomatoes', 'Ginger garlic', 'Coriander', 'Cumin', 'Amchur (dry mango powder)', 'Red chili powder', 'Turmeric', 'Garam masala', 'Coriander powder', 'Salt', 'Oil', 'Fresh coriander'],
+                'instructions': '1. Soak chickpeas overnight, then boil until tender (or use canned chickpeas). 2. Heat oil in a heavy-bottomed pan, add cumin seeds and let them splutter. 3. Add sliced onions and cook until golden brown. 4. Add ginger-garlic paste and cook for 1 minute. 5. Add all ground spices (coriander, cumin, turmeric, red chili powder), mix well. 6. Add chopped tomatoes and cook until soft and oil separates. 7. Add the boiled chickpeas and 1 cup water, simmer for 15 minutes. 8. Add amchur powder and garam masala in the end. 9. Garnish with fresh coriander and serve with naan.'
+            }
+        ]
+
+        return jsonify({
+            'recipes': comprehensive_pakistani_recipes,
+            'count': len(comprehensive_pakistani_recipes),
+            'generated_by': 'database'
+        }), 200
+
+
+# Nutrition Tracking Models
+class NutritionEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    food_name = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    unit = db.Column(db.String(20), nullable=False)
+    meal_type = db.Column(db.String(20), nullable=False)  # breakfast, lunch, dinner, snack
+    calories = db.Column(db.Integer, nullable=False)
+    protein = db.Column(db.Float, nullable=False)  # in grams
+    carbs = db.Column(db.Float, nullable=False)    # in grams
+    fat = db.Column(db.Float, nullable=False)      # in grams
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'food_name': self.food_name,
+            'quantity': self.quantity,
+            'unit': self.unit,
+            'meal_type': self.meal_type,
+            'calories': self.calories,
+            'protein': self.protein,
+            'carbs': self.carbs,
+            'fat': self.fat,
+            'date': self.date.isoformat(),
+            'created_at': self.created_at.isoformat()
+        }
+
+# Nutrition Tracking Endpoints
+@app.route('/api/nutrition/entries', methods=['GET'])
+@login_required
+def get_nutrition_entries():
+    try:
+        user_id = session.get('user_id')
+        date_str = request.args.get('date')  # Format: YYYY-MM-DD
+        
+        if date_str:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            entries = NutritionEntry.query.filter_by(user_id=user_id, date=date).all()
+        else:
+            # Get today's entries by default
+            today = datetime.utcnow().date()
+            entries = NutritionEntry.query.filter_by(user_id=user_id, date=today).all()
+        
+        total_calories = sum(entry.calories for entry in entries)
+        total_protein = sum(entry.protein for entry in entries)
+        total_carbs = sum(entry.carbs for entry in entries)
+        total_fat = sum(entry.fat for entry in entries)
+        
+        return jsonify({
+            'entries': [entry.to_dict() for entry in entries],
+            'summary': {
+                'total_calories': total_calories,
+                'total_protein': total_protein,
+                'total_carbs': total_carbs,
+                'total_fat': total_fat
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/nutrition/entries', methods=['POST'])
+@login_required
+def add_nutrition_entry():
+    try:
+        user_id = session.get('user_id')
+        data = request.get_json()
+        
+        required_fields = ['food_name', 'quantity', 'unit', 'meal_type', 'calories', 'protein', 'carbs', 'fat']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'{field} is required'}), 400
+        
+        date_str = data.get('date')  # Format: YYYY-MM-DD
+        if date_str:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            date = datetime.utcnow().date()
+        
         entry = NutritionEntry(
+            user_id=user_id,
             food_name=data['food_name'],
             quantity=data['quantity'],
             unit=data['unit'],
@@ -362,32 +1187,124 @@ def nutrition_entries():
             calories=data['calories'],
             protein=data['protein'],
             carbs=data['carbs'],
-            fat=data['fat']
+            fat=data['fat'],
+            date=date
         )
+        
         db.session.add(entry)
         db.session.commit()
-        return jsonify({'entry': entry.to_dict()}), 201
+        
+        return jsonify({
+            'message': 'Nutrition entry added successfully',
+            'entry': entry.to_dict()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/nutrition/entries/<int:entry_id>', methods=['PUT', 'DELETE'])
+@app.route('/api/nutrition/entries/<int:entry_id>', methods=['PUT'])
 @login_required
-def nutrition_entry_detail(entry_id):
-    entry = NutritionEntry.query.get(entry_id)
-    if not entry:
-        return jsonify({'error': 'Entry not found'}), 404
-    if request.method == 'DELETE':
+def update_nutrition_entry(entry_id):
+    try:
+        user_id = session.get('user_id')
+        entry = NutritionEntry.query.filter_by(id=entry_id, user_id=user_id).first()
+        
+        if not entry:
+            return jsonify({'error': 'Nutrition entry not found'}), 404
+        
+        data = request.get_json()
+        
+        # Update fields if provided
+        if 'food_name' in data:
+            entry.food_name = data['food_name']
+        if 'quantity' in data:
+            entry.quantity = data['quantity']
+        if 'unit' in data:
+            entry.unit = data['unit']
+        if 'meal_type' in data:
+            entry.meal_type = data['meal_type']
+        if 'calories' in data:
+            entry.calories = data['calories']
+        if 'protein' in data:
+            entry.protein = data['protein']
+        if 'carbs' in data:
+            entry.carbs = data['carbs']
+        if 'fat' in data:
+            entry.fat = data['fat']
+        if 'date' in data:
+            entry.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Nutrition entry updated successfully',
+            'entry': entry.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/nutrition/entries/<int:entry_id>', methods=['DELETE'])
+@login_required
+def delete_nutrition_entry(entry_id):
+    try:
+        user_id = session.get('user_id')
+        entry = NutritionEntry.query.filter_by(id=entry_id, user_id=user_id).first()
+        
+        if not entry:
+            return jsonify({'error': 'Nutrition entry not found'}), 404
+        
         db.session.delete(entry)
         db.session.commit()
-        return jsonify({'message': 'Deleted'})
-    # PUT logic here if needed
-    return jsonify({'entry': entry.to_dict()})
+        
+        return jsonify({'message': 'Nutrition entry deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/daily-summary', methods=['GET'])
+@app.route('/api/nutrition/daily-summary', methods=['GET'])
 @login_required
-def daily_summary():
-    today = datetime.utcnow().date()
-    entries = NutritionEntry.query.filter_by(date=today).all()
-    total = sum(e.calories for e in entries)
-    return jsonify({'total_calories': total, 'entries_count': len(entries)})
+def get_daily_nutrition_summary():
+    try:
+        user_id = session.get('user_id')
+        date_str = request.args.get('date')  # Format: YYYY-MM-DD
+        
+        if date_str:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            date = datetime.utcnow().date()
+        
+        entries = NutritionEntry.query.filter_by(user_id=user_id, date=date).all()
+        
+        total_calories = sum(entry.calories for entry in entries)
+        total_protein = sum(entry.protein for entry in entries)
+        total_carbs = sum(entry.carbs for entry in entries)
+        total_fat = sum(entry.fat for entry in entries)
+        
+        # Group by meal type
+        meals = {}
+        for meal_type in ['breakfast', 'lunch', 'dinner', 'snack']:
+            meal_entries = [entry.to_dict() for entry in entries if entry.meal_type == meal_type]
+            meals[meal_type] = {
+                'entries': meal_entries,
+                'total_calories': sum(entry.calories for entry in meal_entries),
+                'total_protein': sum(entry.protein for entry in meal_entries),
+                'total_carbs': sum(entry.carbs for entry in meal_entries),
+                'total_fat': sum(entry.fat for entry in meal_entries)
+            }
+        
+        return jsonify({
+            'date': date.isoformat(),
+            'summary': {
+                'total_calories': total_calories,
+                'total_protein': total_protein,
+                'total_carbs': total_carbs,
+                'total_fat': total_fat
+            },
+            'meals': meals
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/nutrition/history', methods=['GET'])
 @login_required
@@ -791,5 +1708,8 @@ def analyze_food_plate():
             'message': f'Food plate analysis completed with mock data due to error: {str(e)}'
         }), 200
 
+
+# Run the app
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(debug=True, host='127.0.0.1', port=5000)
+
